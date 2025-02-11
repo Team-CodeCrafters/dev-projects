@@ -9,11 +9,12 @@ async function uploadOnCloudinary(filePath) {
       resource_type: 'image',
     };
     const response = await cloudinary.uploader.upload(filePath, options);
-    console.log('file uploaded', response);
+    console.log('File path:', filePath);
+    fs.unlinkSync(filePath);
     return response;
   } catch (err) {
-    console.log(err);
-    fs.unlink(filePath);
+    console.log(err.message);
+    fs.unlinkSync(filePath);
     return null;
   }
 }

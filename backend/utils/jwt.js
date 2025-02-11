@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 function createJWT(payload, duration) {
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: duration });
+  const expiry = duration ? { expiresIn: duration } : {};
+  return jwt.sign(payload, process.env.JWT_SECRET, expiry);
 }
 
 function verifyJWT(token) {
@@ -9,7 +10,7 @@ function verifyJWT(token) {
     const JWTresponse = jwt.verify(token, process.env.JWT_SECRET);
     return JWTresponse;
   } catch (err) {
-    return;
+    return { error: err.message };
   }
 }
 
