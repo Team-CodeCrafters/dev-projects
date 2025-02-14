@@ -22,7 +22,12 @@ router.post(
 );
 router.get('/all', validateProjectFilters, getProjects);
 router.get('/:id', getProjectDetails);
-router.patch('/:id', validateProjectUpdate, updateProject);
-router.delete('/:id', deleteProject);
+router.patch(
+  '/:id',
+  authenticateAdmin,
+  [upload.array('images', 5), validateProjectUpdate],
+  updateProject,
+);
+router.delete('/:id', authenticateAdmin, deleteProject);
 
 export default router;

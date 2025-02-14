@@ -1,6 +1,7 @@
 import zod from 'zod';
 import prisma from '../db/db.js';
 import { Difficulty, Tools, Domain } from '@prisma/client';
+import errorMap from 'zod/locales/en.js';
 
 const projectSchema = zod.object({
   name: zod.string().max(45),
@@ -11,14 +12,17 @@ const projectSchema = zod.object({
   domain: zod.nativeEnum(Domain),
 });
 
-const updateProjectSchema = zod.object({
-  about: zod.string().optional(),
-  // images: zod.array(zod.string()).optional(),
-  requirement: zod.string().optional(),
-  difficulty: zod.nativeEnum(Difficulty).optional(),
-  tools: zod.array(zod.nativeEnum(Tools)).optional(),
-  domain: zod.nativeEnum(Domain).optional(),
-});
+const updateProjectSchema = zod
+  .object({
+    about: zod.string().optional(),
+    requirement: zod.string().optional(),
+    difficulty: zod.nativeEnum(Difficulty).optional(),
+    tools: zod
+      .array(zod.union([zod.nativeEnum(Tools), zod.string().max(0)]))
+      .optional(),
+    domain: zod.nativeEnum(Domain).optional(),
+  })
+  .strict();
 
 const projectFilterSchema = zod.object({
   difficulty: zod
@@ -31,7 +35,7 @@ const projectFilterSchema = zod.object({
 });
 
 async function validateProjectData(req, res, next) {
-  req.body.tools = req.body.tools?.split(",");
+  req.body.tools = req.body.tools?.split(',');
   const zodResponse = projectSchema.safeParse(req.body);
   if (!zodResponse.success) {
     return res.status(401).json({
@@ -43,13 +47,20 @@ async function validateProjectData(req, res, next) {
 }
 
 async function validateProjectUpdate(req, res, next) {
-  const zodResponse = updateProjectSchema.safeParse(req.body.filters);
+  if (req.body.tools) {
+    req.body.tools = req.body.tools?.split(',');
+  }
+
+  const zodResponse = updateProjectSchema.safeParse(req.body);
   if (!zodResponse.success) {
     return res.status(401).json({
       message: 'Invalid project details',
       error: zodResponse.error.errors,
     });
+  } else {
+    req.parsedData = zodResponse.data;
   }
+  next();
 }
 
 async function validateProjectFilters(req, res, next) {

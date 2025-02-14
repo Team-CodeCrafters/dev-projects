@@ -1,4 +1,5 @@
 import prisma from '../db/db.js';
+import fs from 'fs';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 async function getProjects(req, res) {
   try {
@@ -47,22 +48,24 @@ async function createProject(req, res) {
       where: { name: req.body.name },
     });
     if (projectExists) {
+      for (const file of req.files) {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      }
       return res
         .status(401)
         .json({ message: 'Project with same name already exists' });
     }
-    const cloudinaryUploads = [];
-    for (const file of req.files) {
-      const cloudinaryResponse = await uploadOnCloudinary(file.path);
-      if (cloudinaryResponse)
-        cloudinaryUploads.push(cloudinaryResponse.secure_url);
+    if (req.files && req.files.length > 0) {
+      req.body.files = await uploadOnCloudinary(req.files);
     }
 
     await prisma.project.create({
       data: {
         name: req.body.name.trim(),
         about: req.body.about,
-        images: cloudinaryUploads,
+        images: req.body.files,
         requirement: req.body.requirement,
         tools: req.body.tools,
         difficulty: req.body.difficulty,
@@ -81,13 +84,21 @@ async function createProject(req, res) {
 
 async function updateProject(req, res) {
   try {
+    if (req.files && req.files.length > 0) {
+      const cloudinaryResponse = await uploadOnCloudinary(req.files);
+      if (cloudinaryResponse?.length > 0) {
+        req.parsedData.images = cloudinaryResponse;
+      }
+    }
     const projectId = req.params.id;
     const updatedProject = await prisma.project.update({
-      data: req.body,
+      data: req.parsedData,
       where: { id: projectId },
-      select: true,
     });
-    console.log(updatedProject);
+
+    if (!updatedProject) {
+      return res.status(401).json({ message: 'Project does not exists' });
+    }
     res
       .status(200)
       .json({ message: 'Project updated successfully', updatedProject });
@@ -98,22 +109,17 @@ async function updateProject(req, res) {
   }
 }
 
-function deleteProject(req, res) {
-  async function updateProject(req, res) {
-    try {
-      const projectId = req.params.id;
-      const project = await prisma.project.delete({
-        where: { id: projectId },
-      });
-      console.log(project);
-      res
-        .status(200)
-        .json({ message: 'Project deleted successfully', project });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'internal server error', error: error.message });
-    }
+async function deleteProject(req, res) {
+  try {
+    const projectId = req.params.id;
+    await prisma.project.delete({
+      where: { id: projectId },
+    });
+    res.status(200).json({ message: 'Project deleted successfully' });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'internal server error', error: error.message });
   }
 }
 
