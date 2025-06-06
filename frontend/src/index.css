@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .title-text {
+    @apply font-heading text-xl font-medium;
+  }
+  .body-text {
+    @apply font-body text-lg;
+  }
+  .text-small {
+    @apply font-body text-sm font-light;
+  }
+}

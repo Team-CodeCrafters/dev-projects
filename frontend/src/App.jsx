@@ -1,7 +1,9 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoadingPage from './pages/LoadingPage';
 const Login = lazy(() => import('./pages/Login'));
+import DashboardLayout from './components/DashboardLayout';
+import UserProfile from './components/UserProfile';
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 function App() {
@@ -9,8 +11,11 @@ function App() {
     <BrowserRouter>
       <Suspense fallback={<LoadingPage />}>
         <Routes>
-          <Route path="/dashboard" element={<Dashboard />}></Route>
           <Route path="/login" element={<Login />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<UserProfile />} />
+          </Route>
           <Route path="*" element={<div>Page not Found</div>}></Route>
         </Routes>
       </Suspense>
