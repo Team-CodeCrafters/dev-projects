@@ -10,5 +10,15 @@ export const screenSizeAtom = atom({
 
 export const sidebarOpenAtom = atom({
   key: 'sidebarAtom',
+  default: window.innerWidth > 768 ? true : false,
+});
+
+export const dropDownOpenAtom = atom({
+  key: 'dropDownOpenAtom',
+  default: false,
+});
+
+export const searchBoxAtom = atom({
+  key: 'searchBoxAtom',
   default: false,
 });

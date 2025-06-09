@@ -10,7 +10,7 @@ const useFetchData = () => {
     setError(null);
     try {
       const fetchResult = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}${path}`,
+        `${import.meta.env.VITE_BACKEND_URL}/user/signin`,
         options,
       );
       const response = await fetchResult.json();

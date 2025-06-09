@@ -6,7 +6,7 @@ import useFetchData from '../hooks/useFetchData.jsx';
 const Login = () => {
   const [signInData, setSignInData] = useRecoilState(signInDataAtom);
   const [fetchData, error, loading] = useFetchData();
-  const naviate = useNavigate();
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -19,7 +19,7 @@ const Login = () => {
     };
     const response = await fetchData('/user/signin', options);
     localStorage.setItem('token', response.token);
-    if (response) naviate('/dashboard');
+    if (response) navigate('/dashboard');
   }
   return (
     <div>
