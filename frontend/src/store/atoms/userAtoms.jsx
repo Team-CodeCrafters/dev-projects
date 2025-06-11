@@ -1,4 +1,4 @@
-import { atom, selector } from 'recoil';
+import { atom } from 'recoil';
 
 const signInDataAtom = atom({
   key: 'userSignInData',
@@ -8,11 +8,13 @@ const signInDataAtom = atom({
   },
 });
 
-const signInSelector = selector({
-  key: 'signInSelector',
-  get: async ({ get }) => {
-    const data = get(signInDataAtom);
+const signUpDataAtom = atom({
+  key: 'userSignUpData',
+  default: {
+    username: '',
+    email: '',
+    password: '',
   },
 });
 
-export { signInDataAtom, signInSelector };
+export { signInDataAtom, signUpDataAtom };
