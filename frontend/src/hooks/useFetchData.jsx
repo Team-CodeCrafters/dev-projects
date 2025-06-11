@@ -10,7 +10,7 @@ const useFetchData = () => {
     setError(null);
     try {
       const fetchResult = await fetch(
-        `${import.meta.env.VITE_BACKEND_URL}/user/signin`,
+        `${import.meta.env.VITE_BACKEND_URL}${path}`,
         options,
       );
       const response = await fetchResult.json();
@@ -21,6 +21,7 @@ const useFetchData = () => {
         return response;
       } else {
         setError(response.message);
+        console.log(error)
         return null;
       }
     } catch (error) {
@@ -30,7 +31,7 @@ const useFetchData = () => {
       setLoading(false);
     }
   }
-  return [fetchData, data, error, loading];
+  return {fetchData, data, error, loading};
 };
 
 export default useFetchData;
