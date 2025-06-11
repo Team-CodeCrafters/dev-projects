@@ -1,24 +1,34 @@
 import { useRecoilState } from 'recoil';
+import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useState } from 'react';
-import { signUpDataAtom } from '../store/atoms/userAtoms.jsx';
-import useFetchData from '../hooks/useFetchData.jsx';
-import InputField from '../components/InputField.jsx';
-import Card from '../components/Card.jsx';
-import Button from '../components/Button.jsx';
-import Loader from '../components/Loader.jsx';
-import logo from '../assets/images/logo-icon.png';
+
+import { signUpDataAtom } from '../store/atoms/userAtoms';
+import useFetchData from '../hooks/useFetchData';
+
+import InputField from '../components/InputField';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import Loader from '../components/Loader';
+
+import logo from '../assets/images/dev-projects-dark.png';
 
 const Signup = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/dashboard');
+    }
+  });
+
   const [signUpData, setSignUpData] = useRecoilState(signUpDataAtom);
   const { fetchData, error: serverError, loading } = useFetchData();
   const [localError, setLocalError] = useState(null);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLocalError(null); 
-    
+    setLocalError(null);
+
     if (signUpData.password.length < 8) {
       setLocalError('Password must be at least 8 characters long');
       return;
@@ -40,7 +50,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A] px-4">
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <Card>
         <div className="mb-6 flex justify-center">
           <img src={logo} alt="Logo" className="h-12" />

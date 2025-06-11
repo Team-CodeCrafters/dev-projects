@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import InputField from './InputField';
-import Button from './Button';
-import Card from './Card';
-import logo from '../assets/images/logo-icon.png';
-import Loader from './Loader';
+
+import InputField from '../components/InputField';
+import Card from '../components/Card';
+import Button from '../components/Button';
+import Loader from '../components/Loader';
+
+import logo from '../assets/images/dev-projects-dark.png';
+
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -63,7 +66,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1A1A1A]">
+    <div className="flex min-h-screen items-center justify-center bg-black">
       <Card>
         <div className="mb-6 flex justify-center">
           <img src={logo} alt="Logo" className="h-12" />

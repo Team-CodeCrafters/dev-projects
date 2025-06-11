@@ -18,6 +18,7 @@ export default {
         'black-light': '#3D3D3D',
         'black-medium': '#272727',
         'black-dark': '#0F0F0F',
+        'black-neutral': '#171717',
 
         'primary-text': '#1A1A1A',
         'secondary-text': '#6B7280',
