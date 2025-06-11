@@ -1,0 +1,20 @@
+import { atom } from 'recoil';
+
+const signInDataAtom = atom({
+  key: 'userSignInData',
+  default: {
+    identifier: '',
+    password: '',
+  },
+});
+
+const signUpDataAtom = atom({
+  key: 'userSignUpData',
+  default: {
+    username: '',
+    email: '',
+    password: '',
+  },
+});
+
+export { signInDataAtom, signUpDataAtom };
