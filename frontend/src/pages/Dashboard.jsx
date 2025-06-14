@@ -10,8 +10,7 @@ const Dashboard = () => {
     }
   });
   return (
-    <h1 className="title-text h-full w-full dark:text-white">
-      {console.log('re rendered the dashboard')}
+    <h1 className="title-text dark:bg-black-medium h-full w-full dark:text-white">
       Started Projects
     </h1>
   );

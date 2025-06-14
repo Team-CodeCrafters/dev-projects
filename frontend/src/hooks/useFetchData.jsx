@@ -6,32 +6,32 @@ const useFetchData = () => {
   const [loading, setLoading] = useState(false);
 
   async function fetchData(path, options = {}) {
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
+      setError(null);
       const fetchResult = await fetch(
         `${import.meta.env.VITE_BACKEND_URL}${path}`,
         options,
       );
       const response = await fetchResult.json();
-      console.log({ fetchResult, response });
       if (fetchResult.ok) {
-        console.log(response);
         setData(response);
-        return response;
+        return { success: true, data: response };
       } else {
-        setError(response.message);
-        console.log(error)
-        return null;
+        const err = response.message || 'Request failed';
+        setError(err);
+        return { success: false, error: err };
       }
     } catch (error) {
-      setError(error.message);
-      return null;
+      const message = error.message || 'Network error';
+      setError(message);
+      return { success: false, error: message };
     } finally {
       setLoading(false);
     }
   }
-  return {fetchData, data, error, loading};
+
+  return { fetchData, data, error, loading };
 };
 
 export default useFetchData;

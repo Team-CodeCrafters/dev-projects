@@ -43,8 +43,8 @@ const Signup = () => {
     };
 
     const response = await fetchData('/user/signup', options);
-    if (response?.token) {
-      localStorage.setItem('token', response.token);
+    if (response?.data.token) {
+      localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     }
   };
@@ -56,7 +56,7 @@ const Signup = () => {
           <img src={logo} alt="Logo" className="h-12" />
         </div>
 
-        <h2 className="mt-2 mb-4 text-center text-3xl font-semibold">
+        <h2 className="mb-4 mt-2 text-center text-3xl font-semibold">
           Create an account
         </h2>
 
@@ -69,6 +69,9 @@ const Signup = () => {
             type="text"
             placeholder="Username"
             value={signUpData.username}
+            isRequired={true}
+            pattern="^[a-zA-Z0-9_]+$"
+            title={'username can only contain letters, numbers and underscore'}
             onChange={(e) =>
               setSignUpData((prev) => ({
                 ...prev,
@@ -80,6 +83,7 @@ const Signup = () => {
             type="email"
             placeholder="Email"
             value={signUpData.email}
+            isRequired={true}
             onChange={(e) =>
               setSignUpData((prev) => ({
                 ...prev,
@@ -91,6 +95,7 @@ const Signup = () => {
             type="password"
             placeholder="Password"
             value={signUpData.password}
+            isRequired={true}
             onChange={(e) =>
               setSignUpData((prev) => ({
                 ...prev,

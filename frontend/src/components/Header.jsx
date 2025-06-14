@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import NotificationIcon from '../assets/icons/notificationIcon';
 import { SearchIcon } from '../assets/icons/Search';
 import { MenuIcon } from '../assets/icons/MenuIcon';
@@ -22,8 +22,9 @@ const DashboardHeader = memo(() => {
   const toggleSearchBar = () => {
     setIsSearchBarOpen((prev) => !prev);
   };
+
   return (
-    <header className="bg-white-light dark:border-b-black-light relative z-40 flex h-16 items-center justify-between gap-12 border-b-2 px-4 lg:px-6 dark:bg-black dark:text-white">
+    <header className="bg-white-light dark:border-b-black-light dark:bg-black-medium relative z-40 flex h-16 items-center justify-between gap-12 border-b-2 px-4 lg:px-6 dark:text-white">
       {isSearchBarOpen ? (
         <div className="flex w-full items-center justify-between gap-6">
           <button onClick={toggleSearchBar}>
@@ -133,7 +134,12 @@ const ProfileDropDown = ({ isVisible, setIsVisible, profileButtonRef }) => {
   const dropDownRef = useRef(null);
   const toggleTheme = useCallback(() => {
     setTheme((curr) => (curr === 'light' ? 'dark' : 'light'));
-  }, [setTheme]);
+  }, []);
+  const navigate = useNavigate();
+  const LogOutUser = useCallback(() => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  }, []);
 
   useEffect(() => {
     function checkClick(e) {
@@ -153,8 +159,8 @@ const ProfileDropDown = ({ isVisible, setIsVisible, profileButtonRef }) => {
       ref={dropDownRef}
       className={`dark:bg-black-medium absolute right-[30%] top-[130%] grid h-max w-52 items-center rounded-md bg-white shadow-md transition-all duration-300 ${isVisible ? `visible translate-y-2 opacity-100` : `invisible translate-y-[-20%] opacity-0`}`}
     >
-      <ul className="font-body flex flex-col gap-4 p-4 text-left text-sm">
-        <li className="hover:bg-white-medium dark:hover:bg-black-light min-h-4 rounded-md">
+      <ul className="font-body flex flex-col gap-2 p-4 text-left text-sm">
+        <li className="hover:bg-white-medium dark:hover:bg-black-light min-h-6 rounded-md">
           <Link to="/profile" className="block h-full px-4 py-2">
             Profile
           </Link>
@@ -173,6 +179,14 @@ const ProfileDropDown = ({ isVisible, setIsVisible, profileButtonRef }) => {
               />
             </span>
           </label>
+        </li>
+        <li
+          className="hover:bg-white-medium dark:hover:bg-black-light min-h-8 rounded-md"
+          onClick={LogOutUser}
+        >
+          <Link className="block h-full px-4 py-2 font-medium text-red-500">
+            Log out
+          </Link>
         </li>
       </ul>
     </div>

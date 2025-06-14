@@ -15,8 +15,9 @@ export default {
         'white-medium': '#F2F2F3',
         'white-dark': '#F6F8fA',
 
-        'black-light': '#3D3D3D',
-        'black-medium': '#272727',
+        'blak-ligher': '303037',
+        'black-light': '#27272A',
+        'black-medium': '#18181B',
         'black-dark': '#0F0F0F',
         'black-neutral': '#171717',
 
@@ -25,7 +26,7 @@ export default {
       },
 
       fontFamily: {
-        heading: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Geist', 'system-ui', 'sans-serif'],
         body: ['Open Sans', 'system-ui', 'sans-serif'],
       },
     },
