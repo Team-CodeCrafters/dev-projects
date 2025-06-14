@@ -1,22 +1,23 @@
 import prisma from '../db/db.js';
-import zod from 'zod';
+import zod, { string } from 'zod';
 import { verifyJWT } from '../utils/jwt.js';
 import { comparePassword } from '../utils/bcrypt.js';
 
+const usernameSchema = zod.string().regex(/^[a-zA-Z0-9_]{4,15}$/);
 const signUpSchema = zod.object({
-  username: zod.string().regex(/^[a-zA-Z0-9_]{4,15}$/),
+  username: usernameSchema,
   email: zod.string().email(),
   password: zod.string().min(8),
   displayName: zod.string().optional(),
 });
 
 const signInSchema = zod.object({
-  identifier: zod.union([
-    zod.string().regex(/^[a-zA-Z0-9_]{4,15}$/),
-    zod.string().email(),
-  ]),
+  identifier: zod.union([usernameSchema, zod.string().email()]),
   password: zod.string().min(8),
 });
+
+const forgotPasswordSchema = zod.object({ email: zod.string().email() });
+const resetPasswordSchema = signUpSchema.pick({ password: true });
 
 async function authenticateAdmin(req, res, next) {
   try {
@@ -28,7 +29,7 @@ async function authenticateAdmin(req, res, next) {
         userId: userId,
       },
     });
-    
+
     if (!adminUser) {
       return res.status(401).json({ error: 'Unauthorised admin user' });
     }
@@ -56,7 +57,7 @@ async function validateSignUp(req, res, next) {
       },
     });
     if (userExists) {
-      return res.status(401).json({ message: 'User already exists' });
+      return res.status(401).json({ message: 'username is already taken' });
     }
     next();
   } catch (error) {
@@ -79,7 +80,7 @@ async function validateSignIn(req, res, next) {
     },
   });
   if (!user) {
-    return res.status(401).json({ message: 'use does not exist' });
+    return res.status(401).json({ message: 'user does not exist' });
   }
   const passwordMatch = await comparePassword(password, user.password);
   if (!passwordMatch) {
@@ -89,4 +90,51 @@ async function validateSignIn(req, res, next) {
   next();
 }
 
-export { authenticateAdmin, validateSignUp, validateSignIn };
+async function validateForgotPassword(req, res, next) {
+  const { email } = req.body;
+  try {
+    const { success } = forgotPasswordSchema.safeParse({ email });
+    if (!success) {
+      return res.status(401).json({ message: 'Invalid Email', error: e });
+    }
+    const user = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+    if (!user) return res.status(401).json({ message: 'email does not exist' });
+    req.body.username = user.username;
+    next();
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: 'internal server error', error: e });
+  }
+}
+
+async function validateResetPassword(req, res, next) {
+  try {
+    const token = req.query.token;
+    const { password } = req.body;
+    resetPasswordSchema.parse({ password });
+    const JWTResponse = verifyJWT(token);
+    console.log({ JWTResponse });
+    if (JWTResponse.error) {
+      return res.status(401).json({ message: 'link is invalid or expired' });
+    }
+    req.body.email = JWTResponse.email;
+    next();
+  } catch (e) {
+    // console.log(e);
+    return res
+      .status(500)
+      .json({ message: 'internal server error', error: e.message });
+  }
+}
+
+export {
+  authenticateAdmin,
+  validateSignUp,
+  validateSignIn,
+  validateForgotPassword,
+  validateResetPassword,
+};
