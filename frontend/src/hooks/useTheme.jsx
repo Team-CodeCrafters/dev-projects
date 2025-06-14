@@ -8,34 +8,53 @@ function getInitialTheme() {
     const prefersDarkTheme = window.matchMedia(
       '(prefers-color-scheme: dark)',
     ).matches;
-    if (prefersDarkTheme) {
-      localStorage.setItem('theme', 'dark');
-      theme = 'dark';
-    } else {
-      localStorage.setItem('theme', 'light');
-      theme = 'light';
-    }
+    theme = prefersDarkTheme ? 'dark' : 'light';
+    localStorage.setItem('theme', theme);
   }
   return theme;
 }
 
 function applyTheme(theme) {
-  if (theme === 'light') document.body.classList.remove('dark');
-  if (theme === 'dark') document.body.classList.add('dark');
+  if (theme === 'light') {
+    document.body.classList.remove('dark');
+  } else if (theme === 'dark') {
+    document.body.classList.add('dark');
+  }
 }
 
 export const useTheme = () => {
   const [theme, setTheme] = useRecoilState(colorThemeAtom);
 
-  function setCurrentTheme() {
+  useEffect(() => {
     const initialTheme = getInitialTheme();
+    if (theme !== initialTheme) {
+      setTheme(initialTheme);
+    }
     applyTheme(initialTheme);
-  }
+  }, []);
 
   useEffect(() => {
-    localStorage.setItem('theme', theme);
-    applyTheme(theme);
+    if (theme) {
+      localStorage.setItem('theme', theme);
+      applyTheme(theme);
+    }
   }, [theme]);
 
-  return { theme, setTheme, setCurrentTheme };
+  const setCurrentTheme = () => {
+    const initialTheme = getInitialTheme();
+    setTheme(initialTheme);
+    applyTheme(initialTheme);
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+  };
+
+  return {
+    theme,
+    setTheme,
+    setCurrentTheme,
+    toggleTheme,
+  };
 };
