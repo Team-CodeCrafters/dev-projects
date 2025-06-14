@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
 const Card = ({ children }) => {
   return (
-    <div className="bg-neutral-900 text-white p-14 rounded-2xl shadow-lg w-[500px] md:w-[600px] border border-[#2B2B2B]">
+    <div className="bg-black-neutral w-[90vw] rounded-2xl border border-[#2B2B2B] p-14 text-white shadow-lg md:w-[32rem]">
       {children}
     </div>
   );
