@@ -1,11 +1,11 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoadingPage from './pages/LoadingPage';
 
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
-const ForgotPassword = lazy(() => import('./components/ForgotPassword'));
-const ResetPassword = lazy(() => import('./components/ResetPassword'));
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
 import DashboardLayout from './components/DashboardLayout';
@@ -15,7 +15,9 @@ import { useTheme } from './hooks/useTheme';
 
 function App() {
   const { setCurrentTheme } = useTheme();
-  setCurrentTheme();
+  useEffect(() => {
+    setCurrentTheme();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -25,7 +27,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />

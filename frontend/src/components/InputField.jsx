@@ -1,6 +1,15 @@
 import { useState } from 'react';
 
-const InputField = ({ type, placeholder, value, onChange, ...rest }) => {
+const InputField = ({
+  type,
+  placeholder,
+  value,
+  onChange,
+  pattern,
+  isRequired = false,
+  minLength,
+  title,
+}) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
   const inputType = isPassword ? (showPassword ? 'text' : 'password') : type;
@@ -12,28 +21,29 @@ const InputField = ({ type, placeholder, value, onChange, ...rest }) => {
         placeholder={placeholder}
         value={value}
         onChange={onChange}
-        className="w-full rounded-lg border border-gray-600 bg-[#1F1F1F] px-4 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        pattern={placeholder.toLowerCase() === "username" ? "^[A-Za-z0-9]*$" : undefined}
-        title="Only letters and numbers are allowed. No spaces or special characters."
-        {...rest}
+        required={isRequired}
+        minLength={minLength}
+        title={title ? title : undefined}
+        className="w-full rounded-lg border border-gray-600 bg-[#1F1F1F] px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        pattern={pattern || undefined}
+        min={isPassword ? 8 : undefined}
       />
 
       {isPassword && (
         <button
           type="button"
           onClick={() => setShowPassword((prev) => !prev)}
-          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-white"
+          className="absolute right-8 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
           tabIndex={-1}
         >
           {showPassword ? (
-            // 👁️ Eye Open Icon (password is visible)
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-5 w-5"
+              className="h-6 w-6"
             >
               <path
                 strokeLinecap="round"
@@ -48,14 +58,13 @@ const InputField = ({ type, placeholder, value, onChange, ...rest }) => {
               />
             </svg>
           ) : (
-            // 🙈 Eye Slash Icon (password is hidden)
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={1.5}
               stroke="currentColor"
-              className="h-5 w-5"
+              className="h-6 w-6"
             >
               <path
                 strokeLinecap="round"
