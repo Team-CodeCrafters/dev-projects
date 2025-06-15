@@ -1,11 +1,14 @@
 {
-  "name": "Dev Projects",
+  "name": "dev-projects",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "start": "node index.js",
     "dev": "dotenv -e .env.local node index.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   },
   "keywords": [],
   "author": "",
