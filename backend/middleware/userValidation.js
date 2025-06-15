@@ -57,7 +57,7 @@ async function validateSignUp(req, res, next) {
       },
     });
     if (userExists) {
-      return res.status(401).json({ message: 'User already exists' });
+      return res.status(401).json({ message: 'username is already taken' });
     }
     next();
   } catch (error) {
@@ -112,19 +112,22 @@ async function validateForgotPassword(req, res, next) {
 }
 
 async function validateResetPassword(req, res, next) {
-  const token = req.query.token;
-  const { password } = req.body;
-  resetPasswordSchema.parse({ password });
   try {
+    const token = req.query.token;
+    const { password } = req.body;
+    resetPasswordSchema.parse({ password });
     const JWTResponse = verifyJWT(token);
-
+    console.log({ JWTResponse });
     if (JWTResponse.error) {
       return res.status(401).json({ message: 'link is invalid or expired' });
     }
     req.body.email = JWTResponse.email;
     next();
   } catch (e) {
-    return res.status(500).json({ message: 'internal server error' });
+    // console.log(e);
+    return res
+      .status(500)
+      .json({ message: 'internal server error', error: e.message });
   }
 }
 

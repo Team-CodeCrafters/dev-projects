@@ -40,7 +40,6 @@ async function forgotPassword(req, res) {
     }
     return res.status(500).json({ message: 'failed to send the email' });
   } catch (e) {
-    console.log(e);
     return res.status(200).json({ message: 'failed to send email', error: e });
   }
 }
