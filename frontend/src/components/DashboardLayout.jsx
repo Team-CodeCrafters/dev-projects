@@ -19,11 +19,11 @@ const DashboardLayout = () => {
       <DashboardHeader />
       <div className="relative flex flex-1 justify-start overflow-hidden">
         <div
-          className={`bg-white-light dark:bg-black-medium dark:border-r-black-light z-10 flex-shrink-0 border-r-2 transition-all duration-300 ease-in-out ${
+          className={`bg-white-light dark:bg-black-medium dark:border-r-black-light z-10 h-full flex-shrink-0 border-r-2 transition-all duration-300 ease-in-out ${
             screenSize.width < 768
               ? isExpanded
-                ? 'absolute w-56 translate-x-0'
-                : 'absolute w-0 -translate-x-full transition-all dark:border-r-transparent'
+                ? 'fixed w-56 translate-x-0'
+                : 'fixed w-0 -translate-x-full transition-all dark:border-r-transparent'
               : isExpanded
                 ? 'w-56'
                 : 'w-16'

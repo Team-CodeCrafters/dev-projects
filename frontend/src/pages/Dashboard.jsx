@@ -10,9 +10,12 @@ const Dashboard = () => {
     }
   });
   return (
-    <h1 className="title-text dark:bg-black-medium h-full w-full dark:text-white">
-      Started Projects
-    </h1>
+    <>
+      <h1 className="title-text dark:bg-black-medium dark:text-white">
+        Started Projects
+      </h1>
+      <div className="h-[150vh]">this is main content</div>
+    </>
   );
 };
 export default Dashboard;
