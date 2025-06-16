@@ -30,8 +30,9 @@ model Project {
   name        String        @unique
   about       String
   images      String[]
-  requirement String?
+  requirement String[]
   difficulty  Difficulty
+  challenges  String[]
   updatedAt   DateTime      @updatedAt
   createdAt   DateTime      @default(now())
   createdById String?
@@ -84,14 +85,36 @@ enum Tools {
   PostgreSQL
   API
   Git
-  ReactNative
+  React_Native
+  Angular
+  Vue
+  Express
+  Django
+  Flask
+  TensorFlow
+  Scikit_Learn
+  Pandas
+  NumPy
+  Kotlin
+  Swift
+  Firebase
+  MySQL
+  Docker
+  AWS
+  TypeScript
+  GraphQL
 }
 
 enum Domain {
   Frontend
   Backend
-  FullStack
-  MobileDevelopment
+  Web_Development
+  App_Development
   AIML
   UIUX
+  Fullstack
+  Blockchain
+  Data_Science
+  Cloud_Computing
+  DevOps
 }
