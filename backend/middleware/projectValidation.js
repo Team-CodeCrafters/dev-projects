@@ -1,38 +1,33 @@
-import zod from 'zod';
-import prisma from '../db/db.js';
+import zod, { tuple } from 'zod';
 import { Difficulty, Tools, Domain } from '@prisma/client';
-import errorMap from 'zod/locales/en.js';
 
 const projectSchema = zod.object({
-  name: zod.string().max(45),
-  about: zod.string(),
-  requirement: zod.string().optional(),
-  difficulty: zod.nativeEnum(Difficulty),
-  tools: zod.array(zod.nativeEnum(Tools)),
-  domain: zod.nativeEnum(Domain),
+  name: zod
+    .string()
+    .max(45, { message: 'name is too long' })
+    .nonempty({ message: 'name is required' }),
+  about: zod.string().nonempty({ message: 'about is required' }),
+  requirement: zod.array(
+    zod.string().nonempty({ message: 'requirement item cannot be empty' }),
+  ),
+  difficulty: zod.nativeEnum(Difficulty, {
+    message: 'difficulty is incorrect',
+  }),
+  tools: zod.array(zod.nativeEnum(Tools, { message: 'tools are incorrect' })),
+  domain: zod.nativeEnum(Domain, { message: 'domain is incorrect' }),
+  challenges: zod.array(zod.string().nonempty()).optional(),
+  createdBy: zod.string().optional(),
 });
 
-const updateProjectSchema = zod
-  .object({
-    about: zod.string().optional(),
-    requirement: zod.string().optional(),
-    difficulty: zod.nativeEnum(Difficulty).optional(),
-    tools: zod
-      .array(zod.union([zod.nativeEnum(Tools), zod.string().max(0)]))
-      .optional(),
-    domain: zod.nativeEnum(Domain).optional(),
+const updateProjectSchema = projectSchema.partial();
+
+const projectFilterSchema = projectSchema
+  .pick({
+    difficulty: true,
+    domain: true,
+    tools: true,
   })
-  .strict();
-
-const projectFilterSchema = zod.object({
-  difficulty: zod
-    .union([zod.nativeEnum(Difficulty), zod.string().max(0)])
-    .optional(),
-  tools: zod
-    .array(zod.union([zod.nativeEnum(Tools), zod.string().max(0)]))
-    .optional(),
-  domain: zod.union([zod.nativeEnum(Domain), zod.string().max(0)]).optional(),
-});
+  .partial();
 
 async function validateProjectData(req, res, next) {
   req.body.tools = req.body.tools?.split(',');

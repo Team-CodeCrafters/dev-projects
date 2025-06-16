@@ -99,11 +99,11 @@ async function updateProject(req, res) {
     if (!updatedProject) {
       return res.status(401).json({ message: 'Project does not exists' });
     }
-    res
+    return res
       .status(200)
       .json({ message: 'Project updated successfully', updatedProject });
   } catch (error) {
-    res
+    return res
       .status(500)
       .json({ message: 'internal server error', error: error.message });
   }
