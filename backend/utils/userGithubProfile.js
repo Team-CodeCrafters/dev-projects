@@ -11,7 +11,6 @@ async function getUserGitHubProfile(email) {
       return null;
     }
   } catch (e) {
-    console.log(e);
     return null;
   }
 }

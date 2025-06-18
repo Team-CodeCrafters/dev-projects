@@ -50,7 +50,6 @@ async function forgotPassword(req, res) {
 
 async function resetPassword(req, res) {
   const { email, password } = req.body;
-  console.log(email, password);
   const hashedPassword = await hashPassword(password);
   try {
     const user = await prisma.user.update({
@@ -60,7 +59,6 @@ async function resetPassword(req, res) {
     if (user)
       return res.status(200).json({ message: 'password changed successfully' });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
       .json({ message: 'internal server error', error: error.message });
