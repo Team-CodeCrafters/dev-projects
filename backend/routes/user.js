@@ -6,6 +6,7 @@ import {
   resetPassword,
   updateProfile,
   profile,
+  deleteAccount,
 } from '../controllers/userController.js';
 import {
   validateSignIn,
@@ -28,5 +29,6 @@ router.put(
   [authenticateUser, upload.single('avatar'), validateProfileUpdate],
   updateProfile,
 );
+router.delete('/', authenticateUser, deleteAccount);
 
 export default router;

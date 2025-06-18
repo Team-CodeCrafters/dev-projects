@@ -32,7 +32,6 @@ async function authenticateAdmin(req, res, next) {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     const { userId } = verifyJWT(token);
-    console.log(userId);
     if (!userId) return res.status(401).json({ error: 'Invalid token' });
     const adminUser = await prisma.admin.findFirst({
       where: {
@@ -55,8 +54,15 @@ async function authenticateAdmin(req, res, next) {
 async function authenticateUser(req, res, next) {
   try {
     const token = req.headers.authorization?.split(' ')[1];
-    const { userId, userType } = verifyJWT(token);
-    if (!userId) return res.status(401).json({ error: 'Invalid token' });
+    const JWTResult = verifyJWT(token);
+    if (JWTResult.error) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    const { userId, userType } = JWTResult;
+    if (!userId) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
     [req.userId, req.userType] = [userId, userType];
     next();
   } catch (e) {
@@ -68,8 +74,6 @@ async function authenticateUser(req, res, next) {
 
 async function validateSignUp(req, res, next) {
   const zodResult = signUpSchema.safeParse(req.body);
-  console.log(req.body);
-  console.log({ zodResult });
   if (!zodResult.success) {
     return res.status(401).json({
       message: 'Invalid data',
@@ -150,7 +154,6 @@ async function validateResetPassword(req, res, next) {
     req.body.email = JWTResponse.email;
     next();
   } catch (e) {
-    // console.log(e);
     return res
       .status(500)
       .json({ message: 'internal server error', error: e.message });
