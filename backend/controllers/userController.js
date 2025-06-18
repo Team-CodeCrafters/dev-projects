@@ -93,4 +93,34 @@ async function updateProfile(req, res) {
   }
 }
 
-export { signup, signin, forgotPassword, resetPassword, updateProfile };
+const profile = async (req, res) => {
+  try {
+    const user = await prisma.user.findFirstOrThrow({
+      where: {
+        id: req.userId,
+      },
+      select: {
+        username: true,
+        email: true,
+        displayName: true,
+        profilePicture: true,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: 'profile fetched successfully', user });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'failed to  fetched profile', error: e.message });
+  }
+};
+
+export {
+  signup,
+  signin,
+  forgotPassword,
+  resetPassword,
+  profile,
+  updateProfile,
+};
