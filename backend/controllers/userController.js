@@ -116,6 +116,21 @@ const profile = async (req, res) => {
   }
 };
 
+const deleteAccount = async (req, res) => {
+  try {
+    await prisma.user.delete({
+      where: {
+        id: req.userId,
+      },
+    });
+    return res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'Failed to delete account', error: e.message });
+  }
+};
+
 export {
   signup,
   signin,
@@ -123,4 +138,5 @@ export {
   resetPassword,
   profile,
   updateProfile,
+  deleteAccount,
 };
