@@ -1,14 +1,18 @@
 import prisma from '../db/db.js';
-import zod, { string } from 'zod';
+import zod from 'zod';
 import { verifyJWT } from '../utils/jwt.js';
 import { comparePassword } from '../utils/bcrypt.js';
 
-const usernameSchema = zod.string().regex(/^[a-zA-Z0-9_]{4,15}$/);
+const usernameSchema = zod.string().regex(/^[a-zA-Z0-9_]{4,20}$/, {
+  message: 'username can have min 4 and max 20 characters',
+});
 const signUpSchema = zod.object({
   username: usernameSchema,
   email: zod.string().email(),
-  password: zod.string().min(8),
-  displayName: zod.string().optional(),
+  password: zod
+    .string()
+    .min(8, { message: 'password must be atleast 8 characters long' }),
+  displayName: zod.string({ message: 'invalid display name' }).optional(),
 });
 
 const signInSchema = zod.object({
@@ -18,11 +22,17 @@ const signInSchema = zod.object({
 
 const forgotPasswordSchema = zod.object({ email: zod.string().email() });
 const resetPasswordSchema = signUpSchema.pick({ password: true });
-
+const updateProfileSchema = signUpSchema
+  .pick({
+    email: true,
+    displayName: true,
+  })
+  .partial();
 async function authenticateAdmin(req, res, next) {
   try {
     const token = req.headers.authorization?.split(' ')[1];
     const { userId } = verifyJWT(token);
+    console.log(userId);
     if (!userId) return res.status(401).json({ error: 'Invalid token' });
     const adminUser = await prisma.admin.findFirst({
       where: {
@@ -42,12 +52,28 @@ async function authenticateAdmin(req, res, next) {
   }
 }
 
+async function authenticateUser(req, res, next) {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    const { userId, userType } = verifyJWT(token);
+    if (!userId) return res.status(401).json({ error: 'Invalid token' });
+    [req.userId, req.userType] = [userId, userType];
+    next();
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'invalid server error', error: e.message });
+  }
+}
+
 async function validateSignUp(req, res, next) {
   const zodResult = signUpSchema.safeParse(req.body);
+  console.log(req.body);
+  console.log({ zodResult });
   if (!zodResult.success) {
     return res.status(401).json({
       message: 'Invalid data',
-      error: zodResult.error.errors[0].message,
+      error: zodResult.error.errors,
     });
   }
   try {
@@ -131,10 +157,21 @@ async function validateResetPassword(req, res, next) {
   }
 }
 
+async function validateProfileUpdate(req, res, next) {
+  const { email, displayName } = req.body;
+  const ZodResponse = updateProfileSchema.safeParse({ email, displayName });
+  if (!ZodResponse.success) {
+    return res.status(401).json({ message: 'invalid data' });
+  }
+  next();
+}
+
 export {
   authenticateAdmin,
+  authenticateUser,
   validateSignUp,
   validateSignIn,
   validateForgotPassword,
   validateResetPassword,
+  validateProfileUpdate,
 };
