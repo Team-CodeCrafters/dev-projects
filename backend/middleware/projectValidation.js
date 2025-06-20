@@ -1,4 +1,4 @@
-import zod, { tuple } from 'zod';
+import zod from 'zod';
 import { Difficulty, Tools, Domain } from '@prisma/client';
 
 const projectSchema = zod.object({
