@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import Button from './Button';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useRecoilState } from 'recoil';
+import { userProfileAtom } from '../store/atoms/userAtoms';
+import useFetchData from '../hooks/useFetchData';
 
 const PersonalDetails = () => {
   const navigate = useNavigate();
@@ -11,39 +13,30 @@ const PersonalDetails = () => {
     email: '',
   });
 
-  const [editMode, setEditMode] = useState(false);
-  const [editedName, setEditedName] = useState('');
-  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
+  const { fetchData } = useFetchData();
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get('/user/profile');
-        setUserData({ name: res.data.displayName, email: res.data.email });
-        setEditedName(res.data.displayName);
-      } catch (err) {
-        console.error('Failed to fetch profile:', err);
+    if (userProfile) return;
+    async function fetchUserProfile() {
+      const token = localStorage.getItem('token');
+      const options = {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      };
+
+      const fetchResult = await fetchData('/user/profile', options);
+      console.log(fetchResult);
+      if (fetchResult.success) {
+        setUserProfile(fetchResult.data.user);
       }
-    };
-
-    fetchProfile();
-  }, []);
-
-  const handleSave = async () => {
-    try {
-      await axios.put('/user/update-profile', { name: editedName });
-      setUserData((prev) => ({ ...prev, name: editedName }));
-      setEditMode(false);
-    } catch (err) {
-      console.error('Failed to update profile:', err);
     }
-  };
-
-  const handlePasswordChange = () => {
-    setShowPasswordDialog(false);
-    navigate('/forgot-password');
-  };
+    fetchUserProfile();
+  }, []);
 
   return (
     <div className="animate-fade-in mt-20 w-full max-w-2xl space-y-8 px-4 text-white">
@@ -66,7 +59,7 @@ const PersonalDetails = () => {
 
         {editMode ? (
           <div className="mt-4 space-y-4">
-            <p className="text-sm text-secondary-text">
+            <p className="text-secondary-text text-sm">
               This will be visible on your profile and to other team members.
             </p>
             <div>
@@ -96,7 +89,7 @@ const PersonalDetails = () => {
             </div>
           </div>
         ) : (
-          <p className="mt-2 text-base text-secondary-text">
+          <p className="text-secondary-text mt-2 text-base">
             {userData.name || 'Not available'}
           </p>
         )}
@@ -109,7 +102,7 @@ const PersonalDetails = () => {
         <div className="flex items-center justify-between">
           <h2 className="text-base font-medium text-white">Email address</h2>
         </div>
-        <p className="mt-2 text-base text-secondary-text">
+        <p className="text-secondary-text mt-2 text-base">
           {userData.email || 'Not available'}
         </p>
       </div>
@@ -127,22 +120,22 @@ const PersonalDetails = () => {
             Create new
           </button>
         </div>
-        <p className="mt-2 text-base text-secondary-text">••••••••</p>
+        <p className="text-secondary-text mt-2 text-base">••••••••</p>
       </div>
 
       {/* Manage Account */}
-      <div className="mt-10 space-y-4 pt-4 border-t border-white-dark">
-        <h2 className="text-xl mt-10 font-semibold">Manage account</h2>
-        <div className="flex justify-between items-start">
+      <div className="border-white-dark mt-10 space-y-4 border-t pt-4">
+        <h2 className="mt-10 text-xl font-semibold">Manage account</h2>
+        <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-white font-medium">Delete account</h3>
-            <p className="mt-1 text-sm text-secondary-text">
+            <h3 className="font-medium text-white">Delete account</h3>
+            <p className="text-secondary-text mt-1 text-sm">
               Permanently delete your Dev Projects account.
             </p>
           </div>
           <button
             onClick={() => setShowDeleteDialog(true)}
-            className="pt-1 text-sm font-medium text-error hover:underline"
+            className="text-error pt-1 text-sm font-medium hover:underline"
           >
             Delete
           </button>
@@ -179,17 +172,19 @@ const PersonalDetails = () => {
       {/* Delete Account Dialog */}
       {showDeleteDialog && (
         <div className="bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black">
-          <div className="bg-black-medium w-[90%] max-w-md rounded-2xl p-6 text-white relative shadow-lg">
+          <div className="bg-black-medium relative w-[90%] max-w-md rounded-2xl p-6 text-white shadow-lg">
             <button
-              className="absolute right-4 top-4 text-2xl text-white hover:text-gray-400"
+              className="absolute top-4 right-4 text-2xl text-white hover:text-gray-400"
               onClick={() => setShowDeleteDialog(false)}
             >
               &times;
             </button>
-            <h3 className="mb-3 text-center text-xl font-semibold">Are you sure?</h3>
-            <p className="mb-6 text-center text-sm text-secondary-text">
-              Deleting your account is permanent and irreversible.
-              You will lose all your collections and membership status, if any.
+            <h3 className="mb-3 text-center text-xl font-semibold">
+              Are you sure?
+            </h3>
+            <p className="text-secondary-text mb-6 text-center text-sm">
+              Deleting your account is permanent and irreversible. You will lose
+              all your collections and membership status, if any.
             </p>
             <div className="flex justify-between gap-4">
               <button
@@ -200,7 +195,7 @@ const PersonalDetails = () => {
               </button>
               <button
                 onClick={() => setShowDeleteDialog(false)}
-                className="w-full rounded-lg bg-error py-2 text-white hover:bg-red-600"
+                className="bg-error w-full rounded-lg py-2 text-white hover:bg-red-600"
               >
                 Delete account
               </button>
