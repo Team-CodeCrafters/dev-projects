@@ -2,10 +2,13 @@ import prisma from '../db/db.js';
 import { createJWT, verifyJWT } from '../utils/jwt.js';
 import { comparePassword, hashPassword } from '../utils/bcrypt.js';
 import { sendEmail } from '../utils/email.js';
-
+import { getUserGitHubProfile } from '../utils/userGithubProfile.js';
+import { uploadOnCloudinary } from '../utils/cloudinary.js';
 async function signup(req, res) {
   try {
     const { username, email, password, displayName } = req.body;
+    // use GitHub profile picture as default
+    const profileAvatarURL = await getUserGitHubProfile(email);
     const hashedPassword = await hashPassword(password);
     const user = await prisma.user.create({
       data: {
@@ -13,9 +16,10 @@ async function signup(req, res) {
         username,
         password: hashedPassword,
         displayName,
+        profilePicture: profileAvatarURL,
       },
     });
-    const token = createJWT({ userId: user.id });
+    const token = createJWT({ userId: user.id, userType: 'user' });
     res.status(200).json({ token, message: 'User created successfully' });
   } catch (error) {
     console.error('Signup error:', error);
@@ -46,7 +50,6 @@ async function forgotPassword(req, res) {
 
 async function resetPassword(req, res) {
   const { email, password } = req.body;
-  console.log(email, password);
   const hashedPassword = await hashPassword(password);
   try {
     const user = await prisma.user.update({
@@ -56,10 +59,82 @@ async function resetPassword(req, res) {
     if (user)
       return res.status(200).json({ message: 'password changed successfully' });
   } catch (error) {
-    console.log(error);
     return res
       .status(500)
       .json({ message: 'internal server error', error: error.message });
   }
 }
-export { signup, signin, forgotPassword, resetPassword };
+
+async function updateProfile(req, res) {
+  try {
+    const { email, displayName } = req.body;
+    const updateData = {};
+    if (email) updateData.email = email;
+    if (displayName) updateData.displayName = displayName;
+    if (req.file) {
+      const [avatarURL] = await uploadOnCloudinary(req.file);
+      updateData.profilePicture = avatarURL;
+    }
+    await prisma.user.update({
+      where: {
+        id: req.userId,
+      },
+      data: updateData,
+    });
+    return res
+      .status(200)
+      .json({ message: 'user profile updated successfully' });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'failed to update user profile', error: e.message });
+  }
+}
+
+const profile = async (req, res) => {
+  try {
+    const user = await prisma.user.findFirstOrThrow({
+      where: {
+        id: req.userId,
+      },
+      select: {
+        username: true,
+        email: true,
+        displayName: true,
+        profilePicture: true,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: 'profile fetched successfully', user });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'failed to  fetched profile', error: e.message });
+  }
+};
+
+const deleteAccount = async (req, res) => {
+  try {
+    await prisma.user.delete({
+      where: {
+        id: req.userId,
+      },
+    });
+    return res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'Failed to delete account', error: e.message });
+  }
+};
+
+export {
+  signup,
+  signin,
+  forgotPassword,
+  resetPassword,
+  profile,
+  updateProfile,
+  deleteAccount,
+};

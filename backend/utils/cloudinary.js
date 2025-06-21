@@ -4,10 +4,11 @@ cloudinary.config();
 
 async function uploadOnCloudinary(files) {
   if (!files) return null;
+  const fileArray = Array.isArray(files) ? files : [files];
   try {
     let cloudinaryImageUrls = [];
 
-    for (const file of files) {
+    for (const file of fileArray) {
       const options = {
         resource_type: 'auto',
       };
@@ -18,10 +19,10 @@ async function uploadOnCloudinary(files) {
 
     return cloudinaryImageUrls;
   } catch (error) {
-    console.log("file upload error", error.message)
+    console.log('file upload error', error.message);
     return null;
   } finally {
-    for (const file of files) {
+    for (const file of fileArray) {
       if (fs.existsSync(file.path)) {
         fs.unlinkSync(file.path);
       }
