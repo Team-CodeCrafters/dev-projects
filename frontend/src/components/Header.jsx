@@ -15,7 +15,8 @@ import {
 } from '../store/atoms/dashboardLayoutAtoms';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { colorThemeAtom } from '../store/atoms/themeAtoms';
-const Imagesrc = 'https://avatars.githubusercontent.com/u/144588220?v=4';
+import { userProfileAtom } from '../store/atoms/userAtoms';
+import useFetchData from '../hooks/useFetchData';
 
 const DashboardHeader = memo(() => {
   const [isSearchBarOpen, setIsSearchBarOpen] = useRecoilState(searchBoxAtom);
@@ -40,6 +41,7 @@ const DashboardHeader = memo(() => {
 });
 const HeaderContent = () => {
   const setIsSidebarOpen = useSetRecoilState(sidebarOpenAtom);
+  const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
   }, [setIsSidebarOpen]);
@@ -50,7 +52,26 @@ const HeaderContent = () => {
   const toggleSearchBar = () => {
     setIsSearchBarOpen((prev) => !prev);
   };
+  const { fetchData, data } = useFetchData();
 
+  useEffect(() => {
+    if (userProfile) return;
+    async function fetchUserProfile() {
+      const token = localStorage.getItem('token');
+      const options = {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      };
+
+      const fetchResult = await fetchData('/user/profile', options);
+
+      if (fetchResult.success) {
+        setUserProfile(fetchResult.data.user);
+      }
+    }
+    fetchUserProfile();
+  }, []);
   return (
     <>
       <div className="flex items-center gap-1.5 lg:gap-4">
@@ -88,15 +109,15 @@ const HeaderContent = () => {
           <NotificationIcon />
         </button>
         <button
-          className="focus:ring-primary group relative min-w-max cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2"
+          className="focus:ring-primary group relative h-9 w-9 min-w-max cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2"
           ref={profileButtonRef}
           onClick={() => setDropDownOpen((prev) => !prev)}
         >
-          {!Imagesrc ? (
+          {userProfile?.profilePicture ? (
             <img
-              src={Imagesrc}
+              src={userProfile.profilePicture}
               alt="profile icon"
-              className="h-9 w-9 rounded-full"
+              className="h-9 w-9 rounded-full object-cover"
             />
           ) : (
             <ProfileIcon />
