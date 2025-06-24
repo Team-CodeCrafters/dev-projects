@@ -17,4 +17,9 @@ const signUpDataAtom = atom({
   },
 });
 
-export { signInDataAtom, signUpDataAtom };
+const userProfileAtom = atom({
+  key: 'userProfileAtom',
+  default: null,
+});
+
+export { signInDataAtom, signUpDataAtom, userProfileAtom };
