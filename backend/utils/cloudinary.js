@@ -10,7 +10,7 @@ async function uploadOnCloudinary(files) {
 
     for (const file of fileArray) {
       const options = {
-        resource_type: 'auto',
+        resource_type: 'image',
       };
       const response = await cloudinary.uploader.upload(file.path, options);
       fs.unlinkSync(file.path);
