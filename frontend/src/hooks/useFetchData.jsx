@@ -3,7 +3,7 @@ import { useState } from 'react';
 const useFetchData = () => {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(undefined);
 
   async function fetchData(path, options = {}) {
     try {

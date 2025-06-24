@@ -32,7 +32,7 @@ const DashboardLayout = () => {
           <DashboardSidebar />
         </div>
 
-        <div className="dark:bg-black-medium min-h-screen flex-1 overflow-auto bg-white pl-2 pt-10">
+        <div className="dark:bg-black-medium flex-1 overflow-auto bg-white pl-2 pt-10">
           <Outlet />
         </div>
       </div>
