@@ -50,7 +50,6 @@ async function authenticateAdmin(req, res, next) {
       .json({ message: 'Server Error', error: err.message });
   }
 }
-
 async function authenticateUser(req, res, next) {
   try {
     const token = req.headers.authorization?.split(' ')[1];
