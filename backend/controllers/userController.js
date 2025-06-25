@@ -67,7 +67,7 @@ async function resetPassword(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    const { email, displayName } = req.body;
+    const { email, displayName, profilePicture } = req.body;
     const updateData = {};
     if (email) updateData.email = email;
     if (displayName) updateData.displayName = displayName;
@@ -75,15 +75,27 @@ async function updateProfile(req, res) {
       const [avatarURL] = await uploadOnCloudinary(req.file);
       updateData.profilePicture = avatarURL;
     }
-    await prisma.user.update({
+    if (profilePicture === 'DELETE') {
+      updateData.profilePicture = null;
+    }
+
+    const updatedUser = await prisma.user.update({
       where: {
         id: req.userId,
       },
       data: updateData,
+      select: {
+        username: true,
+        email: true,
+        displayName: true,
+        profilePicture: true,
+      },
     });
-    return res
-      .status(200)
-      .json({ message: 'user profile updated successfully' });
+
+    return res.status(200).json({
+      message: 'user profile updated successfully',
+      user: updatedUser,
+    });
   } catch (e) {
     return res
       .status(500)
