@@ -112,7 +112,7 @@ enum Domain {
   App_Development
   AIML
   UIUX
-  Fullstack
+  Full_Stack
   Blockchain
   Data_Science
   Cloud_Computing
