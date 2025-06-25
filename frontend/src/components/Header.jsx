@@ -39,6 +39,7 @@ const DashboardHeader = memo(() => {
     </header>
   );
 });
+
 const HeaderContent = () => {
   const setIsSidebarOpen = useSetRecoilState(sidebarOpenAtom);
   const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
@@ -140,7 +141,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search"
-          className="dark:bg-black-medium focus:border-primary border-black-light outline-black-light dark:border-primary h-full w-full rounded-bl-3xl rounded-tl-3xl border-2 pl-8 outline-none outline-offset-[-2px] focus:outline-none"
+          className="dark:bg-black-medium focus:border-primary border-black-light outline-black-light h-full w-full rounded-bl-3xl rounded-tl-3xl border-2 pl-8 outline-none outline-offset-[-2px] focus:outline-none"
         />
       </div>
       <div className="dark:bg-black-light border-black-light dark:border-black-light flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-[1px] border-l-transparent">
