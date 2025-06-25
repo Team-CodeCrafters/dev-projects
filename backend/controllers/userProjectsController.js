@@ -37,6 +37,15 @@ async function getStartedProjects(req, res) {
       where: {
         userId: req.userId,
       },
+      select: {
+        id: true,
+        projectId: true,
+        project: true,
+        status: true,
+        estimatedTime: true,
+        startedAt: true,
+        completedAt: true,
+      },
     });
 
     return res.status(200).json({

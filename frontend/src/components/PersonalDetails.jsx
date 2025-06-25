@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
 import SkeletalLoader from './SkeletalLoader';
 import { PopupNotification } from './PopupNotification';
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();
   const [editedName, setEditedName] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -14,30 +14,12 @@ const PersonalDetails = () => {
   const [editMode, setEditMode] = useState(false);
   const [popup, setPopup] = useState({ show: false, text: '', type: 'info' });
 
-  const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
-  const { fetchData, loading } = useFetchData();
+  const setUserProfile = useSetRecoilState(userProfileAtom);
+  const { fetchData } = useFetchData();
 
   const showPopup = (text, type = 'info') => {
     setPopup({ show: true, text, type });
   };
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      const token = localStorage.getItem('token');
-      const options = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
-      const res = await fetchData('/user/profile', options);
-      if (res.success && res.data.user) {
-        setUserProfile(res.data.user);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
 
   async function updateDisplayName() {
     const token = localStorage.getItem('token');
@@ -120,7 +102,9 @@ const PersonalDetails = () => {
 
           <div>
             <div className="flex items-center justify-between">
-              <h2 className="text-primary-text text-base font-medium dark:text-white">Name</h2>
+              <h2 className="text-primary-text text-base font-medium dark:text-white">
+                Name
+              </h2>
               {!editMode && (
                 <button
                   className="text-primary text-sm hover:underline dark:text-white"
@@ -134,7 +118,8 @@ const PersonalDetails = () => {
             {editMode ? (
               <div className="mt-4 space-y-4">
                 <p className="text-secondary-text text-sm">
-                  This will be visible on your profile and to other team members.
+                  This will be visible on your profile and to other team
+                  members.
                 </p>
                 <div>
                   <label className="text-primary-text mb-1 block text-sm dark:text-white">
@@ -226,11 +211,12 @@ const PersonalDetails = () => {
       </div>
 
       {showPasswordDialog && (
-        <div className="bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
           <div className="text-primary-text dark:bg-black-medium w-[90%] max-w-md rounded-xl bg-white p-6 dark:text-white">
             <h3 className="mb-4 text-xl font-semibold">Are you sure?</h3>
             <p className="text-secondary-text mb-6">
-              You will be redirected to create a new password. This action cannot be undone.
+              You will be redirected to create a new password. This action
+              cannot be undone.
             </p>
             <div className="flex justify-end space-x-4">
               <button
@@ -251,17 +237,18 @@ const PersonalDetails = () => {
       )}
 
       {showDeleteDialog && (
-        <div className="bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
           <div className="dark:bg-black-medium text-primary-text relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-lg dark:text-white">
             <button
-              className="text-primary-text absolute top-4 right-4 text-2xl hover:text-gray-400 dark:text-white"
+              className="text-primary-text absolute right-4 top-4 text-2xl hover:text-gray-400 dark:text-white"
               onClick={handleCancelDeleteDialog}
             ></button>
             <h3 className="mb-3 text-center text-xl font-semibold">
               Are you sure?
             </h3>
             <p className="text-secondary-text mb-6 text-center text-sm">
-              Deleting your account is permanent and irreversible. You will lose all your collections and membership status, if any.
+              Deleting your account is permanent and irreversible. <br />
+              You will lose all your data related to your account.
             </p>
             <div className="flex justify-between gap-4">
               <button

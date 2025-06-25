@@ -15,8 +15,8 @@ import {
 } from '../store/atoms/dashboardLayoutAtoms';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { colorThemeAtom } from '../store/atoms/themeAtoms';
+import { userProfileAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
-const Imagesrc = 'https://avatars.githubusercontent.com/u/144588220?v=4';
 
 const DashboardHeader = memo(() => {
   const [isSearchBarOpen, setIsSearchBarOpen] = useRecoilState(searchBoxAtom);
@@ -42,6 +42,7 @@ const DashboardHeader = memo(() => {
 
 const HeaderContent = () => {
   const setIsSidebarOpen = useSetRecoilState(sidebarOpenAtom);
+  const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
   }, [setIsSidebarOpen]);
@@ -113,11 +114,11 @@ const HeaderContent = () => {
           ref={profileButtonRef}
           onClick={() => setDropDownOpen((prev) => !prev)}
         >
-          {!Imagesrc ? (
+          {userProfile?.profilePicture ? (
             <img
-              src={Imagesrc}
+              src={userProfile.profilePicture}
               alt="profile icon"
-              className="h-9 w-9 rounded-full"
+              className="h-9 w-9 rounded-full object-cover"
             />
           ) : (
             <ProfileIcon />
