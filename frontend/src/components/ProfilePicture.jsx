@@ -1,45 +1,29 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import useFetchData from '../hooks/useFetchData';
 import { PopupNotification } from './PopupNotification';
-import { useRecoilValue } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../store/atoms/userAtoms';
 
-const ProfilePicture = () => {
-  const [image, setImage] = useState(null);
+const ProfilePicture = ({ userProfile }) => {
   const [popup, setPopup] = useState({ show: false, text: '', type: 'info' });
   const fileInputRef = useRef(null);
-  const userProfile = useRecoilValue(userProfileAtom);
+  const setUserProfile = useSetRecoilState(userProfileAtom);
   const { fetchData } = useFetchData();
 
-  useEffect(() => {
-    const storedImage = localStorage.getItem('profileImage');
-    if (storedImage) setImage(storedImage);
-  }, []);
-
   const handleImageChange = async (e) => {
+    setPopup({
+      show: 'true',
+      text: 'changing profile picture...',
+      type: 'info',
+    });
+
     const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImage(reader.result);
-        localStorage.setItem('profileImage', reader.result);
-
-        setPopup({
-          show: true,
-          text: 'Profile picture updated successfully!',
-          type: 'success',
-        });
-      };
-      reader.readAsDataURL(file);
-    }
-
     const token = localStorage.getItem('token');
 
     if (!token) return;
 
     const formData = new FormData();
     formData.append('avatar', file);
-    console.log(file);
 
     const options = {
       headers: {
@@ -52,19 +36,52 @@ const ProfilePicture = () => {
     };
 
     const res = await fetchData('/user/update-profile', options);
-    console.log('Profile Fetch Result:', res);
+    if (res.success) {
+      setUserProfile(res.data.user);
+      setPopup({
+        show: 'true',
+        text: 'profile updated successfully',
+        type: 'success',
+      });
+    } else {
+      setPopup({
+        show: 'true',
+        text: res.error,
+        type: 'info',
+      });
+    }
   };
 
   const handleClick = () => fileInputRef.current.click();
 
-  const handleDelete = () => {
-    setImage(null);
-    localStorage.removeItem('profileImage');
-    setPopup({
-      show: 'true',
-      text: 'Profile picture deleted.',
-      type: 'info',
-    });
+  const handleDelete = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    const formData = new FormData();
+    formData.append('profilePicture', 'DELETE');
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      method: 'PUT',
+      body: formData,
+    };
+
+    const res = await fetchData('/user/update-profile', options);
+    if (res.success) {
+      setPopup({
+        show: 'true',
+        text: 'Profile picture deleted.',
+        type: 'info',
+      });
+      setUserProfile((prev) => ({ ...prev, profilePicture: null }));
+    } else {
+      setPopup({
+        show: 'true',
+        text: res.error,
+        type: 'info',
+      });
+    }
   };
 
   return (
@@ -78,9 +95,9 @@ const ProfilePicture = () => {
       )}
 
       <div className="group relative h-28 w-28 cursor-pointer overflow-hidden rounded-full border-2 border-white">
-        {image ? (
+        {userProfile?.profilePicture ? (
           <img
-            src={image}
+            src={userProfile.profilePicture}
             alt="Profile"
             className="h-full w-full object-cover"
           />
@@ -93,8 +110,8 @@ const ProfilePicture = () => {
           </div>
         )}
 
-        {image && (
-          <div className="bg-opacity-90 absolute inset-0 hidden flex-col items-center justify-center bg-black text-white transition-all group-hover:flex">
+        {userProfile?.profilePicture && (
+          <div className="absolute inset-0 hidden flex-col items-center justify-center bg-black bg-opacity-90 text-white transition-all group-hover:flex">
             <button
               onClick={handleClick}
               className="text-sm font-medium hover:underline"
