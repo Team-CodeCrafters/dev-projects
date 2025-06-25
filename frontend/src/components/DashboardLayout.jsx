@@ -19,11 +19,11 @@ const DashboardLayout = () => {
       <DashboardHeader />
       <div className="relative flex flex-1 justify-start overflow-hidden">
         <div
-          className={`bg-white-light dark:bg-black-medium dark:border-r-black-light z-10 h-full flex-shrink-0 border-r-2 transition-all duration-300 ease-in-out ${
+          className={`bg-white-light dark:bg-black-medium dark:border-r-black-light z-10 h-full flex-shrink-0 border-r-2 transition-all duration-150 ease-in-out ${
             screenSize.width < 768
               ? isExpanded
                 ? 'fixed w-56 translate-x-0'
-                : 'fixed w-0 -translate-x-full transition-all dark:border-r-transparent'
+                : 'fixed -translate-x-full dark:border-r-transparent'
               : isExpanded
                 ? 'w-56'
                 : 'w-16'
@@ -32,7 +32,11 @@ const DashboardLayout = () => {
           <DashboardSidebar />
         </div>
 
-        <div className="dark:bg-black-medium min-h-screen flex-1 overflow-auto bg-white pl-2 pt-10">
+        <div
+          className={`dark:bg-black-medium min-h-screen flex-1 items-center overflow-auto bg-white px-2 pt-10 transition-all dark:text-white ${
+            screenSize.width < 768 && isExpanded ? `opacity-80 blur-sm` : ''
+          }`}
+        >
           <Outlet />
         </div>
       </div>
