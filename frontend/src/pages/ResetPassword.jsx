@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import InputField from '../components/InputField';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -18,7 +18,7 @@ const ResetPassword = () => {
     confirmPassword: '',
   });
   const { fetchData, loading } = useFetchData();
-
+  const navigate = useNavigate();
   async function handleSubmit(e) {
     setSuccessMessage(null);
     setErrorMessage(null);
@@ -41,8 +41,9 @@ const ResetPassword = () => {
     );
     if (response.success) {
       setSuccessMessage('password reset successfully');
-      localStorage.setItem('token', response.data.token);
-      navigate('/dashboard');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } else {
       setErrorMessage(response.error);
     }

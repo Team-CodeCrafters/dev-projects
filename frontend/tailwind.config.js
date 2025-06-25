@@ -12,8 +12,8 @@ export default {
         success: '#22c55e',
         error: '#EF4444',
         'white-light': '#FFF',
-        'white-medium': '#F2F2F3',
-        'white-dark': '#F6F8fA',
+        'white-medium': '#F6F8fA',
+        'white-dark': '#F2F2F3',
 
         'blak-ligher': '303037',
         'black-light': '#27272A',
