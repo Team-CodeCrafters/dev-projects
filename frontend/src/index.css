@@ -12,4 +12,101 @@
   .text-small {
     @apply font-body text-sm font-light;
   }
+
+  /* Project Tools Utility Classes */
+
+  .status-started {
+    @apply rounded-full border border-blue-200 bg-blue-100/80 px-3 py-1 text-sm font-medium tracking-tight text-blue-800;
+  }
+
+  .status-completed {
+    @apply rounded-full border border-green-200 bg-green-100/80 px-3 py-1 text-sm font-medium tracking-tight text-green-800;
+  }
+
+  .status-inprogress {
+    @apply rounded-full border border-yellow-200 bg-yellow-100/80 px-3 py-1 text-sm font-medium tracking-tight text-yellow-800;
+  }
+
+  .status-paused {
+    @apply rounded-full border border-orange-200 bg-orange-100/80 px-3 py-1 text-sm font-medium tracking-tight text-orange-800;
+  }
+
+  .status-pending {
+    @apply rounded-full border border-gray-200 bg-gray-100/80 px-3 py-1 text-sm font-medium tracking-tight text-gray-800;
+  }
+
+  /* Project Difficulty Utility Classes */
+  .difficulty-beginner {
+    @apply rounded-full border border-green-200 bg-green-100/80 px-3 py-1 text-xs font-medium tracking-tight text-green-800;
+  }
+
+  .difficulty-intermediate {
+    @apply rounded-full border border-yellow-200 bg-yellow-100/80 px-3 py-1 text-xs font-medium tracking-tight text-yellow-800;
+  }
+
+  .difficulty-advanced {
+    @apply rounded-full border border-red-200 bg-red-100/80 px-3 py-1 text-xs font-medium tracking-tight text-red-800;
+  }
+
+  .difficulty-expert {
+    @apply rounded-full border border-purple-200 bg-purple-100/80 px-3 py-1 text-xs font-medium tracking-tight text-purple-800;
+  }
+
+  /* Project Domain Utility Classes */
+  .domain-web-development {
+    @apply rounded-full border border-purple-200 bg-purple-100/80 px-3 py-1 text-xs font-medium tracking-tight text-purple-800;
+  }
+
+  .domain-mobile-development {
+    @apply rounded-full border border-indigo-200 bg-indigo-100/80 px-3 py-1 text-xs font-medium tracking-tight text-indigo-800;
+  }
+
+  .domain-data-science {
+    @apply rounded-full border border-teal-200 bg-teal-100/80 px-3 py-1 text-xs font-medium tracking-tight text-teal-800;
+  }
+
+  .domain-machine-learning {
+    @apply rounded-full border border-pink-200 bg-pink-100/80 px-3 py-1 text-xs font-medium tracking-tight text-pink-800;
+  }
+
+  .domain-backend-development {
+    @apply rounded-full border border-orange-200 bg-orange-100/80 px-3 py-1 text-xs font-medium tracking-tight text-orange-800;
+  }
+
+  .domain-frontend-development {
+    @apply rounded-full border border-cyan-200 bg-cyan-100/80 px-3 py-1 text-xs font-medium tracking-tight text-cyan-800;
+  }
+
+  .domain-devops {
+    @apply rounded-full border border-lime-200 bg-lime-100/80 px-3 py-1 text-xs font-medium tracking-tight text-lime-800;
+  }
+
+  .domain-game-development {
+    @apply rounded-full border border-violet-200 bg-violet-100/80 px-3 py-1 text-xs font-medium tracking-tight text-violet-800;
+  }
+
+  .domain-blockchain {
+    @apply rounded-full border border-amber-200 bg-amber-100/80 px-3 py-1 text-xs font-medium tracking-tight text-amber-800;
+  }
+
+  .domain-ai {
+    @apply rounded-full border border-rose-200 bg-rose-100/80 px-3 py-1 text-xs font-medium tracking-tight text-rose-800;
+  }
+
+  .project-tag {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+  }
+
+  .project-tag-sm {
+    @apply inline-flex items-center rounded-md px-2 py-1 text-xs font-medium;
+  }
+
+  .project-tag-lg {
+    @apply inline-flex items-center rounded-full px-4 py-2 text-sm font-medium;
+  }
+
+  /* Hover Effects */
+  .project-tag:hover {
+    @apply scale-105 transform shadow-sm transition-all duration-200;
+  }
 }

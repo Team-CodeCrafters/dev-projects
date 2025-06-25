@@ -39,6 +39,7 @@ const DashboardHeader = memo(() => {
     </header>
   );
 });
+
 const HeaderContent = () => {
   const setIsSidebarOpen = useSetRecoilState(sidebarOpenAtom);
   const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
@@ -52,7 +53,7 @@ const HeaderContent = () => {
   const toggleSearchBar = () => {
     setIsSearchBarOpen((prev) => !prev);
   };
-  const { fetchData, data } = useFetchData();
+  const { fetchData } = useFetchData();
 
   useEffect(() => {
     if (userProfile) return;
@@ -109,7 +110,7 @@ const HeaderContent = () => {
           <NotificationIcon />
         </button>
         <button
-          className="focus:ring-primary group relative h-9 w-9 min-w-max cursor-pointer rounded-full p-0.5 focus:outline-none focus:ring-2"
+          className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2"
           ref={profileButtonRef}
           onClick={() => setDropDownOpen((prev) => !prev)}
         >
@@ -140,7 +141,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search"
-          className="dark:bg-black-medium focus:border-primary border-black-light outline-black-light dark:border-primary h-full w-full rounded-bl-3xl rounded-tl-3xl border-2 pl-8 outline-none outline-offset-[-2px] focus:outline-none"
+          className="dark:bg-black-medium focus:border-primary border-black-light outline-black-light h-full w-full rounded-bl-3xl rounded-tl-3xl border-2 pl-8 outline-none outline-offset-[-2px] focus:outline-none"
         />
       </div>
       <div className="dark:bg-black-light border-black-light dark:border-black-light flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-[1px] border-l-transparent">
