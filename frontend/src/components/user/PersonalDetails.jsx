@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSetRecoilState } from 'recoil';
-import { userProfileAtom } from '../store/atoms/userAtoms';
-import useFetchData from '../hooks/useFetchData';
-import SkeletalLoader from './SkeletalLoader';
-import { PopupNotification } from './PopupNotification';
+import { userProfileAtom } from '../../store/atoms/userAtoms';
+import useFetchData from '../../hooks/useFetchData';
+import SkeletalLoader from '../ui/SkeletalLoader';
+import { PopupNotification } from '../ui/PopupNotification';
 
 const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();

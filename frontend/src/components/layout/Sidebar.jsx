@@ -1,13 +1,13 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { HomeIcon } from '../assets/icons/Home';
-import { ListIcon } from '../assets/icons/List';
-import { BookmarkIcon } from '../assets/icons/Bookmark';
-import { CircleCheckIcon } from '../assets/icons/CircleCheck';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { HomeIcon } from '../../assets/icons/Home';
+import { ListIcon } from '../../assets/icons/List';
+import { BookmarkIcon } from '../../assets/icons/Bookmark';
+import { CircleCheckIcon } from '../../assets/icons/CircleCheck';
 import { memo, useEffect } from 'react';
 import {
   screenSizeAtom,
   sidebarOpenAtom,
-} from '../store/atoms/dashboardLayoutAtoms';
+} from '../../store/atoms/dashboardLayoutAtoms';
 import { Link, useLocation } from 'react-router-dom';
 import { useRef } from 'react';
 

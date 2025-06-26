@@ -2,8 +2,8 @@ import { Outlet } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import DashboardHeader from './Header';
 import DashboardSidebar from './Sidebar';
-import { sidebarOpenAtom } from '../store/atoms/dashboardLayoutAtoms';
-import useScreenSize from '../hooks/useScreenSize';
+import { sidebarOpenAtom } from '../../store/atoms/dashboardLayoutAtoms';
+import useScreenSize from '../../hooks/useScreenSize';
 import { useEffect } from 'react';
 
 const DashboardLayout = () => {
