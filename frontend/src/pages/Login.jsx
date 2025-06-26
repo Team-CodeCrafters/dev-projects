@@ -2,12 +2,12 @@ import { useRecoilState } from 'recoil';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInDataAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
-import InputField from '../components/InputField';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import Loader from '../components/Loader';
+import InputField from '../components/ui/InputField';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
-import { PopupNotification } from '../components/PopupNotification';
+import { PopupNotification } from '../components/ui/PopupNotification';
 import { useEffect } from 'react';
 
 const Login = () => {
@@ -40,7 +40,7 @@ const Login = () => {
   }
 
   return (
-    <div className="px- bg-black flex min-h-screen items-center justify-center">
+    <div className="px- flex min-h-screen items-center justify-center bg-black">
       <Card>
         {/* ✅ Logo added here */}
         <div className="mb-6 flex justify-center">

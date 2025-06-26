@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import useFetchData from '../hooks/useFetchData';
 import { userProjectsAtom } from '../store/atoms/userProjects';
-import { CircleCheckIcon } from '../assets/icons/CircleCheck';
-import { formatString } from '../utils/formatters';
+import Status from '../components/projects/tags/StatusTag';
+import DifficultyTag from '../components/projects/tags/DifficultyTag';
+import DomainTag from '../components/projects/tags/DomainTag';
+import StatusTag from '../components/projects/tags/StatusTag';
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userProjects, setUserProjects] = useRecoilState(userProjectsAtom);
@@ -67,7 +70,7 @@ const Dashboard = () => {
   }
   if (userProjects.length > 0) {
     return (
-      <div className="bg-white-medium ml-5 max-w-2xl rounded-md p-4 dark:bg-black">
+      <div className="bg-white-medium dark:bg-black-neutral outline-black-dark max-w-2xl rounded-md p-4 md:ml-5">
         <h1 className="font-heading mb-5 text-2xl font-medium tracking-wide">
           Started Projects
         </h1>
@@ -87,21 +90,24 @@ const Dashboard = () => {
     return <div>you have not started any project yet</div>;
   }
 };
-const ProjectCard = ({ project, status, estimatedTime, startedAt }) => {
+const ProjectCard = ({ project, status, startedAt }) => {
   return (
-    <div className="dark:outline-black-light bg-white-light dark:bg-black-neutral outline-white-dark flex w-full max-w-2xl rounded-md p-2 outline outline-2 sm:p-4">
-      <div className="mb-2 flex w-full justify-between">
-        <span className="font-heading w-max text-lg tracking-tight">
-          {project.name}
+    <div className="dark:outline-black-light bg-white-light dark:bg-black-light outline-white-dark flex w-full max-w-2xl rounded-md p-4 outline outline-2 sm:p-4">
+      <div className="mb-2 w-full gap-1">
+        <div className="mr-3 flex flex-col items-start justify-between md:flex-row md:items-center">
+          <span className="font-heading w-max text-xl font-medium tracking-tight">
+            {project.name}
+          </span>
+          <span>
+            <StatusTag status={status} />
+          </span>
+        </div>
+        <span className="mb-5 line-clamp-2 w-[90%] opacity-75">
+          {project.about}
         </span>
-        <div className="flex items-stretch gap-2">
-          <span className="difficulty-beginner font-body flex items-center gap-1 p-2 text-xs opacity-95">
-            <CircleCheckIcon size="size-5" />
-            {project.difficulty}
-          </span>
-          <span className="domain-web-development font-body grid items-center text-center text-sm">
-            {formatString(project.domain)}
-          </span>
+        <div className="flex items-center gap-2">
+          <DifficultyTag difficulty={project.difficulty} />
+          <DomainTag domain={project.domain} />
         </div>
       </div>
     </div>
