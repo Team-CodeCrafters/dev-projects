@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import InputField from '../components/InputField';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import Loader from '../components/Loader';
+import InputField from '../components/ui/InputField';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
 import useFetchData from '../hooks/useFetchData';
-import { PopupNotification } from '../components/PopupNotification';
+import { PopupNotification } from '../components/ui/PopupNotification';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();

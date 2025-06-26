@@ -1,8 +1,8 @@
 import { useRef, useState } from 'react';
-import useFetchData from '../hooks/useFetchData';
-import { PopupNotification } from './PopupNotification';
+import useFetchData from '../../hooks/useFetchData';
+import { PopupNotification } from '../ui/PopupNotification';
 import { useSetRecoilState } from 'recoil';
-import { userProfileAtom } from '../store/atoms/userAtoms';
+import { userProfileAtom } from '../../store/atoms/userAtoms';
 
 const ProfilePicture = ({ userProfile }) => {
   const [popup, setPopup] = useState({ show: false, text: '', type: 'info' });

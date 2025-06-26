@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
-import ProfilePicture from '../components/ProfilePicture';
-import PersonalDetails from '../components/PersonalDetails';
+import ProfilePicture from '../components/user/ProfilePicture';
+import PersonalDetails from '../components/user/PersonalDetails';
 import { useNavigate } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import { userProfileAtom } from '../store/atoms/userAtoms';
-import { PopupNotification } from '../components/PopupNotification';
+import { PopupNotification } from '../components/ui/PopupNotification';
 import { useRecoilState } from 'recoil';
 
 const UserProfile = () => {

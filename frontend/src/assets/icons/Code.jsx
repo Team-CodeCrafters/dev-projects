@@ -1,4 +1,4 @@
-export const ListIcon = () => {
+const CodeIcon = ({ size = 'size-6' }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -6,14 +6,15 @@ export const ListIcon = () => {
       viewBox="0 0 24 24"
       strokeWidth={1.5}
       stroke="currentColor"
-      className="size-6"
+      className={size}
     >
       <path
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth={1.5}
-        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+        d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"
       />
     </svg>
   );
 };
+
+export default CodeIcon;

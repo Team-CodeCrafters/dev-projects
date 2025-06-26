@@ -1,22 +1,22 @@
 import { Link, useNavigate } from 'react-router-dom';
-import NotificationIcon from '../assets/icons/notificationIcon';
-import { SearchIcon } from '../assets/icons/Search';
-import { MenuIcon } from '../assets/icons/MenuIcon';
-import { ProfileIcon } from '../assets/icons/ProfileIcon';
-import { ArrowLeft } from '../assets/icons/ArrowLeft';
-import { ToggleSwitch } from '../assets/icons/ToggleSwitch';
-import brandImageLight from '../assets/images/dev-projects-dark.png';
-import brandImageDark from '../assets/images/dev-projects-logo.png';
+import NotificationIcon from '../../assets/icons/notificationIcon';
+import { SearchIcon } from '../../assets/icons/Search';
+import { MenuIcon } from '../../assets/icons/MenuIcon';
+import { ProfileIcon } from '../../assets/icons/ProfileIcon';
+import { ArrowLeft } from '../../assets/icons/ArrowLeft';
+import { ToggleSwitch } from '../../assets/icons/ToggleSwitch';
+import brandImageLight from '../../assets/images/dev-projects-dark.png';
+import brandImageDark from '../../assets/images/dev-projects-logo.png';
 import { memo, useCallback, useEffect, useRef } from 'react';
 import {
   sidebarOpenAtom,
   dropDownOpenAtom,
   searchBoxAtom,
-} from '../store/atoms/dashboardLayoutAtoms';
+} from '../../store/atoms/dashboardLayoutAtoms';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { colorThemeAtom } from '../store/atoms/themeAtoms';
-import { userProfileAtom } from '../store/atoms/userAtoms';
-import useFetchData from '../hooks/useFetchData';
+import { colorThemeAtom } from '../../store/atoms/themeAtoms';
+import { userProfileAtom } from '../../store/atoms/userAtoms';
+import useFetchData from '../../hooks/useFetchData';
 
 const DashboardHeader = memo(() => {
   const [isSearchBarOpen, setIsSearchBarOpen] = useRecoilState(searchBoxAtom);

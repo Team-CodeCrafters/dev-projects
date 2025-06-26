@@ -15,7 +15,7 @@ export default {
         'white-medium': '#F6F8fA',
         'white-dark': '#F2F2F3',
 
-        'blak-ligher': '303037',
+        'black-lighter': '#303037',
         'black-light': '#27272A',
         'black-medium': '#18181B',
         'black-dark': '#0F0F0F',

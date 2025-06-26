@@ -8,7 +8,7 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 
-import DashboardLayout from './components/DashboardLayout';
+import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
 
 import { useTheme } from './hooks/useTheme';

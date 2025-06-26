@@ -5,10 +5,10 @@ import { useNavigate, Link } from 'react-router-dom';
 import { signUpDataAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
 
-import InputField from '../components/InputField';
-import Card from '../components/Card';
-import Button from '../components/Button';
-import Loader from '../components/Loader';
+import InputField from '../components/ui/InputField';
+import Card from '../components/ui/Card';
+import Button from '../components/ui/Button';
+import Loader from '../components/ui/Loader';
 
 import logo from '../assets/images/dev-projects-dark.png';
 
