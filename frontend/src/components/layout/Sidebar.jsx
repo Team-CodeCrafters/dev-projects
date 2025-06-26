@@ -77,7 +77,7 @@ const SidebarElement = ({ Icon, name, href }) => {
             <Icon />
           </div>
           <span
-            className={`ml-2 text-inherit transition-all duration-300 ease-in-out ${
+            className={`ml-2 text-inherit ease-in-out ${
               isExpanded ? 'opacity-100' : 'overflow-hidden opacity-0'
             }`}
           >

@@ -31,9 +31,8 @@ const DashboardLayout = () => {
         >
           <DashboardSidebar />
         </div>
-
         <div
-          className={`dark:bg-black-medium flex-1 items-center overflow-auto bg-white px-2 pt-10 transition-all dark:text-white ${
+          className={`dark:bg-black-medium flex-1 items-center justify-center overflow-auto bg-white px-2 pt-3 transition-all md:pt-10 dark:text-white ${
             screenSize.width < 768 && isExpanded ? `opacity-80 blur-sm` : ''
           }`}
         >

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import useFetchData from '../hooks/useFetchData';
 import { userProjectsAtom } from '../store/atoms/userProjects';
-import Status from '../components/projects/tags/StatusTag';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import StatusTag from '../components/projects/tags/StatusTag';
+import ToolsTag from '../components/projects/tags/ToolsTag';
+import { ListIcon } from '../assets/icons/List';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -70,45 +71,81 @@ const Dashboard = () => {
   }
   if (userProjects.length > 0) {
     return (
-      <div className="bg-white-medium dark:bg-black-neutral outline-black-dark max-w-2xl rounded-md p-4 md:ml-5">
+      <div className="bg-white-medium dark:bg-black-medium outline-black-dark mb-96 max-w-2xl rounded-lg p-3 md:p-5">
         <h1 className="font-heading mb-5 text-2xl font-medium tracking-wide">
           Started Projects
         </h1>
-        {userProjects.map((userProject) => (
-          <ProjectCard
-            key={userProject.id}
-            status={userProject.status}
-            estimatedTime={userProject.estimatedTime}
-            startedAt={userProject.startedAt}
-            project={userProject.project}
-          />
-        ))}
+        <div>
+          {userProjects.map((userProject) => (
+            <ProjectCard
+              key={userProject.id}
+              status={userProject.status}
+              estimatedTime={userProject.estimatedTime}
+              startedAt={userProject.startedAt}
+              project={userProject.project}
+            />
+          ))}
+        </div>
       </div>
     );
   }
   if (!loading && !error && userProjects.length == 0) {
-    return <div>you have not started any project yet</div>;
+    return <NoProjectsStarted />;
   }
 };
-const ProjectCard = ({ project, status, startedAt }) => {
+const ProjectCard = ({ project, status }) => {
   return (
-    <div className="dark:outline-black-light bg-white-light dark:bg-black-light outline-white-dark flex w-full max-w-2xl rounded-md p-4 outline outline-2 sm:p-4">
-      <div className="mb-2 w-full gap-1">
-        <div className="mr-3 flex flex-col items-start justify-between md:flex-row md:items-center">
-          <span className="font-heading w-max text-xl font-medium tracking-tight">
+    <div className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md">
+      <div className="w-full gap-1">
+        <div className="mb-3 flex items-start justify-between md:mb-2 md:flex-row md:items-center">
+          <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">
             {project.name}
           </span>
           <span>
             <StatusTag status={status} />
           </span>
         </div>
-        <span className="mb-5 line-clamp-2 w-[90%] opacity-75">
+        <span className="text-md mb-5 line-clamp-2 w-[90%] opacity-75">
           {project.about}
         </span>
         <div className="flex items-center gap-2">
           <DifficultyTag difficulty={project.difficulty} />
           <DomainTag domain={project.domain} />
         </div>
+        <div className="my-2 p-2">
+          <ToolsTag tools={project.tools} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const NoProjectsStarted = () => {
+  const navigate = useNavigate();
+
+  function goToProjectsPage() {
+    navigate('/projects');
+  }
+
+  return (
+    <div className="bg-white-medium dark:bg-black-medium m-4 rounded-lg p-3">
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="dark:bg-black-light bg-white-dark mb-6 rounded-full p-6">
+          <ListIcon />
+        </div>
+        <h2 className="font-heading dark:text-white-light mb-3 text-xl font-medium tracking-wide">
+          No Projects Started Yet
+        </h2>
+        <p className="dark:text-white-medium mb-8 max-w-md text-balance opacity-80">
+          Start buiding cool stuff by exploring our curated collection of
+          projects designed to help you learn and grow your skills.
+        </p>
+        <button
+          onClick={goToProjectsPage}
+          className="bg-primary hover:bg-primary/90 duration-250 font-heading rounded-lg px-8 py-3 font-medium text-white transition-all hover:scale-105 hover:shadow-lg"
+        >
+          Explore Projects
+        </button>
       </div>
     </div>
   );
