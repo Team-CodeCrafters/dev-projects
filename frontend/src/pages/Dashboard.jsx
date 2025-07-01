@@ -8,6 +8,7 @@ import DomainTag from '../components/projects/tags/DomainTag';
 import StatusTag from '../components/projects/tags/StatusTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
 import { ListIcon } from '../assets/icons/List';
+import SkeletalLoader from '../components/ui/SkeletalLoader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,22 +17,12 @@ const Dashboard = () => {
 
   const ProjectsLoadingIndicator = () => {
     return (
-      <div className="dark:bg-black-neutral w-[90%] max-w-xl rounded-md bg-gray-50 outline outline-gray-300 lg:ml-10 dark:outline-black">
-        <div
-          className="flex w-full animate-pulse flex-col p-4"
-          style={{ animationDuration: '1000ms' }}
-        >
-          <div className="flex justify-between">
-            <div className="dark:bg-black-light h-6 w-52 max-w-[45%] rounded-full bg-gray-200"></div>
-            <div className="flex justify-end gap-1 md:gap-2">
-              <div className="dark:bg-black-light mb-4 h-6 w-36 max-w-[35%] rounded-full bg-gray-200"></div>
-              <div className="dark:bg-black-light h-6 w-20 max-w-[30%] rounded-full bg-gray-200"></div>
-            </div>
-          </div>
-          <div className="dark:bg-black-light mb-3 h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-          <div className="dark:bg-black-light mb-2 h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-          <div className="dark:bg-black-light h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-        </div>
+      <div className="bg-white-medium dark:bg-black-medium w-[90%] max-w-2xl p-2">
+        <SkeletalLoader height="h-7">
+          <SkeletalLoader height="h-8" width="w-[70%]" />
+          <SkeletalLoader height="h-10" styles="mt-5" />
+          <SkeletalLoader height="h-10" />
+        </SkeletalLoader>
       </div>
     );
   };

@@ -29,6 +29,20 @@ export default {
         heading: ['Geist', 'system-ui', 'sans-serif'],
         body: ['Open Sans', 'system-ui', 'sans-serif'],
       },
+      keyframes: {
+        loadingBar: {
+          '0%': { width: '0%', display: 'block' },
+          '100%': { width: '95%' },
+        },
+        loadingComplete: {
+          '0%': { width: '90%' },
+          '100%': { width: '100%', display: 'none' },
+        },
+      },
+      animation: {
+        'loading-bar': 'loadingBar 1s ease-in forwards',
+        'loading-complete': 'loadingComplete 200ms ease-out forwards',
+      },
     },
   },
   plugins: [],

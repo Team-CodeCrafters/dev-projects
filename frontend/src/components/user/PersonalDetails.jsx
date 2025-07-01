@@ -90,12 +90,20 @@ const PersonalDetails = ({ userProfile, loading }) => {
       )}
 
       {loading ? (
-        <>
-          <SkeletalLoader height="h-6" width="w-1/3" />
-          <SkeletalLoader height="h-14" width="w-full" />
-          <SkeletalLoader height="h-14" width="w-full" />
-          <SkeletalLoader height="h-14" width="w-full" />
-        </>
+        <div className="space-y-8">
+          <div>
+            <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+            <SkeletalLoader height="h-7" width="w-full" />
+          </div>
+          <div>
+            <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+            <SkeletalLoader height="h-7" width="w-full" />
+          </div>
+          <div>
+            <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+            <SkeletalLoader height="h-7" width="w-full" />
+          </div>
+        </div>
       ) : (
         <>
           <h1 className="text-2xl font-semibold">Personal details</h1>
