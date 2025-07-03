@@ -7,10 +7,9 @@ const Signup = lazy(() => import('./pages/Signup'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-
+const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
-
 import { useTheme } from './hooks/useTheme';
 
 function App() {
@@ -33,6 +32,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/projects" element={<div />} />
+            <Route path="/project/:id" element={<ProjectDetails />} />
           </Route>
 
           <Route path="*" element={<div>Page Not Found</div>} />

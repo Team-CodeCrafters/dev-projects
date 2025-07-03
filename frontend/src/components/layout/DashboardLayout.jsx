@@ -32,8 +32,10 @@ const DashboardLayout = () => {
           <DashboardSidebar />
         </div>
         <div
-          className={`dark:bg-black-medium w-screen items-center justify-center overflow-auto bg-white pt-3 transition-all md:pt-6 dark:text-white ${
-            screenSize.width < 768 && isExpanded ? `opacity-80 blur-sm` : ''
+          className={`dark:bg-black-medium custom-scrollbar w-screen items-center justify-center overflow-auto bg-white pt-3 transition-all md:pt-6 dark:text-white ${
+            screenSize.width < 768 && isExpanded
+              ? `pointer-events-none opacity-80 blur-sm`
+              : ''
           }`}
         >
           <Outlet />
