@@ -5,6 +5,7 @@ import { userProfileAtom } from '../../store/atoms/userAtoms';
 import useFetchData from '../../hooks/useFetchData';
 import SkeletalLoader from '../ui/SkeletalLoader';
 import { PopupNotification } from '../ui/PopupNotification';
+import ConfirmDialog from '../ui/ConfirmationDialog';
 
 const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();
@@ -243,40 +244,13 @@ const PersonalDetails = ({ userProfile, loading }) => {
             </div>
           </div>
         )}
-
         {showDeleteDialog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-            <div className="dark:bg-black-medium text-primary-text relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-lg dark:text-white">
-              <button
-                className="text-primary-text absolute right-4 top-4 text-2xl hover:text-gray-400 dark:text-white"
-                onClick={handleCancelDeleteDialog}
-              ></button>
-              <h3 className="mb-3 text-center text-xl font-semibold">
-                Are you sure?
-              </h3>
-              <p className="text-secondary-text mb-6 text-center text-sm">
-                Deleting your account is permanent and irreversible. <br />
-                You will lose all your data related to your account.
-              </p>
-              <div className="flex justify-between gap-4">
-                <button
-                  onClick={handleCancelDeleteDialog}
-                  className="w-full rounded-lg border border-gray-300 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowDeleteDialog(false);
-                    deleteUserAccount();
-                  }}
-                  className="bg-error w-full rounded-lg py-2 text-white hover:bg-red-600"
-                >
-                  Delete account
-                </button>
-              </div>
-            </div>
-          </div>
+          <ConfirmDialog
+            onConfirm={deleteUserAccount}
+            onCancel={handleCancelDeleteDialog}
+            message="Deleting your account is permanent and irreversible.
+                You will lose all your data related to your account."
+          />
         )}
       </div>
     </>

@@ -16,10 +16,10 @@
     scrollbar-color: #d0d0d3 transparent;
   }
 
-  .custom-scrollbar::-webkit-scrollbar {
+  /* .custom-scrollbar::-webkit-scrollbar {
     height: 6px;
     width: 3px;
-  }
+  } */
 
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;

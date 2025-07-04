@@ -85,10 +85,17 @@ const Dashboard = () => {
   }
 };
 const ProjectCard = ({ project, status }) => {
+  const navigate = useNavigate();
+  function redirectToUserProject() {
+    navigate(`/project/${project.id} `);
+  }
   return (
-    <div className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md">
+    <div
+      className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md"
+      onClick={redirectToUserProject}
+    >
       <div className="w-full gap-1">
-        <div className="mb-3 flex items-start justify-between md:mb-2 md:flex-row md:items-center">
+        <div className="mb-3 flex items-start justify-between sm:items-center md:mb-2 md:flex-row">
           <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">
             {project.name}
           </span>
@@ -103,7 +110,7 @@ const ProjectCard = ({ project, status }) => {
           <DifficultyTag difficulty={project.difficulty} />
           <DomainTag domain={project.domain} />
         </div>
-        <div className="my-2 p-2">
+        <div className="my-2 py-2">
           <ToolsTag tools={project.tools} />
         </div>
       </div>
