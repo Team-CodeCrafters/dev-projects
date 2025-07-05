@@ -17,6 +17,7 @@ model User {
   admin           Admin?
   createdProjects Project[]
   startedProjects UserProject[]
+  Bookmarks       Bookmarks[]
 }
 
 model Admin {
@@ -40,6 +41,7 @@ model Project {
   tools       Tools[]
   user        User?         @relation(fields: [createdById], references: [id])
   project     UserProject[]
+  Bookmarks   Bookmarks[]
 }
 
 model UserProject {
@@ -57,6 +59,17 @@ model UserProject {
   @@unique([userId, projectId])
   @@index([projectId])
   @@index([userId])
+}
+
+model Bookmarks {
+  id        String   @id @default(uuid())
+  userId    String
+  projectId String
+  createdAt DateTime @default(now())
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
 }
 
 enum Status {
