@@ -87,7 +87,7 @@ const Dashboard = () => {
 const ProjectCard = ({ project, status }) => {
   const navigate = useNavigate();
   function redirectToUserProject() {
-    navigate(`/project/${project.id} `);
+    // redirect to user's progress page
   }
   return (
     <div
