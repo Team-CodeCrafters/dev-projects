@@ -1,6 +1,6 @@
 import prisma from '../db/db.js';
-import { createJWT, verifyJWT } from '../utils/jwt.js';
-import { comparePassword, hashPassword } from '../utils/bcrypt.js';
+import { createJWT } from '../utils/jwt.js';
+import { hashPassword } from '../utils/bcrypt.js';
 import { sendEmail } from '../utils/email.js';
 import { getUserGitHubProfile } from '../utils/userGithubProfile.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
