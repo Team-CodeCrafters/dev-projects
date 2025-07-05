@@ -1,22 +1,18 @@
-import CodeIcon from '../../../assets/icons/Code';
+import { formatString } from '../../../utils/formatters';
 
 const ToolsTag = ({ tools }) => {
   if (!tools || tools.length <= 0) return null;
+
   return (
-    <div className="dark:bg-black-light dark:outline-white-dark flex w-full flex-col gap-2 rounded-lg bg-zinc-100 p-2 py-3 outline outline-1">
-      <div className="mb-2 flex w-full items-center gap-2">
-        <CodeIcon size={'size-5'} />
-        <p className="text-center text-sm font-medium">
-          Tools and Technologies
-        </p>
-      </div>
-      <div className="flex gap-3">
+    <div className="flex w-full flex-col gap-2 border-[#495057] py-1">
+      <div className="flex flex-wrap gap-2 md:gap-3">
         {tools.map((tool, index) => (
           <span
             key={index}
-            className="dark:bg-white-light dark:text-black-dark rounded-md p-3 py-1 text-sm font-semibold tracking-tight outline outline-1"
+            className="dark:bg-black-light dark:hover:bg-primary/20 dark:hover:text-primary hover:text-primary border-black-light group relative inline-flex items-center gap-1.5 rounded-full border bg-white px-3 py-1.5 text-sm font-medium shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md dark:border-gray-700 dark:text-gray-200 dark:hover:border-blue-600"
           >
-            {tool}
+            <div className="h-1.5 w-1.5 rounded-full bg-current opacity-60 transition-opacity group-hover:opacity-100" />
+            {formatString(tool)}
           </span>
         ))}
       </div>

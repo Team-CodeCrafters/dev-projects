@@ -1,15 +1,87 @@
-import React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRecoilState } from 'recoil';
+import { ConfirmDialogAtom } from '../../store/atoms/dialog';
 
-const ConfirmDialog = ({ message, onConfirm, onCancel }) => {
+const ConfirmDialog = ({
+  title = 'Are you sure?',
+  message,
+  onConfirm,
+  onCancel,
+  confirmText = 'Confirm',
+  children,
+}) => {
+  const [showDialog, setShowDialog] = useRecoilState(ConfirmDialogAtom);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    setShowDialog(true);
+
+    function checkKeyPress(e) {
+      if (e.code === 'Escape') {
+        setShowDialog(false);
+        if (onCancel) onCancel();
+      }
+    }
+
+    function checkMouseClick(e) {
+      if (!dialogRef?.current?.contains(e.target)) {
+        setShowDialog(false);
+        if (onCancel) onCancel();
+      }
+    }
+    document.documentElement.addEventListener('keydown', checkKeyPress);
+    document.documentElement.addEventListener('click', checkMouseClick);
+
+    return () => {
+      document.documentElement.removeEventListener('keydown', checkKeyPress);
+      document.documentElement.removeEventListener('click', checkMouseClick);
+    };
+  }, []);
+
+  if (!showDialog) {
+    return null;
+  }
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50">
-      <div className="bg-black-light p-6 rounded-xl shadow-xl max-w-sm w-full text-white">
-        <h2 className="text-lg font-semibold mb-3">Are you sure?</h2>
-        <p className="text-sm text-secondary-text mb-6">{message}</p>
-        <div className="flex justify-end gap-4">
-          <button onClick={onCancel} className="text-white hover:underline">Cancel</button>
-          <button onClick={onConfirm} className="text-error font-semibold hover:underline">Continue</button>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+      <div
+        className="dark:bg-black-medium text-primary-text relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-lg dark:text-white"
+        ref={dialogRef}
+      >
+        <h3 className="font-heading mb-3 text-center text-xl font-semibold">
+          {title}
+        </h3>
+        {message && (
+          <p className="dark:text-white-dark text-black-medium mb-6 text-center text-sm">
+            {message}
+          </p>
+        )}
+        {!!children ? (
+          children
+        ) : (
+          <>
+            <div className="flex justify-between gap-4">
+              <button
+                onClick={() => {
+                  setShowDialog(false);
+                  if (onCancel) onCancel();
+                }}
+                className="font-heading w-full rounded-lg border border-gray-300 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowDialog(false);
+                  onConfirm();
+                }}
+                className="bg-error font-heading w-full rounded-lg py-2 text-white hover:bg-red-600"
+              >
+                {confirmText}
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

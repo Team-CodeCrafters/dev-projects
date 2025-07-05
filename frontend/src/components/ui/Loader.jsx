@@ -1,8 +1,8 @@
-import React from 'react';
-
-const Loader = () => {
+const Loader = ({ primaryColor, height = 'h-7', width = 'w-7' }) => {
   return (
-    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+    <div
+      className={`${height} ${width} animate-spin rounded-full border-2 border-t-transparent dark:border-white ${!!primaryColor && 'border-primary border-4'} `}
+    />
   );
 };
 

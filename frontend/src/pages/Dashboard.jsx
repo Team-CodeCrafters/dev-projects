@@ -8,6 +8,7 @@ import DomainTag from '../components/projects/tags/DomainTag';
 import StatusTag from '../components/projects/tags/StatusTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
 import { ListIcon } from '../assets/icons/List';
+import SkeletalLoader from '../components/ui/SkeletalLoader';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -16,22 +17,12 @@ const Dashboard = () => {
 
   const ProjectsLoadingIndicator = () => {
     return (
-      <div className="dark:bg-black-neutral w-[90%] max-w-xl rounded-md bg-gray-50 outline outline-gray-300 lg:ml-10 dark:outline-black">
-        <div
-          className="flex w-full animate-pulse flex-col p-4"
-          style={{ animationDuration: '1000ms' }}
-        >
-          <div className="flex justify-between">
-            <div className="dark:bg-black-light h-6 w-52 max-w-[45%] rounded-full bg-gray-200"></div>
-            <div className="flex justify-end gap-1 md:gap-2">
-              <div className="dark:bg-black-light mb-4 h-6 w-36 max-w-[35%] rounded-full bg-gray-200"></div>
-              <div className="dark:bg-black-light h-6 w-20 max-w-[30%] rounded-full bg-gray-200"></div>
-            </div>
-          </div>
-          <div className="dark:bg-black-light mb-3 h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-          <div className="dark:bg-black-light mb-2 h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-          <div className="dark:bg-black-light h-5 w-[80%] max-w-sm rounded-full bg-gray-200"></div>
-        </div>
+      <div className="bg-white-medium dark:bg-black-medium w-[90%] max-w-2xl p-2">
+        <SkeletalLoader height="h-7">
+          <SkeletalLoader height="h-8" width="w-[70%]" />
+          <SkeletalLoader height="h-10" styles="mt-5" />
+          <SkeletalLoader height="h-10" />
+        </SkeletalLoader>
       </div>
     );
   };
@@ -94,10 +85,17 @@ const Dashboard = () => {
   }
 };
 const ProjectCard = ({ project, status }) => {
+  const navigate = useNavigate();
+  function redirectToUserProject() {
+    // redirect to user's progress page
+  }
   return (
-    <div className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md">
+    <div
+      className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md"
+      onClick={redirectToUserProject}
+    >
       <div className="w-full gap-1">
-        <div className="mb-3 flex items-start justify-between md:mb-2 md:flex-row md:items-center">
+        <div className="mb-3 flex items-start justify-between sm:items-center md:mb-2 md:flex-row">
           <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">
             {project.name}
           </span>
@@ -112,7 +110,7 @@ const ProjectCard = ({ project, status }) => {
           <DifficultyTag difficulty={project.difficulty} />
           <DomainTag domain={project.domain} />
         </div>
-        <div className="my-2 p-2">
+        <div className="my-2 py-2">
           <ToolsTag tools={project.tools} />
         </div>
       </div>

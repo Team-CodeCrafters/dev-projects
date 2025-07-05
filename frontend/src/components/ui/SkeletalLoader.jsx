@@ -1,12 +1,18 @@
-const SkeletalLoader = ({ height = 'h-16', width = 'w-full' }) => {
-  return (
+const SkeletalLoader = ({
+  height = 'h-7',
+  width = 'w-full',
+  styles = '',
+  children,
+}) => {
+  return children ? (
+    <div className={`flex w-full flex-col ${width} ${styles}`}>{children}</div>
+  ) : (
     <div
-      className={`bg-white-dark dark:bg-black-neutral m-2 flex w-full flex-row items-center justify-center rounded-lg p-1 ${height} ${width}`}
+      className={`my-1 flex w-full flex-col justify-start rounded-lg p-1 ${height} ${width} ${styles}`}
     >
-      <div className="flex w-full flex-col items-start justify-center gap-2">
-        <div className="bg-black-light h-5 w-[20%] animate-pulse rounded-lg"></div>
-        <div className="dark:bg-black-light h-4 w-3/5 animate-pulse rounded-lg bg-gray-200"></div>
-      </div>
+      <div
+        className={`dark:bg-black-light animate-pulse rounded-lg bg-gray-200 ${height} ${width}`}
+      ></div>
     </div>
   );
 };

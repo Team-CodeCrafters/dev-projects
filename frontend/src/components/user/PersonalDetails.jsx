@@ -5,6 +5,7 @@ import { userProfileAtom } from '../../store/atoms/userAtoms';
 import useFetchData from '../../hooks/useFetchData';
 import SkeletalLoader from '../ui/SkeletalLoader';
 import { PopupNotification } from '../ui/PopupNotification';
+import ConfirmDialog from '../ui/ConfirmationDialog';
 
 const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
   }
 
   return (
-    <div className="animate-fade-in text-primary-text mt-20 w-full max-w-2xl space-y-8 px-4 dark:text-white">
+    <>
       {popup.show && (
         <PopupNotification
           text={popup.text}
@@ -88,189 +89,171 @@ const PersonalDetails = ({ userProfile, loading }) => {
           onClose={() => setPopup({ ...popup, show: false })}
         />
       )}
+      <div className="animate-fade-in text-primary-text mt-20 w-full max-w-2xl space-y-8 px-4 dark:text-white">
+        {loading ? (
+          <div className="space-y-8">
+            <div>
+              <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+              <SkeletalLoader height="h-7" width="w-full" />
+            </div>
+            <div>
+              <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+              <SkeletalLoader height="h-7" width="w-full" />
+            </div>
+            <div>
+              <SkeletalLoader height="h-7" width="w-1/3" styles="" />
+              <SkeletalLoader height="h-7" width="w-full" />
+            </div>
+          </div>
+        ) : (
+          <>
+            <h1 className="text-2xl font-semibold">Personal details</h1>
 
-      {loading ? (
-        <>
-          <SkeletalLoader height="h-6" width="w-1/3" />
-          <SkeletalLoader height="h-14" width="w-full" />
-          <SkeletalLoader height="h-14" width="w-full" />
-          <SkeletalLoader height="h-14" width="w-full" />
-        </>
-      ) : (
-        <>
-          <h1 className="text-2xl font-semibold">Personal details</h1>
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-primary-text text-base font-medium dark:text-white">
+                  Name
+                </h2>
+                {!editMode && (
+                  <button
+                    className="text-primary text-sm hover:underline dark:text-white"
+                    onClick={() => setEditMode(true)}
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
 
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-primary-text text-base font-medium dark:text-white">
-                Name
-              </h2>
-              {!editMode && (
-                <button
-                  className="text-primary text-sm hover:underline dark:text-white"
-                  onClick={() => setEditMode(true)}
-                >
-                  Edit
-                </button>
+              {editMode ? (
+                <div className="mt-4 space-y-4">
+                  <p className="text-secondary-text text-sm">
+                    This will be visible on your profile and to other team
+                    members.
+                  </p>
+                  <div>
+                    <label className="text-primary-text mb-1 block text-sm dark:text-white">
+                      Full name
+                    </label>
+                    <input
+                      type="text"
+                      value={editedName}
+                      onChange={(e) => setEditedName(e.target.value)}
+                      className="text-primary-text border-white-dark bg-white-medium dark:bg-black-light dark:border-white-dark w-full rounded-lg border p-3 dark:text-white"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="w-fit">
+                      <button
+                        onClick={handleSave}
+                        className="bg-primary hover:bg-secondary rounded-lg px-4 py-1.5 font-medium text-white transition"
+                      >
+                        Save
+                      </button>
+                    </div>
+                    <button
+                      onClick={handleCancelEditName}
+                      className="text-primary hover:underline dark:text-white"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-secondary-text mt-2 text-base">
+                  {userProfile?.displayName || 'You have not set any Name.'}
+                </p>
               )}
             </div>
 
-            {editMode ? (
-              <div className="mt-4 space-y-4">
-                <p className="text-secondary-text text-sm">
-                  This will be visible on your profile and to other team
-                  members.
-                </p>
-                <div>
-                  <label className="text-primary-text mb-1 block text-sm dark:text-white">
-                    Full name
-                  </label>
-                  <input
-                    type="text"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    className="text-primary-text border-white-dark bg-white-medium dark:bg-black-light dark:border-white-dark w-full rounded-lg border p-3 dark:text-white"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="w-fit">
-                    <button
-                      onClick={handleSave}
-                      className="bg-primary hover:bg-secondary rounded-lg px-4 py-1.5 font-medium text-white transition"
-                    >
-                      Save
-                    </button>
-                  </div>
-                  <button
-                    onClick={handleCancelEditName}
-                    className="text-primary hover:underline dark:text-white"
-                  >
-                    Cancel
-                  </button>
-                </div>
+            <hr className="border border-gray-300 dark:border-gray-700" />
+
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-primary-text text-base font-medium dark:text-white">
+                  Email address
+                </h2>
               </div>
-            ) : (
               <p className="text-secondary-text mt-2 text-base">
-                {userProfile?.displayName || 'You have not set any Name.'}
+                {userProfile?.email}
               </p>
-            )}
-          </div>
-
-          <hr className="border border-gray-300 dark:border-gray-700" />
-
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-primary-text text-base font-medium dark:text-white">
-                Email address
-              </h2>
             </div>
-            <p className="text-secondary-text mt-2 text-base">
-              {userProfile?.email}
-            </p>
-          </div>
 
-          <hr className="border border-gray-300 dark:border-gray-700" />
+            <hr className="border border-gray-300 dark:border-gray-700" />
 
-          <div>
-            <div className="flex items-center justify-between">
-              <h2 className="text-primary-text text-base font-medium dark:text-white">
-                Password
-              </h2>
-              <button
-                className="text-primary text-sm hover:underline dark:text-white"
-                onClick={() => setShowPasswordDialog(true)}
-              >
-                Create new
-              </button>
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-primary-text text-base font-medium dark:text-white">
+                  Password
+                </h2>
+                <button
+                  className="text-primary text-sm hover:underline dark:text-white"
+                  onClick={() => setShowPasswordDialog(true)}
+                >
+                  Create new
+                </button>
+              </div>
+              <p className="text-secondary-text mt-2 text-base">••••••••</p>
             </div>
-            <p className="text-secondary-text mt-2 text-base">••••••••</p>
-          </div>
-        </>
-      )}
+          </>
+        )}
 
-      <div className="dark:border-white-dark mt-10 space-y-4 border-t border-gray-300 pt-4">
-        <h2 className="text-primary-text mt-10 text-xl font-semibold dark:text-white">
-          Manage account
-        </h2>
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-primary-text font-medium dark:text-white">
-              Delete account
-            </h3>
-            <p className="text-secondary-text mt-1 text-sm">
-              Permanently delete your Dev Projects account.
-            </p>
-          </div>
-          <button
-            onClick={() => setShowDeleteDialog(true)}
-            className="text-error pt-1 text-sm font-medium hover:underline"
-          >
-            Delete
-          </button>
-        </div>
-      </div>
-
-      {showPasswordDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-          <div className="text-primary-text dark:bg-black-medium w-[90%] max-w-md rounded-xl bg-white p-6 dark:text-white">
-            <h3 className="mb-4 text-xl font-semibold">Are you sure?</h3>
-            <p className="text-secondary-text mb-6">
-              You will be redirected to create a new password. This action
-              cannot be undone.
-            </p>
-            <div className="flex justify-end space-x-4">
-              <button
-                className="bg-white-light text-primary-text hover:bg-white-dark dark:bg-white-dark rounded-md px-4 py-2 dark:text-black dark:hover:bg-white"
-                onClick={handleCancelPasswordDialog}
-              >
-                Cancel
-              </button>
-              <button
-                className="bg-error rounded-md px-4 py-2 text-white hover:bg-red-600"
-                onClick={handlePasswordChange}
-              >
-                Continue
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showDeleteDialog && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
-          <div className="dark:bg-black-medium text-primary-text relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-lg dark:text-white">
-            <button
-              className="text-primary-text absolute right-4 top-4 text-2xl hover:text-gray-400 dark:text-white"
-              onClick={handleCancelDeleteDialog}
-            ></button>
-            <h3 className="mb-3 text-center text-xl font-semibold">
-              Are you sure?
-            </h3>
-            <p className="text-secondary-text mb-6 text-center text-sm">
-              Deleting your account is permanent and irreversible. <br />
-              You will lose all your data related to your account.
-            </p>
-            <div className="flex justify-between gap-4">
-              <button
-                onClick={handleCancelDeleteDialog}
-                className="w-full rounded-lg border border-gray-300 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  setShowDeleteDialog(false);
-                  deleteUserAccount();
-                }}
-                className="bg-error w-full rounded-lg py-2 text-white hover:bg-red-600"
-              >
+        <div className="dark:border-white-dark mt-10 space-y-4 border-t border-gray-300 pt-4">
+          <h2 className="text-primary-text mt-10 text-xl font-semibold dark:text-white">
+            Manage account
+          </h2>
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-primary-text font-medium dark:text-white">
                 Delete account
-              </button>
+              </h3>
+              <p className="text-secondary-text mt-1 text-sm">
+                Permanently delete your Dev Projects account.
+              </p>
             </div>
+            <button
+              onClick={() => setShowDeleteDialog(true)}
+              className="text-error pt-1 text-sm font-medium hover:underline"
+            >
+              Delete
+            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        {showPasswordDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+            <div className="text-primary-text dark:bg-black-medium w-[90%] max-w-md rounded-xl bg-white p-6 dark:text-white">
+              <h3 className="mb-4 text-xl font-semibold">Are you sure?</h3>
+              <p className="text-secondary-text mb-6">
+                You will be redirected to create a new password. This action
+                cannot be undone.
+              </p>
+              <div className="flex justify-end space-x-4">
+                <button
+                  className="bg-white-light text-primary-text hover:bg-white-dark dark:bg-white-dark rounded-md px-4 py-2 dark:text-black dark:hover:bg-white"
+                  onClick={handleCancelPasswordDialog}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-error rounded-md px-4 py-2 text-white hover:bg-red-600"
+                  onClick={handlePasswordChange}
+                >
+                  Continue
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {showDeleteDialog && (
+          <ConfirmDialog
+            onConfirm={deleteUserAccount}
+            onCancel={handleCancelDeleteDialog}
+            message="Deleting your account is permanent and irreversible.
+                You will lose all your data related to your account."
+          />
+        )}
+      </div>
+    </>
   );
 };
 

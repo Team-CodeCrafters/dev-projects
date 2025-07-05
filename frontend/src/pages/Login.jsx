@@ -42,7 +42,6 @@ const Login = () => {
   return (
     <div className="px- flex min-h-screen items-center justify-center bg-black">
       <Card>
-        {/* ✅ Logo added here */}
         <div className="mb-6 flex justify-center">
           <img src={logo} alt="Logo" className="h-12" />
         </div>

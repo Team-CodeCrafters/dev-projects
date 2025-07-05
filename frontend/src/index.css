@@ -11,6 +11,46 @@
 }
 
 @layer utilities {
+  .custom-scrollbar {
+    scrollbar-width: 6px;
+    scrollbar-color: #d0d0d3 transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #303037;
+    border-radius: 6px;
+    border: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: #27272a transparent;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #303037;
+  }
+
+  .dark .custom-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    height: 4px;
+    width: 4px;
+  }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -41,22 +81,22 @@
   }
 
   .difficulty-beginner {
-    @apply rounded-full border border-green-200 bg-green-300 px-3 py-1 text-xs font-medium tracking-tight text-green-800;
+    @apply rounded-full border border-green-200 bg-green-300 px-3 py-1 text-xs font-medium tracking-tight text-green-800 md:text-sm;
   }
 
   .difficulty-intermediate {
-    @apply rounded-full border border-yellow-200 bg-yellow-100/80 px-3 py-1 text-xs font-medium tracking-tight text-yellow-800;
+    @apply rounded-full border border-yellow-200 bg-yellow-100/80 px-3 py-1 text-xs font-medium tracking-tight text-yellow-800 md:text-sm;
   }
 
   .difficulty-master {
-    @apply rounded-full border border-red-200 bg-red-100/80 px-3 py-1 text-xs font-medium tracking-tight text-red-800;
+    @apply rounded-full border border-red-200 bg-red-100/80 px-3 py-1 text-xs font-medium tracking-tight text-red-800 md:text-sm;
   }
 
   .difficulty-expert {
-    @apply rounded-full border border-purple-200 bg-purple-100/80 px-3 py-1 text-xs font-medium tracking-tight text-purple-800;
+    @apply rounded-full border border-blue-300 bg-blue-200 px-3 py-1 text-xs font-medium tracking-tight text-blue-800 md:text-sm;
   }
 
   .text-domain {
-    @apply rounded-full bg-purple-200/80 px-3 py-1 text-xs font-medium tracking-tight text-purple-900;
+    @apply rounded-full bg-purple-200/80 px-3 py-1 text-xs font-medium tracking-tight text-purple-900 md:text-sm;
   }
 }
