@@ -3,7 +3,7 @@ const Button = ({ text, onClick, loading, ...props }) => {
     <button
       onClick={onClick}
       {...props}
-      className="bg-primary focus:ring-primary group relative flex h-12 w-full min-w-28 items-center justify-center overflow-hidden rounded-lg border-none text-base font-semibold capitalize text-white shadow-2xl outline-none transition-all hover:scale-105 hover:bg-indigo-600 focus:scale-105 focus:ring-2 focus:ring-offset-2 md:min-w-36 md:text-lg"
+      className="bg-primary focus:ring-primary group relative flex h-12 w-full min-w-28 items-center justify-center overflow-hidden rounded-lg border-none text-base font-semibold capitalize text-white shadow-2xl outline-none transition-all hover:scale-[1.035] hover:bg-indigo-600 focus:scale-[1.035] focus:ring-2 focus:ring-offset-2 md:min-w-36 md:text-lg"
     >
       <span
         className={`transition-opacity duration-200 ${loading ? 'opacity-0' : 'opacity-100'} `}

@@ -2,9 +2,10 @@ import { formatString } from '../../../utils/formatters';
 
 const ToolsTag = ({ tools }) => {
   if (!tools || tools.length <= 0) return null;
+
   return (
     <div className="flex w-full flex-col gap-2 border-[#495057] py-1">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2 md:gap-3">
         {tools.map((tool, index) => (
           <span
             key={index}
