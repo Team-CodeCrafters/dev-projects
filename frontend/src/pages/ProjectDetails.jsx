@@ -106,7 +106,6 @@ const ProjectHeader = ({ projectId }) => {
 
     return (
       <>
-        {console.log({ error, data })}
         {!!data && <PopupNotification type="success" text={data.message} />}
         {!!error &&
           (error === 'Request failed' ? (
