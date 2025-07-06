@@ -25,6 +25,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    document.title = 'Dev Projects | Dashboard';
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/signup');
@@ -60,7 +61,7 @@ const Dashboard = () => {
   if (userProjects.length > 0) {
     return (
       <div className="bg-white-medium dark:bg-black-medium outline-black-dark mb-96 max-w-2xl rounded-lg p-3 md:p-5">
-        <h1 className="font-heading mb-5 text-2xl font-medium tracking-wide">
+        <h1 className="font-heading mb-5 text-xl font-medium tracking-wide md:text-2xl">
           Started Projects
         </h1>
         <div>

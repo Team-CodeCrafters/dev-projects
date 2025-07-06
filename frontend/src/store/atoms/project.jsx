@@ -8,3 +8,8 @@ export const projectDetailsTab = atom({
   key: 'projectDetailsTab',
   default: 'get-started',
 });
+
+export const BookmarkedProjectsAtom = atom({
+  key: 'BookmarkedProjectsAtom',
+  default: [],
+});
