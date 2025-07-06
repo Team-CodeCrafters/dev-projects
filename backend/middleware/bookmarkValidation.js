@@ -26,7 +26,7 @@ function validateDeleteBookmark(req, res, next) {
 
   if (!zodResult.success) {
     return res.status(400).json({
-      mesage: 'invalid bookmark id',
+      message: 'invalid bookmark id',
       error: zodResult?.error?.errors[0]?.message,
     });
   }
