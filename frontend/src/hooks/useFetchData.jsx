@@ -23,7 +23,7 @@ const useFetchData = () => {
         return { success: false, error: err };
       }
     } catch (error) {
-      const message = error.message || 'Network error';
+      const message = 'Network error';
       setError(message);
       return { success: false, error: message };
     } finally {

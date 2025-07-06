@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import { projectDetailsAtom, projectDetailsTab } from '../store/atoms/project';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import LoadingPage from '../pages/LoadingPage';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
@@ -31,7 +30,7 @@ const ProjectDetails = () => {
   }, []);
 
   if (error) {
-    return null;
+    return <PopupNotification text={error} type="error" />;
   }
   if (loading) {
     return (
@@ -53,35 +52,88 @@ const ProjectDetails = () => {
 
 const ProjectHeader = ({ projectId }) => {
   const project = useRecoilValue(projectDetailsAtom);
-  const { fetchData, loading, error } = useFetchData();
-  const [isProjectStarted, setProjectStarted] = useState(false);
-  async function startUserProject() {
-    const token = localStorage.getItem('token');
-    const options = {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        projectId: projectId,
-      }),
-    };
-    const response = await fetchData('/user-projects/create', options);
-    if (response.success) {
-      setProjectStarted(true);
+
+  const StartProjectButton = () => {
+    const { fetchData, loading, error } = useFetchData();
+
+    async function handleStartProject() {
+      const token = localStorage.getItem('token');
+      const options = {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectId }),
+      };
+
+      await fetchData('/user-projects/create', options);
     }
-  }
+
+    return (
+      <div className="min-w-32">
+        {!!error &&
+          (error === 'Request failed' ? (
+            <CreateAccountDialog />
+          ) : (
+            <PopupNotification type="error" text={error} />
+          ))}
+        <Button
+          onClick={handleStartProject}
+          text={loading ? <Loader /> : 'Start Project'}
+          disabled={loading}
+        />
+      </div>
+    );
+  };
+
+  const BookmarkButton = ({}) => {
+    const { fetchData, data, loading, error } = useFetchData();
+
+    async function handleBookmark() {
+      const token = localStorage.getItem('token');
+      const options = {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectId }),
+      };
+
+      await fetchData('/bookmark/', options);
+    }
+
+    return (
+      <>
+        {console.log({ error, data })}
+        {!!data && <PopupNotification type="success" text={data.message} />}
+        {!!error &&
+          (error === 'Request failed' ? (
+            <CreateAccountDialog />
+          ) : (
+            <PopupNotification type="info" text={error} />
+          ))}
+        <button
+          onClick={handleBookmark}
+          disabled={loading}
+          className="font-body duration focus:outline-primary dark:hover:bg-black-medium box-content flex w-16 shrink items-center justify-center gap-2 rounded-md p-1 px-3 transition-all duration-200 hover:bg-gray-200 focus:scale-95 disabled:opacity-50 md:px-5"
+        >
+          {loading ? (
+            <Loader height={'h-5'} width={'w-5'} />
+          ) : (
+            <>
+              <BookmarkIcon size={'md:size-5 size-4'} />
+              <span>Save</span>
+            </>
+          )}
+        </button>
+      </>
+    );
+  };
+
   return (
     <>
-      {!!isProjectStarted && (
-        <PopupNotification type="success" text={'Project is started now'} />
-      )}
-      {error === 'Request failed' && <CreateAccountDialog />}
-      {error && error !== 'Request failed' && (
-        <PopupNotification text={error} type="error" />
-      )}
-
       <div className="ml-2 flex flex-col gap-3">
         <div className="flex w-full flex-col items-start justify-between gap-3 sm:flex-row">
           <h1 className="font-heading inline flex-1 text-2xl font-medium tracking-wide">
@@ -96,16 +148,8 @@ const ProjectHeader = ({ projectId }) => {
           <ToolsTag tools={project.tools} />
         </div>
         <div className="mt-4 flex gap-4 md:flex-row">
-          <div className="min-w-32">
-            <Button
-              onClick={startUserProject}
-              text={loading ? <Loader /> : 'Start Project'}
-            />
-          </div>
-          <button className="font-body duration focus:outline-primary dark:hover:bg-black-medium box-content flex w-16 shrink items-center justify-end gap-2 rounded-md p-1 px-3 transition-all duration-200 hover:bg-gray-200 focus:scale-95 md:px-5">
-            <BookmarkIcon size={'md:size-5 size-4 '} />
-            <span>Save</span>
-          </button>
+          <StartProjectButton />
+          <BookmarkButton />
         </div>
       </div>
     </>
