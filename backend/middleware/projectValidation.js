@@ -35,8 +35,8 @@ const recommendationSchema = projectSchema
     tools: true,
   })
   .extend({
-    maxCount: zod.number({ message: 'maxCount is invalid' }).max(50),
-    excludeIds: zod.array(zod.string().uuid({ message: 'invalid exclude id' })),
+    maxCount: zod.number({ message: 'maxCount is invalid' }).min(1).max(50),
+    excludeIds: zod.array(zod.string({ message: 'invalid exclude id' })),
   })
   .partial();
 
@@ -83,7 +83,7 @@ async function validateProjectFilters(req, res, next) {
   next();
 }
 async function validateRecommendation(req, res, next) {
-  let { difficulty, domain, tools, maxCount, excludeIds = '' } = req.query;
+  let { difficulty, domain, tools, maxCount, excludeIds } = req.query;
   tools = tools?.split(',');
   excludeIds = excludeIds?.split(',');
 

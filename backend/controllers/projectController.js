@@ -133,7 +133,7 @@ async function getRecommendation(req, res) {
   } = req.filters;
   const query = {};
   if (difficulty) query['difficulty'] = difficulty;
-  if (tools) query['tools'] = { equals: tools };
+  if (tools) query['tools'] = { hasSome: tools };
   if (domain) query['domain'] = domain;
 
   try {
