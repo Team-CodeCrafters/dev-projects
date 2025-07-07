@@ -3,12 +3,13 @@ import DomainTag from './tags/DomainTag';
 import StatusTag from './tags/StatusTag';
 import ToolsTag from './tags/ToolsTag';
 
-const ProjectCard = ({ project, status, onClick }) => {
+const ProjectCard = ({ project, status, onClick, styles, children }) => {
   return (
     <div
-      className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md"
+      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all duration-700 hover:shadow-md ${styles}`}
       onClick={onClick}
     >
+      {children}
       <div className="w-full gap-1">
         <div className="mb-3 flex items-start justify-between sm:items-center md:mb-2 md:flex-row">
           <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">

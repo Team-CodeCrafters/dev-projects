@@ -1,8 +1,12 @@
-import { useEffect, useState, memo } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
-import { projectDetailsAtom, projectDetailsTab } from '../store/atoms/project';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import {
+  BookmarkedProjectsAtom,
+  projectDetailsAtom,
+  projectDetailsTab,
+} from '../store/atoms/project';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
@@ -41,7 +45,7 @@ const ProjectDetails = () => {
   }
   if (project) {
     return (
-      <div className="dark:bg-black-light bg-white-dark bg-red relative flex w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-2xl">
+      <div className="dark:bg-black-light bg-white-dark bg-red relative flex w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:max-w-2xl md:p-4 lg:max-w-2xl">
         <ProjectHeader projectId={project.id} />
         <TabsLayout />
         <ProjectContent />
@@ -54,7 +58,7 @@ const ProjectHeader = ({ projectId }) => {
   const project = useRecoilValue(projectDetailsAtom);
 
   const StartProjectButton = () => {
-    const { fetchData, loading, error } = useFetchData();
+    const { fetchData, loading, error, data } = useFetchData();
 
     async function handleStartProject() {
       const token = localStorage.getItem('token');
@@ -78,6 +82,7 @@ const ProjectHeader = ({ projectId }) => {
           ) : (
             <PopupNotification type="error" text={error} />
           ))}
+        {!!data && <PopupNotification type="success" text={data.message} />}
         <Button
           onClick={handleStartProject}
           text={loading ? <Loader /> : 'Start Project'}
@@ -88,8 +93,8 @@ const ProjectHeader = ({ projectId }) => {
   };
 
   const BookmarkButton = ({}) => {
-    const { fetchData, data, loading, error } = useFetchData();
-
+    const { fetchData, data: bookmarkData, loading, error } = useFetchData();
+    const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
     async function handleBookmark() {
       const token = localStorage.getItem('token');
       const options = {
@@ -101,12 +106,18 @@ const ProjectHeader = ({ projectId }) => {
         body: JSON.stringify({ projectId }),
       };
 
-      await fetchData('/bookmark/', options);
+      const response = await fetchData('/bookmark/', options);
+      if (response.success) {
+        const newBookmark = response.data.bookmark;
+        addBookmark((prev) => ({ ...prev, newBookmark }));
+      }
     }
 
     return (
       <>
-        {!!data && <PopupNotification type="success" text={data.message} />}
+        {!!bookmarkData && (
+          <PopupNotification type="success" text={bookmarkData.message} />
+        )}
         {!!error &&
           (error === 'Request failed' ? (
             <CreateAccountDialog />

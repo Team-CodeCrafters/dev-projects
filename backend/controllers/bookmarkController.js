@@ -4,14 +4,16 @@ async function createBookmark(req, res) {
   try {
     const { projectId } = req.body;
 
-    await prisma.bookmarks.create({
+    const bookmark = await prisma.bookmarks.create({
       data: {
         userId: req.userId,
         projectId: projectId,
       },
     });
 
-    return res.status(200).json({ message: 'bookmark created successfully' });
+    return res
+      .status(200)
+      .json({ message: 'bookmark created successfully', bookmark });
   } catch (error) {
     if (error.code === 'P2002') {
       return res.status(400).json({
