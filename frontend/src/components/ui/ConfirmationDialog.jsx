@@ -29,8 +29,10 @@ const ConfirmDialog = ({
         if (onCancel) onCancel();
       }
     }
-    document.documentElement.addEventListener('keydown', checkKeyPress);
-    document.documentElement.addEventListener('click', checkMouseClick);
+    setTimeout(() => {
+      document.documentElement.addEventListener('keydown', checkKeyPress);
+      document.documentElement.addEventListener('click', checkMouseClick);
+    }, 0);
 
     return () => {
       document.documentElement.removeEventListener('keydown', checkKeyPress);

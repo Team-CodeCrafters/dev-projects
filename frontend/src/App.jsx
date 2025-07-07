@@ -11,6 +11,7 @@ const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
 import { useTheme } from './hooks/useTheme';
+import Bookmarks from './pages/Bookmarks';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -33,6 +34,7 @@ function App() {
             <Route path="/profile" element={<UserProfile />} />
             <Route path="/projects" element={<div />} />
             <Route path="/project/:id" element={<ProjectDetails />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
           </Route>
 
           <Route path="*" element={<div>Page Not Found</div>} />

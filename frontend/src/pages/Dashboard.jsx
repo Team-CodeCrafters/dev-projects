@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import useFetchData from '../hooks/useFetchData';
 import { userProjectsAtom } from '../store/atoms/userProjects';
-import DifficultyTag from '../components/projects/tags/DifficultyTag';
-import DomainTag from '../components/projects/tags/DomainTag';
-import StatusTag from '../components/projects/tags/StatusTag';
-import ToolsTag from '../components/projects/tags/ToolsTag';
 import { ListIcon } from '../assets/icons/List';
 import SkeletalLoader from '../components/ui/SkeletalLoader';
+import ProjectCard from '../components/projects/ProjectCard';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -28,6 +25,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    document.title = 'Dev Projects | Dashboard';
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/signup');
@@ -63,7 +61,7 @@ const Dashboard = () => {
   if (userProjects.length > 0) {
     return (
       <div className="bg-white-medium dark:bg-black-medium outline-black-dark mb-96 max-w-2xl rounded-lg p-3 md:p-5">
-        <h1 className="font-heading mb-5 text-2xl font-medium tracking-wide">
+        <h1 className="font-heading mb-5 text-xl font-medium tracking-wide md:text-2xl">
           Started Projects
         </h1>
         <div>
@@ -83,39 +81,6 @@ const Dashboard = () => {
   if (!loading && !error && userProjects.length == 0) {
     return <NoProjectsStarted />;
   }
-};
-const ProjectCard = ({ project, status }) => {
-  const navigate = useNavigate();
-  function redirectToUserProject() {
-    // redirect to user's progress page
-  }
-  return (
-    <div
-      className="bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all hover:scale-[1.025] hover:shadow-md"
-      onClick={redirectToUserProject}
-    >
-      <div className="w-full gap-1">
-        <div className="mb-3 flex items-start justify-between sm:items-center md:mb-2 md:flex-row">
-          <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">
-            {project.name}
-          </span>
-          <span>
-            <StatusTag status={status} />
-          </span>
-        </div>
-        <span className="text-md mb-5 line-clamp-2 w-[90%] opacity-75">
-          {project.about}
-        </span>
-        <div className="flex items-center gap-2">
-          <DifficultyTag difficulty={project.difficulty} />
-          <DomainTag domain={project.domain} />
-        </div>
-        <div className="my-2 py-2">
-          <ToolsTag tools={project.tools} />
-        </div>
-      </div>
-    </div>
-  );
 };
 
 const NoProjectsStarted = () => {
