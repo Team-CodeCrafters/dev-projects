@@ -49,7 +49,6 @@ const PersonalDetails = ({ userProfile, loading }) => {
 
   const handleCancelEditName = () => {
     setEditMode(false);
-    showPopup('Name edit cancelled.', 'info');
   };
 
   const handlePasswordChange = () => {
@@ -58,7 +57,6 @@ const PersonalDetails = ({ userProfile, loading }) => {
 
   const handleCancelPasswordDialog = () => {
     setShowPasswordDialog(false);
-    showPopup('Password change cancelled.', 'info');
   };
 
   const handleCancelDeleteDialog = () => {
@@ -126,14 +124,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
 
               {editMode ? (
                 <div className="mt-4 space-y-4">
-                  <p className="text-secondary-text text-sm">
-                    This will be visible on your profile and to other team
-                    members.
-                  </p>
                   <div>
-                    <label className="text-primary-text mb-1 block text-sm dark:text-white">
-                      Full name
-                    </label>
                     <input
                       type="text"
                       value={editedName}
