@@ -4,6 +4,7 @@ import {
   deleteProject,
   getProjectDetails,
   getProjects,
+  getRecommendation,
   updateProject,
 } from '../controllers/projectController.js';
 import { authenticateAdmin } from '../middleware/userValidation.js';
@@ -11,6 +12,7 @@ import {
   validateProjectData,
   validateProjectFilters,
   validateProjectUpdate,
+  validateRecommendation,
 } from '../middleware/projectValidation.js';
 import { upload } from '../middleware/multer.js';
 
@@ -21,6 +23,7 @@ router.post(
   createProject,
 );
 router.get('/all', validateProjectFilters, getProjects);
+router.get('/recommend', validateRecommendation, getRecommendation);
 router.get('/:id', getProjectDetails);
 router.patch(
   '/:id',
@@ -29,5 +32,4 @@ router.patch(
   updateProject,
 );
 router.delete('/:id', authenticateAdmin, deleteProject);
-
 export default router;

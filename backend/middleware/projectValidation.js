@@ -28,6 +28,17 @@ const projectFilterSchema = projectSchema
     tools: true,
   })
   .partial();
+const recommendationSchema = projectSchema
+  .pick({
+    difficulty: true,
+    domain: true,
+    tools: true,
+  })
+  .extend({
+    maxCount: zod.number({ message: 'maxCount is invalid' }).min(1).max(50),
+    excludeIds: zod.array(zod.string({ message: 'invalid exclude id' })),
+  })
+  .partial();
 
 async function validateProjectData(req, res, next) {
   req.body.tools = req.body.tools?.split(',');
@@ -71,5 +82,31 @@ async function validateProjectFilters(req, res, next) {
   }
   next();
 }
+async function validateRecommendation(req, res, next) {
+  let { difficulty, domain, tools, maxCount, excludeIds } = req.query;
+  tools = tools?.split(',');
+  excludeIds = excludeIds?.split(',');
 
-export { validateProjectData, validateProjectFilters, validateProjectUpdate };
+  const zodResponse = recommendationSchema.safeParse({
+    difficulty,
+    domain,
+    tools,
+    maxCount: maxCount ? parseInt(maxCount) : undefined,
+    excludeIds,
+  });
+  if (!zodResponse.success) {
+    return res.status(401).json({
+      message: 'Invalid filters',
+      error: zodResponse.error.errors,
+    });
+  }
+  req.filters = zodResponse.data;
+  next();
+}
+
+export {
+  validateProjectData,
+  validateProjectFilters,
+  validateProjectUpdate,
+  validateRecommendation,
+};

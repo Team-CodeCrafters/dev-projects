@@ -1,6 +1,7 @@
 import prisma from '../db/db.js';
 import fs from 'fs';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { recommendOtherProjects } from '../utils/project.js';
 async function getProjects(req, res) {
   try {
     const { difficulty, tools, domain } = req.filters;
@@ -123,10 +124,57 @@ async function deleteProject(req, res) {
   }
 }
 
+async function getRecommendation(req, res) {
+  const {
+    difficulty,
+    domain,
+    tools,
+    maxCount = 3,
+    excludeIds = [],
+  } = req.filters;
+
+  const query = {};
+  if (difficulty) query['difficulty'] = difficulty;
+  if (tools) query['tools'] = { hasSome: tools };
+  if (domain) query['domain'] = domain;
+
+  try {
+    const recommendedprojects = await prisma.project.findMany({
+      take: maxCount,
+      where: {
+        ...query,
+        id: {
+          notIn: excludeIds,
+        },
+      },
+    });
+    console.log(recommendedprojects.length <= 0);
+
+    if (recommendedprojects.length <= 0) {
+      const otherProjects = await recommendOtherProjects(
+        domain,
+        difficulty,
+        maxCount,
+        excludeIds,
+      );
+
+      return res
+        .status(200)
+        .json({ message: 'projects fetched', otherProjects });
+    }
+    res.status(200).json({ message: 'projects fetched', recommendedprojects });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: 'internal server error', error: error.message });
+  }
+}
+
 export {
   createProject,
   getProjectDetails,
   getProjects,
   updateProject,
   deleteProject,
+  getRecommendation,
 };
