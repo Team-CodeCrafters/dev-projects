@@ -1,6 +1,7 @@
 import prisma from '../db/db.js';
 import fs from 'fs';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { recommendOtherProjects } from '../utils/project.js';
 async function getProjects(req, res) {
   try {
     const { difficulty, tools, domain } = req.filters;
@@ -131,6 +132,7 @@ async function getRecommendation(req, res) {
     maxCount = 3,
     excludeIds = [],
   } = req.filters;
+
   const query = {};
   if (difficulty) query['difficulty'] = difficulty;
   if (tools) query['tools'] = { hasSome: tools };
@@ -146,6 +148,20 @@ async function getRecommendation(req, res) {
         },
       },
     });
+    console.log(recommendedprojects.length <= 0);
+
+    if (recommendedprojects.length <= 0) {
+      const otherProjects = await recommendOtherProjects(
+        domain,
+        difficulty,
+        maxCount,
+        excludeIds,
+      );
+
+      return res
+        .status(200)
+        .json({ message: 'projects fetched', otherProjects });
+    }
     res.status(200).json({ message: 'projects fetched', recommendedprojects });
   } catch (error) {
     res
