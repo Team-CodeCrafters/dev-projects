@@ -1,18 +1,21 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { memo, useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
   BookmarkedProjectsAtom,
   projectDetailsAtom,
   projectDetailsTab,
+  similarProjectsAtom,
 } from '../store/atoms/project';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
 import { BookmarkIcon } from '../assets/icons/Bookmark';
+import { ArrowLeft } from '../assets/icons/ArrowLeft';
 import Button from '../components/ui/Button';
 import NoContentToDisplay from '../components/ui/NoContent';
+import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
 import { PopupNotification } from '../components/ui/PopupNotification';
 import CreateAccountDialog from '../components/ui/CreateAccountDialog';
@@ -21,6 +24,7 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const { fetchData, loading, error } = useFetchData();
   const [project, setProject] = useRecoilState(projectDetailsAtom);
+  const setSimilarProjects = useSetRecoilState(similarProjectsAtom);
 
   useEffect(() => {
     async function getProjectDetails() {
@@ -29,26 +33,51 @@ const ProjectDetails = () => {
         setProject(response.data.project);
         document.title = `Dev Projects | ${response.data.project.name}`;
       }
+      return response.data.project;
     }
-    getProjectDetails();
-  }, []);
+
+    async function getSimilarProjects(project) {
+      const response = await fetchData(
+        `/project/recommend?domain=${project.domain}&difficulty=${project.difficulty}&excludeIds=${id}`,
+      );
+
+      if (response.success) {
+        setSimilarProjects([
+          ...response.data.recommendedprojects,
+          ...response.data.similarProjects,
+        ]);
+      }
+    }
+
+    async function fetchProject() {
+      const project = await getProjectDetails();
+      if (error) return;
+      await getSimilarProjects(project);
+    }
+
+    fetchProject();
+  }, [id]);
 
   if (error) {
     return <PopupNotification text={error} type="error" />;
   }
   if (loading) {
     return (
-      <div className="dark:bg-black-light bg-white-dark bg-red relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-2xl">
-        <Loader height={'h-8'} width={'w-8'} primaryColor={true} />
+      <div className="grid h-full place-items-center">
+        <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-3xl">
+          <Loader height={'h-8'} width={'w-8'} primaryColor={true} />
+        </div>
       </div>
     );
   }
   if (project) {
     return (
-      <div className="dark:bg-black-light bg-white-dark bg-red relative flex w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:max-w-2xl md:p-4 lg:max-w-2xl">
-        <ProjectHeader projectId={project.id} />
-        <TabsLayout />
-        <ProjectContent />
+      <div className="grid h-full place-items-center">
+        <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
+          <ProjectHeader projectId={project.id} />
+          <TabsLayout />
+          <ProjectContent />
+        </div>
       </div>
     );
   }
@@ -154,7 +183,7 @@ const ProjectHeader = ({ projectId }) => {
             <DomainTag domain={project.domain} />
           </div>
         </div>
-        <div>
+        <div className="max-w-sm">
           <ToolsTag tools={project.tools} />
         </div>
         <div className="mt-4 flex gap-4 md:flex-row">
@@ -213,18 +242,17 @@ const TabElement = ({ text, currentTab }) => {
 
 const ProjectContent = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
-
+  const project = useRecoilValue(projectDetailsAtom);
   return (
     <section className="mt-3 rounded-md transition-all">
-      {activeTab === 'get-started' && <ProjectInformation />}
+      {activeTab === 'get-started' && <ProjectInformation project={project} />}
       {activeTab === 'submissions' && <Submissions />}
       {activeTab === 'discussions' && <Discussions />}
     </section>
   );
 };
 
-const ProjectInformation = () => {
-  const project = useRecoilValue(projectDetailsAtom);
+const ProjectInformation = ({ project }) => {
   return (
     <div className="flex flex-col gap-4">
       <div className="max-w-fit rounded-md p-3">
@@ -249,7 +277,41 @@ const ProjectInformation = () => {
           ))}
         </ul>
       </div>
+      <SimilarProjectsList />
     </div>
+  );
+};
+
+const SimilarProjectsList = () => {
+  const similarProjects = useRecoilValue(similarProjectsAtom);
+
+  if (!similarProjects) return null;
+  const navigate = useNavigate();
+
+  function handleProjectClick(id) {
+    navigate(`/project/${id}`);
+  }
+
+  return (
+    <>
+      <h2 className="font-heading ml-3 mt-3 place-self-start text-xl font-medium tracking-wide md:text-2xl">
+        Similar Projects
+      </h2>
+      <div className="flex flex-wrap justify-center gap-1 md:justify-start">
+        {similarProjects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            styles={'sm:max-w-[20rem]  w-full mx-2 h-2xl pt-6'}
+            project={project}
+            onClick={() => handleProjectClick(project.id)}
+          >
+            <span className="invisible absolute right-1 top-1 rotate-[135deg] p-1 opacity-80 transition-[visiblity] group-hover:visible">
+              <ArrowLeft />
+            </span>
+          </ProjectCard>
+        ))}
+      </div>
+    </>
   );
 };
 

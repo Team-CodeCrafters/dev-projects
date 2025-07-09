@@ -59,7 +59,7 @@ const DashboardSidebar = memo(() => {
   );
 });
 
-const SidebarElement = ({ Icon, name, href }) => {
+const SidebarElement = memo(({ Icon, name, href }) => {
   const isExpanded = useRecoilValue(sidebarOpenAtom);
   const location = useLocation();
 
@@ -88,7 +88,7 @@ const SidebarElement = ({ Icon, name, href }) => {
       {!isExpanded && <ToolTip text={name} />}
     </li>
   );
-};
+});
 
 const ToolTip = ({ text }) => (
   <div className="bg-black-light dark:bg-white-light pointer-events-none invisible absolute left-full top-1/2 z-50 -translate-y-1/2 translate-x-0 rounded-md px-4 py-2 text-white opacity-0 outline-none transition-all duration-300 ease-in-out peer-hover:visible peer-hover:translate-x-4 peer-hover:opacity-100 peer-focus-visible:visible peer-focus-visible:translate-x-4 peer-focus-visible:opacity-100 dark:text-black">

@@ -148,21 +148,27 @@ async function getRecommendation(req, res) {
         },
       },
     });
-    console.log(recommendedprojects.length <= 0);
 
-    if (recommendedprojects.length <= 0) {
-      const otherProjects = await recommendOtherProjects(
+    let similarProjects = [];
+
+    // getting similar projects (same domain) if recommended projects are few.
+    if (recommendedprojects.length <= 3) {
+      if (recommendedprojects.length >= 1) {
+        recommendedprojects.forEach((project) => excludeIds.push(project.id));
+      }
+
+      similarProjects = await recommendOtherProjects(
         domain,
         difficulty,
         maxCount,
         excludeIds,
       );
-
-      return res
-        .status(200)
-        .json({ message: 'projects fetched', otherProjects });
     }
-    res.status(200).json({ message: 'projects fetched', recommendedprojects });
+    return res.status(200).json({
+      message: 'projects fetched',
+      recommendedprojects,
+      similarProjects,
+    });
   } catch (error) {
     res
       .status(500)

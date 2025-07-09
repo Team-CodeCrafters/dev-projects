@@ -13,3 +13,8 @@ export const BookmarkedProjectsAtom = atom({
   key: 'BookmarkedProjectsAtom',
   default: [],
 });
+
+export const similarProjectsAtom = atom({
+  key: 'similarProjectsAtom',
+  default: [],
+});

@@ -16,6 +16,7 @@ export async function recommendOtherProjects(
   if (!domain && difficulty) {
     query['difficulty'] = difficulty;
   }
+
   const projects = await prisma.project.findMany({
     take: maxCount,
     where: {

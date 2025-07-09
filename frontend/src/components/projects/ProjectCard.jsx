@@ -6,7 +6,7 @@ import ToolsTag from './tags/ToolsTag';
 const ProjectCard = ({ project, status, onClick, styles, children }) => {
   return (
     <div
-      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-4 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all duration-700 hover:shadow-md ${styles}`}
+      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all duration-500 hover:shadow-md md:my-4 ${styles}`}
       onClick={onClick}
     >
       {children}
@@ -21,7 +21,7 @@ const ProjectCard = ({ project, status, onClick, styles, children }) => {
             </span>
           )}
         </div>
-        <span className="text-md mb-5 line-clamp-2 w-[90%] opacity-75">
+        <span className="text-md mb-5 line-clamp-4 w-full opacity-75 md:w-[90%]">
           {project.about}
         </span>
         <div className="flex items-center gap-2">
