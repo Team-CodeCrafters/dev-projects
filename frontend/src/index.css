@@ -15,7 +15,9 @@
     scrollbar-width: 6px;
     scrollbar-color: #d0d0d3 transparent;
   }
-
+  .scrollbar-gutter-stable {
+    scrollbar-gutter: stable;
+  }
   .custom-scrollbar::-webkit-scrollbar-track {
     background: transparent;
   }
