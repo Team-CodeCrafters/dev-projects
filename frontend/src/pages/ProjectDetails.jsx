@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
@@ -7,7 +7,12 @@ import {
   projectDetailsTab,
   similarProjectsAtom,
 } from '../store/atoms/project';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+  useRecoilState,
+  useRecoilStateLoadable,
+  useRecoilValue,
+  useSetRecoilState,
+} from 'recoil';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
@@ -19,11 +24,14 @@ import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
 import { PopupNotification } from '../components/ui/PopupNotification';
 import CreateAccountDialog from '../components/ui/CreateAccountDialog';
+import { userProjectsAtom } from '../store/atoms/userProjects';
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const { fetchData, loading, error } = useFetchData();
   const [project, setProject] = useRecoilState(projectDetailsAtom);
+  const [userProjects, setUserProjects] = useRecoilState(userProjectsAtom);
+  const [isProjectStarted, setIsProjectStarted] = useState(undefined);
   const setSimilarProjects = useSetRecoilState(similarProjectsAtom);
 
   useEffect(() => {
@@ -49,10 +57,52 @@ const ProjectDetails = () => {
       }
     }
 
+    async function getUserProjects() {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      if (userProjects.length) return userProjects;
+      const options = {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      };
+      const response = await fetchData('/user-projects', options);
+      if (response.success) {
+        setUserProjects(response.data.projects);
+        return response.data.projects;
+      }
+      return null;
+    }
+
+    function checkProjectStarted(project, userProjects) {
+      if (!project || !userProjects) return false;
+
+      const isStarted = userProjects.some(({ projectId }) => {
+        return projectId === project.id;
+      });
+      console.log({ isStarted });
+      return isStarted;
+    }
+
     async function fetchProject() {
-      const project = await getProjectDetails();
-      if (error) return;
-      await getSimilarProjects(project);
+      try {
+        const fetchedUserProjects = await getUserProjects();
+        const project = await getProjectDetails();
+        await getSimilarProjects(project);
+
+        if (error) return;
+
+        // Check if project is started immediately after both are loaded
+        const isStarted = checkProjectStarted(
+          project,
+          fetchedUserProjects || userProjects,
+        );
+        setIsProjectStarted(isStarted);
+
+        // Finally get similar projects
+      } catch (err) {
+        console.error('Error fetching project data:', err);
+      }
     }
 
     fetchProject();
@@ -74,7 +124,10 @@ const ProjectDetails = () => {
     return (
       <div className="grid h-full place-items-center">
         <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
-          <ProjectHeader projectId={project.id} />
+          <ProjectHeader
+            projectId={project.id}
+            isProjectStarted={isProjectStarted}
+          />
           <TabsLayout />
           <ProjectContent />
         </div>
@@ -83,11 +136,13 @@ const ProjectDetails = () => {
   }
 };
 
-const ProjectHeader = ({ projectId }) => {
+const ProjectHeader = ({ projectId, isProjectStarted }) => {
+  const navigate = useNavigate();
   const project = useRecoilValue(projectDetailsAtom);
-
+  const setUserProject = useSetRecoilState(userProjectsAtom);
+  const [projectStatus, setProjectStatus] = useState(false);
   const StartProjectButton = () => {
-    const { fetchData, loading, error, data } = useFetchData();
+    const { fetchData, loading, error } = useFetchData();
 
     async function handleStartProject() {
       const token = localStorage.getItem('token');
@@ -100,7 +155,17 @@ const ProjectHeader = ({ projectId }) => {
         body: JSON.stringify({ projectId }),
       };
 
-      await fetchData('/user-projects/create', options);
+      const response = await fetchData('/user-projects/create', options);
+
+      if (response.success) {
+        setProjectStatus(true);
+        const project = response.data.userProject.project;
+        setUserProject((prev) => [...prev, project]);
+      }
+    }
+
+    async function handleProjectSubmission() {
+      navigate(`/submit/${project.id}`);
     }
 
     return (
@@ -111,17 +176,26 @@ const ProjectHeader = ({ projectId }) => {
           ) : (
             <PopupNotification type="error" text={error} />
           ))}
-        {!!data && <PopupNotification type="success" text={data.message} />}
-        <Button
-          onClick={handleStartProject}
-          text={loading ? <Loader /> : 'Start Project'}
-          disabled={loading}
-        />
+        {!!projectStatus && (
+          <PopupNotification type="success" text={'started'} />
+        )}
+
+        {isProjectStarted ? (
+          <Button
+            onClick={handleProjectSubmission}
+            text={loading ? <Loader /> : 'Submit Project'}
+          />
+        ) : (
+          <Button
+            onClick={handleStartProject}
+            text={loading ? <Loader /> : 'start project'}
+          />
+        )}
       </div>
     );
   };
 
-  const BookmarkButton = ({}) => {
+  const BookmarkButton = () => {
     const { fetchData, data: bookmarkData, loading, error } = useFetchData();
     const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
     async function handleBookmark() {
