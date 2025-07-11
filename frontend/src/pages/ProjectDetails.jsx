@@ -1,18 +1,14 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
   BookmarkedProjectsAtom,
   projectDetailsAtom,
   projectDetailsTab,
+  projectStartedSelector,
   similarProjectsAtom,
 } from '../store/atoms/project';
-import {
-  useRecoilState,
-  useRecoilStateLoadable,
-  useRecoilValue,
-  useSetRecoilState,
-} from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
@@ -28,33 +24,23 @@ import { userProjectsAtom } from '../store/atoms/userProjects';
 
 const ProjectDetails = () => {
   const { id } = useParams();
-  const { fetchData, loading, error } = useFetchData();
+  const { fetchData: fetchProjectData, loading: loadingProject } =
+    useFetchData();
+  const { fetchData: fetchSimilarProjects } = useFetchData();
+  const { fetchData: fetchUserProject, loading: loadingUserProject } =
+    useFetchData();
   const [project, setProject] = useRecoilState(projectDetailsAtom);
   const [userProjects, setUserProjects] = useRecoilState(userProjectsAtom);
-  const [isProjectStarted, setIsProjectStarted] = useState(undefined);
-  const setSimilarProjects = useSetRecoilState(similarProjectsAtom);
+  const isProjectStarted = useRecoilValue(projectStartedSelector);
 
   useEffect(() => {
     async function getProjectDetails() {
-      const response = await fetchData(`/project/${id}`);
+      const response = await fetchProjectData(`/project/${id}`);
       if (response.success) {
         setProject(response.data.project);
         document.title = `Dev Projects | ${response.data.project.name}`;
       }
       return response.data.project;
-    }
-
-    async function getSimilarProjects(project) {
-      const response = await fetchData(
-        `/project/recommend?domain=${project.domain}&difficulty=${project.difficulty}&excludeIds=${id}`,
-      );
-
-      if (response.success) {
-        setSimilarProjects([
-          ...response.data.recommendedprojects,
-          ...response.data.similarProjects,
-        ]);
-      }
     }
 
     async function getUserProjects() {
@@ -66,7 +52,7 @@ const ProjectDetails = () => {
           authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       };
-      const response = await fetchData('/user-projects', options);
+      const response = await fetchUserProject('/user-projects', options);
       if (response.success) {
         setUserProjects(response.data.projects);
         return response.data.projects;
@@ -74,44 +60,15 @@ const ProjectDetails = () => {
       return null;
     }
 
-    function checkProjectStarted(project, userProjects) {
-      if (!project || !userProjects) return false;
-
-      const isStarted = userProjects.some(({ projectId }) => {
-        return projectId === project.id;
-      });
-      console.log({ isStarted });
-      return isStarted;
-    }
-
     async function fetchProject() {
-      try {
-        const fetchedUserProjects = await getUserProjects();
-        const project = await getProjectDetails();
-        await getSimilarProjects(project);
-
-        if (error) return;
-
-        // Check if project is started immediately after both are loaded
-        const isStarted = checkProjectStarted(
-          project,
-          fetchedUserProjects || userProjects,
-        );
-        setIsProjectStarted(isStarted);
-
-        // Finally get similar projects
-      } catch (err) {
-        console.error('Error fetching project data:', err);
-      }
+      await getProjectDetails();
+      await getUserProjects();
     }
 
     fetchProject();
   }, [id]);
 
-  if (error) {
-    return <PopupNotification text={error} type="error" />;
-  }
-  if (loading) {
+  if (loadingProject || loadingUserProject) {
     return (
       <div className="grid h-full place-items-center">
         <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-3xl">
@@ -120,7 +77,7 @@ const ProjectDetails = () => {
       </div>
     );
   }
-  if (project) {
+  if (!loadingProject && !loadingUserProject && project) {
     return (
       <div className="grid h-full place-items-center">
         <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
@@ -136,11 +93,12 @@ const ProjectDetails = () => {
   }
 };
 
-const ProjectHeader = ({ projectId, isProjectStarted }) => {
+const ProjectHeader = memo(({ projectId }) => {
   const navigate = useNavigate();
   const project = useRecoilValue(projectDetailsAtom);
   const setUserProject = useSetRecoilState(userProjectsAtom);
-  const [projectStatus, setProjectStatus] = useState(false);
+  const isProjectStarted = useRecoilValue(projectStartedSelector);
+  const [hasProjectStarted, setHasProjectStarted] = useState(false);
   const StartProjectButton = () => {
     const { fetchData, loading, error } = useFetchData();
 
@@ -154,12 +112,11 @@ const ProjectHeader = ({ projectId, isProjectStarted }) => {
         },
         body: JSON.stringify({ projectId }),
       };
-
       const response = await fetchData('/user-projects/create', options);
 
       if (response.success) {
-        setProjectStatus(true);
-        const project = response.data.userProject.project;
+        setHasProjectStarted(true);
+        const project = response.data.userProject;
         setUserProject((prev) => [...prev, project]);
       }
     }
@@ -176,14 +133,14 @@ const ProjectHeader = ({ projectId, isProjectStarted }) => {
           ) : (
             <PopupNotification type="error" text={error} />
           ))}
-        {!!projectStatus && (
-          <PopupNotification type="success" text={'started'} />
+        {!!hasProjectStarted && (
+          <PopupNotification type="success" text={'project started!'} />
         )}
 
         {isProjectStarted ? (
           <Button
             onClick={handleProjectSubmission}
-            text={loading ? <Loader /> : 'Submit Project'}
+            text={loading ? <Loader /> : 'Submit'}
           />
         ) : (
           <Button
@@ -267,7 +224,7 @@ const ProjectHeader = ({ projectId, isProjectStarted }) => {
       </div>
     </>
   );
-};
+});
 
 const TabsLayout = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
@@ -357,15 +314,32 @@ const ProjectInformation = ({ project }) => {
 };
 
 const SimilarProjectsList = () => {
-  const similarProjects = useRecoilValue(similarProjectsAtom);
-
-  if (!similarProjects) return null;
   const navigate = useNavigate();
+  const { fetchData } = useFetchData();
+  const project = useRecoilValue(projectDetailsAtom);
+  const [similarProjects, setSimilarProjects] =
+    useRecoilState(similarProjectsAtom);
+  useEffect(() => {
+    async function getSimilarProjects() {
+      const response = await fetchData(
+        `/project/recommend?domain=${project.domain}&difficulty=${project.difficulty}&excludeIds=${project.id}`,
+      );
+
+      if (response.success) {
+        setSimilarProjects([
+          ...response.data.recommendedprojects,
+          ...response.data.similarProjects,
+        ]);
+      }
+    }
+    getSimilarProjects();
+  }, []);
 
   function handleProjectClick(id) {
     navigate(`/project/${id}`);
   }
 
+  if (!similarProjects) return null;
   return (
     <>
       <h2 className="font-heading ml-3 mt-3 place-self-start text-xl font-medium tracking-wide md:text-2xl">
