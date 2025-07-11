@@ -7,15 +7,26 @@ async function startProject(req, res) {
       return res.status(401).json({ message: 'Invalid project id' });
     }
 
-    await prisma.userProject.create({
+    const userProject = await prisma.userProject.create({
       data: {
         userId: req.userId,
         projectId: projectId,
         status: 'started',
       },
+      select: {
+        id: true,
+        projectId: true,
+        project: true,
+        status: true,
+        estimatedTime: true,
+        startedAt: true,
+        completedAt: true,
+      },
     });
 
-    return res.status(200).json({ message: 'projected started successfully' });
+    return res
+      .status(200)
+      .json({ message: 'projected started successfully', userProject });
   } catch (e) {
     if (e.code === 'P2003') {
       return res.status(401).json({ message: 'project does not exists' });

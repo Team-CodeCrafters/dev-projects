@@ -58,6 +58,10 @@ const Dashboard = () => {
       </div>
     );
   }
+  function redirectToProject(id) {
+    navigate(`/project/${id}`);
+  }
+
   if (userProjects.length > 0) {
     return (
       <div className="bg-white-medium dark:bg-black-medium outline-black-dark mb-96 max-w-2xl rounded-lg p-3 md:p-5">
@@ -72,6 +76,7 @@ const Dashboard = () => {
               estimatedTime={userProject.estimatedTime}
               startedAt={userProject.startedAt}
               project={userProject.project}
+              onClick={() => redirectToProject(userProject.project.id)}
             />
           ))}
         </div>

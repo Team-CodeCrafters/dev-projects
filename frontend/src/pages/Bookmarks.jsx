@@ -78,26 +78,31 @@ const Bookmarks = () => {
   return (
     <>
       {!!error && <PopupNotification type="info" text={error} />}
-      <div className="bg-white-medium dark:bg-black-medium outline-black-dark relative ml-2 grid min-h-full max-w-2xl place-items-center rounded-lg p-3 md:p-5">
+      <div className="bg-white-medium dark:bg-black-medium relative ml-2 h-full rounded-lg p-3 md:p-5">
         {bookmarks.length > 0 ? (
           <>
             <h1 className="font-heading mb-2 place-self-start text-xl font-medium tracking-wide md:text-2xl">
               Bookmarks
             </h1>
-            {bookmarks.map((bookmark) => {
-              return (
-                <ProjectCard
-                  key={bookmark.id}
-                  project={bookmark.project}
-                  onClick={() => redirectToDetails(bookmark.project.id)}
-                >
-                  <DeleteBookmarkButton bookmarkId={bookmark.id} />
-                </ProjectCard>
-              );
-            })}
+            <div className="mt-2 flex w-full flex-wrap">
+              {bookmarks.map((bookmark) => {
+                return (
+                  <ProjectCard
+                    key={bookmark.id}
+                    styles={'sm:max-w-[20rem]  w-full mx-2  pt-6'}
+                    project={bookmark.project}
+                    onClick={() => redirectToDetails(bookmark.project.id)}
+                  >
+                    <DeleteBookmarkButton bookmarkId={bookmark.id} />
+                  </ProjectCard>
+                );
+              })}
+            </div>
           </>
         ) : loading ? (
-          <Loader primaryColor={true} />
+          <div className="relative top-40 flex h-full justify-center">
+            <Loader primaryColor={true} />
+          </div>
         ) : (
           !loading && bookmarks.length == 0 && <EmptyBookmarks />
         )}

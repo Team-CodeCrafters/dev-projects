@@ -5,6 +5,7 @@ import {
   BookmarkedProjectsAtom,
   projectDetailsAtom,
   projectDetailsTab,
+  projectStartedSelector,
   similarProjectsAtom,
 } from '../store/atoms/project';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -19,16 +20,22 @@ import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
 import { PopupNotification } from '../components/ui/PopupNotification';
 import CreateAccountDialog from '../components/ui/CreateAccountDialog';
+import { userProjectsAtom } from '../store/atoms/userProjects';
 
 const ProjectDetails = () => {
   const { id } = useParams();
-  const { fetchData, loading, error } = useFetchData();
+  const { fetchData: fetchProjectData, loading: loadingProject } =
+    useFetchData();
+  const { fetchData: fetchSimilarProjects } = useFetchData();
+  const { fetchData: fetchUserProject, loading: loadingUserProject } =
+    useFetchData();
   const [project, setProject] = useRecoilState(projectDetailsAtom);
-  const setSimilarProjects = useSetRecoilState(similarProjectsAtom);
+  const [userProjects, setUserProjects] = useRecoilState(userProjectsAtom);
+  const isProjectStarted = useRecoilValue(projectStartedSelector);
 
   useEffect(() => {
     async function getProjectDetails() {
-      const response = await fetchData(`/project/${id}`);
+      const response = await fetchProjectData(`/project/${id}`);
       if (response.success) {
         setProject(response.data.project);
         document.title = `Dev Projects | ${response.data.project.name}`;
@@ -36,32 +43,32 @@ const ProjectDetails = () => {
       return response.data.project;
     }
 
-    async function getSimilarProjects(project) {
-      const response = await fetchData(
-        `/project/recommend?domain=${project.domain}&difficulty=${project.difficulty}&excludeIds=${id}`,
-      );
-
+    async function getUserProjects() {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      if (userProjects.length) return userProjects;
+      const options = {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      };
+      const response = await fetchUserProject('/user-projects', options);
       if (response.success) {
-        setSimilarProjects([
-          ...response.data.recommendedprojects,
-          ...response.data.similarProjects,
-        ]);
+        setUserProjects(response.data.projects);
+        return response.data.projects;
       }
+      return null;
     }
 
     async function fetchProject() {
-      const project = await getProjectDetails();
-      if (error) return;
-      await getSimilarProjects(project);
+      await getProjectDetails();
+      await getUserProjects();
     }
 
     fetchProject();
   }, [id]);
 
-  if (error) {
-    return <PopupNotification text={error} type="error" />;
-  }
-  if (loading) {
+  if (loadingProject || loadingUserProject) {
     return (
       <div className="grid h-full place-items-center">
         <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-3xl">
@@ -70,11 +77,14 @@ const ProjectDetails = () => {
       </div>
     );
   }
-  if (project) {
+  if (!loadingProject && !loadingUserProject && project) {
     return (
       <div className="grid h-full place-items-center">
         <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
-          <ProjectHeader projectId={project.id} />
+          <ProjectHeader
+            projectId={project.id}
+            isProjectStarted={isProjectStarted}
+          />
           <TabsLayout />
           <ProjectContent />
         </div>
@@ -83,11 +93,14 @@ const ProjectDetails = () => {
   }
 };
 
-const ProjectHeader = ({ projectId }) => {
+const ProjectHeader = memo(({ projectId }) => {
+  const navigate = useNavigate();
   const project = useRecoilValue(projectDetailsAtom);
-
+  const setUserProject = useSetRecoilState(userProjectsAtom);
+  const isProjectStarted = useRecoilValue(projectStartedSelector);
+  const [hasProjectStarted, setHasProjectStarted] = useState(false);
   const StartProjectButton = () => {
-    const { fetchData, loading, error, data } = useFetchData();
+    const { fetchData, loading, error } = useFetchData();
 
     async function handleStartProject() {
       const token = localStorage.getItem('token');
@@ -99,8 +112,17 @@ const ProjectHeader = ({ projectId }) => {
         },
         body: JSON.stringify({ projectId }),
       };
+      const response = await fetchData('/user-projects/create', options);
 
-      await fetchData('/user-projects/create', options);
+      if (response.success) {
+        setHasProjectStarted(true);
+        const project = response.data.userProject;
+        setUserProject((prev) => [...prev, project]);
+      }
+    }
+
+    async function handleProjectSubmission() {
+      navigate(`/submit/${project.id}`);
     }
 
     return (
@@ -111,17 +133,26 @@ const ProjectHeader = ({ projectId }) => {
           ) : (
             <PopupNotification type="error" text={error} />
           ))}
-        {!!data && <PopupNotification type="success" text={data.message} />}
-        <Button
-          onClick={handleStartProject}
-          text={loading ? <Loader /> : 'Start Project'}
-          disabled={loading}
-        />
+        {!!hasProjectStarted && (
+          <PopupNotification type="success" text={'project started!'} />
+        )}
+
+        {isProjectStarted ? (
+          <Button
+            onClick={handleProjectSubmission}
+            text={loading ? <Loader /> : 'Submit'}
+          />
+        ) : (
+          <Button
+            onClick={handleStartProject}
+            text={loading ? <Loader /> : 'start project'}
+          />
+        )}
       </div>
     );
   };
 
-  const BookmarkButton = ({}) => {
+  const BookmarkButton = () => {
     const { fetchData, data: bookmarkData, loading, error } = useFetchData();
     const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
     async function handleBookmark() {
@@ -193,7 +224,7 @@ const ProjectHeader = ({ projectId }) => {
       </div>
     </>
   );
-};
+});
 
 const TabsLayout = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
@@ -283,15 +314,32 @@ const ProjectInformation = ({ project }) => {
 };
 
 const SimilarProjectsList = () => {
-  const similarProjects = useRecoilValue(similarProjectsAtom);
-
-  if (!similarProjects) return null;
   const navigate = useNavigate();
+  const { fetchData } = useFetchData();
+  const project = useRecoilValue(projectDetailsAtom);
+  const [similarProjects, setSimilarProjects] =
+    useRecoilState(similarProjectsAtom);
+  useEffect(() => {
+    async function getSimilarProjects() {
+      const response = await fetchData(
+        `/project/recommend?domain=${project.domain}&difficulty=${project.difficulty}&excludeIds=${project.id}`,
+      );
+
+      if (response.success) {
+        setSimilarProjects([
+          ...response.data.recommendedprojects,
+          ...response.data.similarProjects,
+        ]);
+      }
+    }
+    getSimilarProjects();
+  }, []);
 
   function handleProjectClick(id) {
     navigate(`/project/${id}`);
   }
 
+  if (!similarProjects) return null;
   return (
     <>
       <h2 className="font-heading ml-3 mt-3 place-self-start text-xl font-medium tracking-wide md:text-2xl">
