@@ -13,6 +13,7 @@ const UserProfile = () => {
   const { fetchData, loading } = useFetchData();
 
   useEffect(() => {
+    document.title = 'Dev Projects | Profile';
     const token = localStorage.getItem('token');
     if (!token) navigate('/login');
 
