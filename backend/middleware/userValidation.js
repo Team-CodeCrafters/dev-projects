@@ -86,7 +86,9 @@ async function validateSignUp(req, res, next) {
       },
     });
     if (userExists) {
-      return res.status(401).json({ message: 'username is already taken' });
+      return res
+        .status(401)
+        .json({ message: 'user already exists. Please Login' });
     }
     next();
   } catch (error) {

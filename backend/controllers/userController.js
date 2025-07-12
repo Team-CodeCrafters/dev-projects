@@ -2,14 +2,15 @@ import prisma from '../db/db.js';
 import { createJWT } from '../utils/jwt.js';
 import { hashPassword } from '../utils/bcrypt.js';
 import { sendEmail } from '../utils/email.js';
-import { getUserGitHubProfile } from '../utils/userGithubProfile.js';
+import { generateProfilePicture } from '../utils/profilePicture.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 async function signup(req, res) {
   try {
     const { username, email, password, displayName } = req.body;
-    // use GitHub profile picture as default
-    const profileAvatarURL = await getUserGitHubProfile(email);
+    // setting a profile picture for account
+    const profileAvatarURL = await generateProfilePicture(email);
     const hashedPassword = await hashPassword(password);
+
     const user = await prisma.user.create({
       data: {
         email,
