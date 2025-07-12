@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
@@ -13,20 +13,21 @@ import DifficultyTag from '../components/projects/tags/DifficultyTag';
 import DomainTag from '../components/projects/tags/DomainTag';
 import ToolsTag from '../components/projects/tags/ToolsTag';
 import { BookmarkIcon } from '../assets/icons/Bookmark';
+import SettingIcon from '../assets/icons/Setting';
 import { ArrowLeft } from '../assets/icons/ArrowLeft';
 import Button from '../components/ui/Button';
 import NoContentToDisplay from '../components/ui/NoContent';
 import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
-import { PopupNotification } from '../components/ui/PopupNotification';
 import CreateAccountDialog from '../components/ui/CreateAccountDialog';
 import { userProjectsAtom } from '../store/atoms/userProjects';
+import usePopupNotication from '../hooks/usePopup';
+import { createAccountDialogAtom } from '../store/atoms/dialog';
 
 const ProjectDetails = () => {
   const { id } = useParams();
   const { fetchData: fetchProjectData, loading: loadingProject } =
     useFetchData();
-  const { fetchData: fetchSimilarProjects } = useFetchData();
   const { fetchData: fetchUserProject, loading: loadingUserProject } =
     useFetchData();
   const [project, setProject] = useRecoilState(projectDetailsAtom);
@@ -79,18 +80,150 @@ const ProjectDetails = () => {
   }
   if (!loadingProject && !loadingUserProject && project) {
     return (
-      <div className="grid h-full place-items-center">
-        <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
-          <ProjectHeader
-            projectId={project.id}
-            isProjectStarted={isProjectStarted}
-          />
-          <TabsLayout />
-          <ProjectContent />
+      <>
+        <div className="grid h-full place-items-center">
+          <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
+            <ProjectHeader
+              projectId={project.id}
+              isProjectStarted={isProjectStarted}
+            />
+            <TabsLayout />
+            <ProjectContent />
+          </div>
         </div>
-      </div>
+      </>
     );
   }
+};
+
+const ProjectSettings = () => {
+  const [isSettingOpen, setIsSettingOpen] = useState(false);
+  const settingsBtnRef = useRef(null);
+
+  return (
+    <div
+      className={`absolute right-4 top-3 opacity-80 ${!!isSettingOpen && '!opacity-100'}`}
+    >
+      <button
+        onClick={() => setIsSettingOpen((prev) => !prev)}
+        ref={settingsBtnRef}
+        className="focus:ring-primary absolutecursor-pointer group rounded-md p-1 outline-none focus:ring-2"
+      >
+        <SettingIcon />
+      </button>
+      <SettingsDropDown
+        settingsBtnRef={settingsBtnRef}
+        setIsSettingOpen={setIsSettingOpen}
+        isSettingOpen={isSettingOpen}
+      />
+    </div>
+  );
+};
+const BookmarkButton = () => {
+  const project = useRecoilValue(projectDetailsAtom);
+  const { fetchData } = useFetchData();
+  const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
+  const showPopup = usePopupNotication();
+  const setShowAccountDialog = useSetRecoilState(createAccountDialogAtom);
+
+  async function handleBookmark(e) {
+    e.stopPropagation();
+    const token = localStorage.getItem('token');
+    const options = {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ projectId: project.id }),
+    };
+
+    const response = await fetchData('/bookmark/', options);
+    if (response.success) {
+      showPopup('success', response.data.message);
+      const newBookmark = response.data.bookmark;
+      addBookmark((prev) => ({ ...prev, newBookmark }));
+    } else {
+      if (response.error == 'Request failed') {
+        setShowAccountDialog(true);
+      } else {
+        showPopup('info', response.error);
+      }
+    }
+  }
+
+  return (
+    <>
+      <button
+        onClick={handleBookmark}
+        className="font-body duration box-content flex h-full w-full items-center justify-start gap-3 rounded-md transition-all duration-200 focus:scale-95"
+      >
+        <BookmarkIcon size={'size-4'} />
+        <span>Save</span>
+      </button>
+    </>
+  );
+};
+
+const CancelProject = () => {
+  const project = useRecoilValue(projectDetailsAtom);
+  const { fetchData } = useFetchData();
+  const userProjects = useSetRecoilState(userProjectsAtom);
+  function removeUserProject() {
+    // remove user started project
+  }
+
+  return <button onClick={removeUserProject}>Cancel Project</button>;
+};
+
+const SettingsDropDown = ({
+  settingsBtnRef,
+  setIsSettingOpen,
+  isSettingOpen,
+}) => {
+  const dropDownRef = useRef(null);
+  const isProjectStarted = useRecoilValue(projectStartedSelector);
+  useEffect(() => {
+    function checkClick(e) {
+      if (!isSettingOpen) return;
+      const clickedInsideDropdown =
+        settingsBtnRef?.current?.contains(e.target) ||
+        dropDownRef.current?.contains(e.target);
+
+      if (!clickedInsideDropdown) {
+        setIsSettingOpen(false);
+      }
+    }
+    function checkKeyPress(e) {
+      if (!isSettingOpen) return;
+
+      if (e.key === 'Escape') setIsSettingOpen(false);
+    }
+    document.body.addEventListener('click', checkClick);
+    document.body.addEventListener('keyup', checkKeyPress);
+    return () => {
+      document.body.removeEventListener('click', checkClick);
+      document.body.removeEventListener('keyup', checkKeyPress);
+    };
+  }, [isSettingOpen]);
+
+  return (
+    <div
+      ref={dropDownRef}
+      className={`dark:bg-black-medium duration-250 absolute right-0 top-[130%] z-50 grid h-max w-max items-center rounded-md bg-white shadow-md transition-all ${isSettingOpen ? `visible translate-y-2 opacity-100` : `invisible translate-y-[-10%] opacity-0`}`}
+    >
+      <ul className="font-body flex min-w-max flex-col gap-1 p-2 py-3 text-left text-sm">
+        <li className="hover:bg-white-medium dark:hover:bg-black-light cursor-pointer rounded-md px-3 py-2">
+          <BookmarkButton />
+        </li>
+        {!!isProjectStarted && (
+          <li className="hover:bg-white-medium text-error dark:hover:bg-black-light min-h-8 flex-1 cursor-pointer rounded-md px-3 py-2">
+            <CancelProject />
+          </li>
+        )}
+      </ul>
+    </div>
+  );
 };
 
 const ProjectHeader = memo(({ projectId }) => {
@@ -98,16 +231,17 @@ const ProjectHeader = memo(({ projectId }) => {
   const project = useRecoilValue(projectDetailsAtom);
   const setUserProject = useSetRecoilState(userProjectsAtom);
   const isProjectStarted = useRecoilValue(projectStartedSelector);
-  const [hasProjectStarted, setHasProjectStarted] = useState(false);
+
   const StartProjectButton = () => {
     const { fetchData, loading, error } = useFetchData();
-
+    const showPopup = usePopupNotication();
+    const setShowAccountDialog = useSetRecoilState(createAccountDialogAtom);
     async function handleStartProject() {
       const token = localStorage.getItem('token');
       const options = {
         method: 'POST',
         headers: {
-          authorization: `Bearer ${token}`,
+          authorization: `Bearer${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ projectId }),
@@ -115,9 +249,15 @@ const ProjectHeader = memo(({ projectId }) => {
       const response = await fetchData('/user-projects/create', options);
 
       if (response.success) {
-        setHasProjectStarted(true);
+        showPopup('success', response.data.message);
         const project = response.data.userProject;
         setUserProject((prev) => [...prev, project]);
+      } else {
+        if (response.error === 'Request failed') {
+          setShowAccountDialog(true);
+        } else {
+          showPopup('info', response.error);
+        }
       }
     }
 
@@ -127,16 +267,6 @@ const ProjectHeader = memo(({ projectId }) => {
 
     return (
       <div className="min-w-32">
-        {!!error &&
-          (error === 'Request failed' ? (
-            <CreateAccountDialog />
-          ) : (
-            <PopupNotification type="error" text={error} />
-          ))}
-        {!!hasProjectStarted && (
-          <PopupNotification type="success" text={'project started!'} />
-        )}
-
         {isProjectStarted ? (
           <Button
             onClick={handleProjectSubmission}
@@ -152,74 +282,24 @@ const ProjectHeader = memo(({ projectId }) => {
     );
   };
 
-  const BookmarkButton = () => {
-    const { fetchData, data: bookmarkData, loading, error } = useFetchData();
-    const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
-    async function handleBookmark() {
-      const token = localStorage.getItem('token');
-      const options = {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ projectId }),
-      };
-
-      const response = await fetchData('/bookmark/', options);
-      if (response.success) {
-        const newBookmark = response.data.bookmark;
-        addBookmark((prev) => ({ ...prev, newBookmark }));
-      }
-    }
-
-    return (
-      <>
-        {!!bookmarkData && (
-          <PopupNotification type="success" text={bookmarkData.message} />
-        )}
-        {!!error &&
-          (error === 'Request failed' ? (
-            <CreateAccountDialog />
-          ) : (
-            <PopupNotification type="info" text={error} />
-          ))}
-        <button
-          onClick={handleBookmark}
-          disabled={loading}
-          className="font-body duration focus:outline-primary dark:hover:bg-black-medium box-content flex w-16 shrink items-center justify-center gap-2 rounded-md p-1 px-3 transition-all duration-200 hover:bg-gray-200 focus:scale-95 disabled:opacity-50 md:px-5"
-        >
-          {loading ? (
-            <Loader height={'h-5'} width={'w-5'} />
-          ) : (
-            <>
-              <BookmarkIcon size={'md:size-5 size-4'} />
-              <span>Save</span>
-            </>
-          )}
-        </button>
-      </>
-    );
-  };
-
   return (
     <>
       <div className="ml-2 flex flex-col gap-3">
-        <div className="flex w-full flex-col items-start justify-between gap-3 sm:flex-row">
+        <ProjectSettings />
+        <div className="mt-3 gap-3 sm:flex-row">
           <h1 className="font-heading inline flex-1 text-2xl font-medium tracking-wide">
             {project.name}
           </h1>
-          <div className="flex gap-4">
+        </div>
+        <div className="flex w-full items-start justify-between">
+          <ToolsTag tools={project.tools} />
+          <div className="flex h-full items-center gap-3">
             <DifficultyTag difficulty={project.difficulty} />
             <DomainTag domain={project.domain} />
           </div>
         </div>
-        <div className="max-w-sm">
-          <ToolsTag tools={project.tools} />
-        </div>
         <div className="mt-4 flex gap-4 md:flex-row">
           <StartProjectButton />
-          <BookmarkButton />
         </div>
       </div>
     </>
