@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
   BookmarkedProjectsAtom,
@@ -19,9 +19,10 @@ import Button from '../components/ui/Button';
 import NoContentToDisplay from '../components/ui/NoContent';
 import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
-import { PopupNotification } from '../components/ui/PopupNotification';
 import CreateAccountDialog from '../components/ui/CreateAccountDialog';
 import { userProjectsAtom } from '../store/atoms/userProjects';
+import usePopupNotication from '../hooks/usePopup';
+import { createAccountDialogAtom } from '../store/atoms/dialog';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -122,13 +123,16 @@ const BookmarkButton = () => {
   const project = useRecoilValue(projectDetailsAtom);
   const { fetchData } = useFetchData();
   const addBookmark = useSetRecoilState(BookmarkedProjectsAtom);
+  const showPopup = usePopupNotication();
+  const setShowAccountDialog = useSetRecoilState(createAccountDialogAtom);
+
   async function handleBookmark(e) {
     e.stopPropagation();
     const token = localStorage.getItem('token');
     const options = {
       method: 'POST',
       headers: {
-        authorization: `Bearer${token}`,
+        authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ projectId: project.id }),
@@ -136,8 +140,15 @@ const BookmarkButton = () => {
 
     const response = await fetchData('/bookmark/', options);
     if (response.success) {
+      showPopup('success', response.data.message);
       const newBookmark = response.data.bookmark;
       addBookmark((prev) => ({ ...prev, newBookmark }));
+    } else {
+      if (response.error == 'Request failed') {
+        setShowAccountDialog(true);
+      } else {
+        showPopup('info', response.error);
+      }
     }
   }
 
@@ -145,7 +156,7 @@ const BookmarkButton = () => {
     <>
       <button
         onClick={handleBookmark}
-        className="font-body duration focus:outline-primary box-content flex h-full w-full items-center justify-start gap-3 rounded-md p-1 py-2 transition-all duration-200 focus:scale-95"
+        className="font-body duration box-content flex h-full w-full items-center justify-start gap-3 rounded-md transition-all duration-200 focus:scale-95"
       >
         <BookmarkIcon size={'size-4'} />
         <span>Save</span>
@@ -185,7 +196,6 @@ const SettingsDropDown = ({
     }
     function checkKeyPress(e) {
       if (!isSettingOpen) return;
-      console.log(e.key);
 
       if (e.key === 'Escape') setIsSettingOpen(false);
     }
@@ -202,12 +212,12 @@ const SettingsDropDown = ({
       ref={dropDownRef}
       className={`dark:bg-black-medium duration-250 absolute right-0 top-[130%] z-50 grid h-max w-max items-center rounded-md bg-white shadow-md transition-all ${isSettingOpen ? `visible translate-y-2 opacity-100` : `invisible translate-y-[-10%] opacity-0`}`}
     >
-      <ul className="font-body flex flex-col gap-1 p-4 text-left text-sm">
-        <li className="hover:bg-white-medium dark:hover:bg-black-light cursor-pointer rounded-md">
+      <ul className="font-body flex min-w-max flex-col gap-1 p-2 py-3 text-left text-sm">
+        <li className="hover:bg-white-medium dark:hover:bg-black-light cursor-pointer rounded-md px-3 py-2">
           <BookmarkButton />
         </li>
         {!!isProjectStarted && (
-          <li className="hover:bg-white-medium text-error dark:hover:bg-black-light min-h-8 flex-1 cursor-pointer rounded-md p-2">
+          <li className="hover:bg-white-medium text-error dark:hover:bg-black-light min-h-8 flex-1 cursor-pointer rounded-md px-3 py-2">
             <CancelProject />
           </li>
         )}
@@ -221,17 +231,17 @@ const ProjectHeader = memo(({ projectId }) => {
   const project = useRecoilValue(projectDetailsAtom);
   const setUserProject = useSetRecoilState(userProjectsAtom);
   const isProjectStarted = useRecoilValue(projectStartedSelector);
-  const [hasProjectStarted, setHasProjectStarted] = useState(false);
 
   const StartProjectButton = () => {
     const { fetchData, loading, error } = useFetchData();
-
+    const showPopup = usePopupNotication();
+    const setShowAccountDialog = useSetRecoilState(createAccountDialogAtom);
     async function handleStartProject() {
       const token = localStorage.getItem('token');
       const options = {
         method: 'POST',
         headers: {
-          authorization: `Bearer ${token}`,
+          authorization: `Bearer${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ projectId }),
@@ -239,9 +249,15 @@ const ProjectHeader = memo(({ projectId }) => {
       const response = await fetchData('/user-projects/create', options);
 
       if (response.success) {
-        setHasProjectStarted(true);
+        showPopup('success', response.data.message);
         const project = response.data.userProject;
         setUserProject((prev) => [...prev, project]);
+      } else {
+        if (response.error === 'Request failed') {
+          setShowAccountDialog(true);
+        } else {
+          showPopup('info', response.error);
+        }
       }
     }
 
@@ -251,16 +267,6 @@ const ProjectHeader = memo(({ projectId }) => {
 
     return (
       <div className="min-w-32">
-        {!!error &&
-          (error === 'Request failed' ? (
-            <CreateAccountDialog />
-          ) : (
-            <PopupNotification type="error" text={error} />
-          ))}
-        {!!hasProjectStarted && (
-          <PopupNotification type="success" text={'project started!'} />
-        )}
-
         {isProjectStarted ? (
           <Button
             onClick={handleProjectSubmission}

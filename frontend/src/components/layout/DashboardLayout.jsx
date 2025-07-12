@@ -1,11 +1,13 @@
 import { Outlet } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import DashboardHeader from './Header';
 import DashboardSidebar from './Sidebar';
 import { sidebarOpenAtom } from '../../store/atoms/dashboardLayoutAtoms';
+import { createAccountDialogAtom } from '../../store/atoms/dialog';
 import useScreenSize from '../../hooks/useScreenSize';
 import { useEffect } from 'react';
-
+import { PopupNotification } from '../ui/PopupNotification';
+import CreateAccountDialog from '../../components/ui/CreateAccountDialog';
 const DashboardLayout = () => {
   const [isExpanded, setIsExpanded] = useRecoilState(sidebarOpenAtom);
   const screenSize = useScreenSize();
@@ -13,6 +15,12 @@ const DashboardLayout = () => {
   useEffect(() => {
     screenSize.width > 768 ? setIsExpanded(true) : setIsExpanded(false);
   }, [screenSize]);
+
+  const ShowCreateAccount = () => {
+    const showAccountDialog = useRecoilValue(createAccountDialogAtom);
+
+    return !!showAccountDialog && <CreateAccountDialog />;
+  };
 
   return (
     <div className="dark:bg-black-medium flex h-screen w-screen flex-col">
@@ -41,6 +49,8 @@ const DashboardLayout = () => {
           <Outlet />
         </div>
       </div>
+      <PopupNotification />
+      <ShowCreateAccount />
     </div>
   );
 };

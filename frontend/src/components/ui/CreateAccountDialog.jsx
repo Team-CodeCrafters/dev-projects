@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom';
 import ConfirmDialog from './ConfirmationDialog';
 import CancelIcon from '../../assets/icons/Cancel';
-import { ConfirmDialogAtom } from '../../store/atoms/dialog';
+import {
+  ConfirmDialogAtom,
+  createAccountDialogAtom,
+} from '../../store/atoms/dialog';
 import { useSetRecoilState } from 'recoil';
 
 const CreateAccountDialog = () => {
   const setShowDialog = useSetRecoilState(ConfirmDialogAtom);
-
+  const setCreateAccountDialog = useSetRecoilState(createAccountDialogAtom);
   return (
     <ConfirmDialog
       title="Create Dev Projects Account"
@@ -27,7 +30,10 @@ const CreateAccountDialog = () => {
         </Link>
       </div>
       <button
-        onClick={() => setShowDialog(false)}
+        onClick={() => {
+          setShowDialog(false);
+          setCreateAccountDialog(false);
+        }}
         className="absolute right-3 top-1 cursor-pointer p-1"
       >
         <CancelIcon />

@@ -26,7 +26,7 @@ async function startProject(req, res) {
 
     return res
       .status(200)
-      .json({ message: 'projected started successfully', userProject });
+      .json({ message: 'project started successfully', userProject });
   } catch (e) {
     if (e.code === 'P2003') {
       return res.status(401).json({ message: 'project does not exists' });
