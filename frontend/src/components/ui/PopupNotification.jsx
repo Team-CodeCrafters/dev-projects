@@ -4,8 +4,6 @@ import { PopupNotificationAtom } from '../../store/atoms/ui';
 export const PopupNotification = () => {
   const popupNotification = useRecoilValue(PopupNotificationAtom);
 
-  console.log(popupNotification);
-
   return (
     <div className="fixed bottom-6 right-8 z-[999] flex flex-col items-end gap-3 transition-all">
       {popupNotification.map((notification, index) => (

@@ -1,22 +1,16 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import useFetchData from '../../hooks/useFetchData';
-import { PopupNotification } from '../ui/PopupNotification';
 import { useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../../store/atoms/userAtoms';
+import usePopupNotication from '../../hooks/usePopup';
 
 const ProfilePicture = ({ userProfile }) => {
-  const [popup, setPopup] = useState({ show: false, text: '', type: 'info' });
   const fileInputRef = useRef(null);
   const setUserProfile = useSetRecoilState(userProfileAtom);
   const { fetchData } = useFetchData();
-
+  const showPopup = usePopupNotication();
   const handleImageChange = async (e) => {
-    setPopup({
-      show: 'true',
-      text: 'changing profile picture...',
-      type: 'info',
-    });
-
+    showPopup('info', 'changing profile picture...');
     const file = e.target.files[0];
     const token = localStorage.getItem('token');
 
@@ -38,17 +32,9 @@ const ProfilePicture = ({ userProfile }) => {
     const res = await fetchData('/user/update-profile', options);
     if (res.success) {
       setUserProfile(res.data.user);
-      setPopup({
-        show: 'true',
-        text: 'profile updated successfully',
-        type: 'success',
-      });
+      showPopup('success', 'profile updated successfully');
     } else {
-      setPopup({
-        show: 'true',
-        text: res.error,
-        type: 'info',
-      });
+      showPopup('error', res.error);
     }
   };
 
@@ -69,31 +55,15 @@ const ProfilePicture = ({ userProfile }) => {
 
     const res = await fetchData('/user/update-profile', options);
     if (res.success) {
-      setPopup({
-        show: 'true',
-        text: 'Profile picture deleted.',
-        type: 'info',
-      });
+      showPopup('c', 'Profile picture deleted.');
       setUserProfile((prev) => ({ ...prev, profilePicture: null }));
     } else {
-      setPopup({
-        show: 'true',
-        text: res.error,
-        type: 'info',
-      });
+      showPopup('error', res.error);
     }
   };
 
   return (
     <>
-      {popup.show && (
-        <PopupNotification
-          text={popup.text}
-          type={popup.type}
-          onClose={() => setPopup({ ...popup, show: false })}
-        />
-      )}
-
       <div className="group relative h-28 w-28 cursor-pointer overflow-hidden rounded-full border-2 border-white">
         {userProfile?.profilePicture ? (
           <img

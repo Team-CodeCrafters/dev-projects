@@ -49,6 +49,7 @@ const ConfirmDialog = ({
       <div
         className="dark:bg-black-medium text-primary-text relative w-[90%] max-w-md rounded-2xl bg-white p-6 shadow-lg dark:text-white"
         ref={dialogRef}
+        onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-heading mb-3 text-center text-xl font-semibold">
           {title}
