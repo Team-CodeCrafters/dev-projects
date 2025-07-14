@@ -131,6 +131,10 @@ const BookmarkButton = () => {
   async function handleBookmark(e) {
     e.stopPropagation();
     const token = localStorage.getItem('token');
+    if (!token) {
+      setShowAccountDialog(true);
+      return;
+    }
     const options = {
       method: 'POST',
       headers: {
@@ -168,13 +172,38 @@ const BookmarkButton = () => {
 };
 
 const CancelProject = () => {
+  const userProjects = useRecoilValue(userProjectsAtom);
   const project = useRecoilValue(projectDetailsAtom);
   const { fetchData } = useFetchData();
-  const userProjects = useSetRecoilState(userProjectsAtom);
+  const setUserProjects = useSetRecoilState(userProjectsAtom);
   const showPopup = usePopupNotication();
-  function removeUserProject() {
-    // remove user started project
-    showPopup('success', 'cancelling project');
+
+  async function removeUserProject() {
+    const currentProject = userProjects.find(
+      (userProject) => userProject.project.id === project.id,
+    );
+
+    const options = {
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userProjectId: currentProject.id,
+      }),
+
+      method: 'DELETE',
+    };
+
+    const response = await fetchData('/user-projects/', options);
+    if (response.success) {
+      setUserProjects((prev) =>
+        prev.filter((userProject) => userProject.project.id !== project.id),
+      );
+      showPopup('success', response.data.message);
+    } else {
+      showPopup('error', response.error);
+    }
   }
 
   return <button onClick={removeUserProject}>Cancel Project</button>;
@@ -237,11 +266,15 @@ const ProjectHeader = memo(({ projectId }) => {
   const isProjectStarted = useRecoilValue(projectStartedSelector);
 
   const StartProjectButton = () => {
-    const { fetchData, loading, error } = useFetchData();
+    const { fetchData, loading } = useFetchData();
     const showPopup = usePopupNotication();
     const setShowAccountDialog = useSetRecoilState(createAccountDialogAtom);
     async function handleStartProject() {
       const token = localStorage.getItem('token');
+      if (!token) {
+        setShowAccountDialog(true);
+        return;
+      }
       const options = {
         method: 'POST',
         headers: {
