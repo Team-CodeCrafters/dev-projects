@@ -1,4 +1,4 @@
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { Link, useNavigate } from 'react-router-dom';
 import { signInDataAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
@@ -7,11 +7,12 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
-import { PopupNotification } from '../components/ui/PopupNotification';
 import { useEffect } from 'react';
+import usePopupNotication from '../hooks/usePopup';
 
 const Login = () => {
   const navigate = useNavigate();
+  const showPopup = usePopupNotication();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -20,7 +21,7 @@ const Login = () => {
   });
 
   const [signInData, setSignInData] = useRecoilState(signInDataAtom);
-  const { fetchData, error, loading } = useFetchData();
+  const { fetchData, loading } = useFetchData();
   async function handleSubmit(e) {
     e.preventDefault();
     const options = {
@@ -36,6 +37,7 @@ const Login = () => {
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
     } else {
+      showPopup('error', response.error);
     }
   }
 
@@ -101,7 +103,6 @@ const Login = () => {
           </Link>
         </p>
       </Card>
-      {error && <PopupNotification type="error" text={error} />}
     </div>
   );
 };

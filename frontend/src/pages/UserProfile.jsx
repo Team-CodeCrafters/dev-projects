@@ -4,14 +4,13 @@ import PersonalDetails from '../components/user/PersonalDetails';
 import { useNavigate } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import { userProfileAtom } from '../store/atoms/userAtoms';
-import { PopupNotification } from '../components/ui/PopupNotification';
 import { useRecoilState } from 'recoil';
-
+import usePopupNotication from '../hooks/usePopup';
 const UserProfile = () => {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
   const { fetchData, loading } = useFetchData();
-
+  const showPopup = usePopupNotication();
   useEffect(() => {
     document.title = 'Dev Projects | Profile';
     const token = localStorage.getItem('token');
@@ -28,7 +27,7 @@ const UserProfile = () => {
       if (res.success && res.data.user) {
         setUserProfile(res.data.user);
       } else {
-        <PopupNotification type="error" text={res.error} />;
+        showPopup('error', res.error);
       }
     }
     if (!userProfile) fetchUserProfile();

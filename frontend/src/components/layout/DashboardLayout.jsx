@@ -6,7 +6,6 @@ import { sidebarOpenAtom } from '../../store/atoms/dashboardLayoutAtoms';
 import { createAccountDialogAtom } from '../../store/atoms/dialog';
 import useScreenSize from '../../hooks/useScreenSize';
 import { useEffect } from 'react';
-import { PopupNotification } from '../ui/PopupNotification';
 import CreateAccountDialog from '../../components/ui/CreateAccountDialog';
 const DashboardLayout = () => {
   const [isExpanded, setIsExpanded] = useRecoilState(sidebarOpenAtom);
@@ -49,7 +48,6 @@ const DashboardLayout = () => {
           <Outlet />
         </div>
       </div>
-      <PopupNotification />
       <ShowCreateAccount />
     </div>
   );

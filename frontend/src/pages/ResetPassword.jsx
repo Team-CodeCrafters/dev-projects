@@ -6,13 +6,12 @@ import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
 import useFetchData from '../hooks/useFetchData';
-import { PopupNotification } from '../components/ui/PopupNotification';
+import usePopupNotication from '../hooks/usePopup';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const showPop = usePopupNotication();
   const [signInData, setSignInData] = useState({
     password: '',
     confirmPassword: '',
@@ -20,11 +19,9 @@ const ResetPassword = () => {
   const { fetchData, loading } = useFetchData();
   const navigate = useNavigate();
   async function handleSubmit(e) {
-    setSuccessMessage(null);
-    setErrorMessage(null);
     e.preventDefault();
     if (signInData.password !== signInData.confirmPassword) {
-      setErrorMessage('passwords do not match');
+      showPop('error', 'passwords do not match');
       return;
     }
     const options = {
@@ -40,12 +37,12 @@ const ResetPassword = () => {
       options,
     );
     if (response.success) {
-      setSuccessMessage('password reset successfully');
+      showPop('success', 'password reset successfully');
       setTimeout(() => {
         navigate('/login');
       }, 2000);
     } else {
-      setErrorMessage(response.error);
+      showPop('error', response.error);
     }
   }
   return (
@@ -92,10 +89,6 @@ const ResetPassword = () => {
           </a>
         </p>
       </Card>
-      {successMessage && (
-        <PopupNotification text={successMessage} type="success" />
-      )}
-      {errorMessage && <PopupNotification text={errorMessage} type="error" />}
     </div>
   );
 };

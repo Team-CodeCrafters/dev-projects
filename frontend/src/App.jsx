@@ -12,6 +12,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
 import { useTheme } from './hooks/useTheme';
 import Bookmarks from './pages/Bookmarks';
+import { PopupNotification } from './components/ui/PopupNotification';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -20,27 +21,29 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<LoadingPage />}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+    <>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingPage />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-          <Route element={<DashboardLayout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/profile" element={<UserProfile />} />
-            <Route path="/projects" element={<div />} />
-            <Route path="/project/:id" element={<ProjectDetails />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
-          </Route>
-
-          <Route path="*" element={<div>Page Not Found</div>} />
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+            <Route element={<DashboardLayout />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/projects" element={<div />} />
+              <Route path="/project/:id" element={<ProjectDetails />} />
+              <Route path="/bookmarks" element={<Bookmarks />} />
+            </Route>
+            <Route path="*" element={<div>Page Not Found</div>} />
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+      <PopupNotification />
+    </>
   );
 }
 

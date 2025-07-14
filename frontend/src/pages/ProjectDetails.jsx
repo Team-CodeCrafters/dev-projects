@@ -19,7 +19,6 @@ import Button from '../components/ui/Button';
 import NoContentToDisplay from '../components/ui/NoContent';
 import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
-import CreateAccountDialog from '../components/ui/CreateAccountDialog';
 import { userProjectsAtom } from '../store/atoms/userProjects';
 import usePopupNotication from '../hooks/usePopup';
 import { createAccountDialogAtom } from '../store/atoms/dialog';
@@ -33,15 +32,18 @@ const ProjectDetails = () => {
   const [project, setProject] = useRecoilState(projectDetailsAtom);
   const [userProjects, setUserProjects] = useRecoilState(userProjectsAtom);
   const isProjectStarted = useRecoilValue(projectStartedSelector);
-
+  const showPopup = usePopupNotication();
   useEffect(() => {
     async function getProjectDetails() {
       const response = await fetchProjectData(`/project/${id}`);
       if (response.success) {
         setProject(response.data.project);
         document.title = `Dev Projects | ${response.data.project.name}`;
+      } else {
+        showPopup('error', response.error);
       }
-      return response.data.project;
+
+      return response.data?.project;
     }
 
     async function getUserProjects() {
@@ -169,8 +171,10 @@ const CancelProject = () => {
   const project = useRecoilValue(projectDetailsAtom);
   const { fetchData } = useFetchData();
   const userProjects = useSetRecoilState(userProjectsAtom);
+  const showPopup = usePopupNotication();
   function removeUserProject() {
     // remove user started project
+    showPopup('success', 'cancelling project');
   }
 
   return <button onClick={removeUserProject}>Cancel Project</button>;
@@ -241,7 +245,7 @@ const ProjectHeader = memo(({ projectId }) => {
       const options = {
         method: 'POST',
         headers: {
-          authorization: `Bearer${token}`,
+          authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ projectId }),
@@ -429,7 +433,9 @@ const SimilarProjectsList = () => {
         {similarProjects.map((project) => (
           <ProjectCard
             key={project.id}
-            styles={'sm:max-w-[20rem]  w-full mx-2 h-2xl pt-6'}
+            styles={
+              'sm:max-w-[20rem] !dark:bg-black-medium w-full mx-2 h-2xl pt-6'
+            }
             project={project}
             onClick={() => handleProjectClick(project.id)}
           >

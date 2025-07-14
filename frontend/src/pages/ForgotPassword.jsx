@@ -6,17 +6,14 @@ import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
 import useFetchData from '../hooks/useFetchData';
-import { PopupNotification } from '../components/ui/PopupNotification';
-
+import usePopupNotication from '../hooks/usePopup';
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const { fetchData, loading } = useFetchData();
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const showPopup = usePopupNotication();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage(null);
-    setSuccessMessage(null);
+
     const options = {
       method: 'POST',
       headers: {
@@ -26,11 +23,12 @@ const ForgotPassword = () => {
     };
 
     const response = await fetchData('/user/forgot-password', options);
+    console.log({ response });
 
     if (response.success) {
-      setSuccessMessage('Password reset instructions sent to your email.');
+      showPopup('success', 'Password reset instructions sent to your email');
     } else {
-      setErrorMessage(response.error);
+      showPopup('error', response.error);
     }
   };
 
@@ -61,16 +59,12 @@ const ForgotPassword = () => {
         </form>
 
         <p className="mt-5 text-center text-gray-400">
-          Back to{' '}
-          <Link to="/login" className="text-blue-400 hover:underline">
+          Back to
+          <Link to="/login" className="ml-2 text-blue-400 hover:underline">
             Sign in
           </Link>
         </p>
       </Card>
-      {successMessage && (
-        <PopupNotification text={successMessage} type="success" />
-      )}
-      {errorMessage && <PopupNotification text={errorMessage} type="error" />}
     </div>
   );
 };
