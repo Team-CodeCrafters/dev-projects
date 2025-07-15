@@ -14,6 +14,10 @@ const CreateAccountDialog = () => {
     <ConfirmDialog
       title="Create Dev Projects Account"
       message={'Start Building Today'}
+      onCancel={() => {
+        setShowDialog(false);
+        setCreateAccountDialog(false);
+      }}
     >
       <div className="mb-3 mt-4 flex items-start justify-center gap-4">
         <Link
