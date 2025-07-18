@@ -2,9 +2,14 @@ import React, { useState } from 'react';
 import Filter from '../assets/icons/Filter';
 import Cancel from '../assets/icons/Cancel';
 
-const SearchableTagInput = ({ title, options, accent }) => {
+const SearchableTagInput = ({
+  title,
+  options,
+  accent,
+  selected,
+  setSelected,
+}) => {
   const [query, setQuery] = useState('');
-  const [selected, setSelected] = useState([]);
 
   const handleSelect = (option) => {
     if (!selected.includes(option)) {
@@ -72,6 +77,20 @@ const SearchableTagInput = ({ title, options, accent }) => {
 
 const Projects = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [selectedFilters, setSelectedFilters] = useState({
+    difficulty: [],
+    domain: [],
+    language: [],
+  });
+
+  const handleDifficultyChange = (level, checked) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      difficulty: checked
+        ? [...prev.difficulty, level]
+        : prev.difficulty.filter((item) => item !== level),
+    }));
+  };
 
   return (
     <div className="relative">
@@ -103,9 +122,17 @@ const Projects = () => {
       >
         <div className="border-white-dark flex items-center justify-between border-b px-4 py-4">
           <h2 className="text-white-light text-lg font-bold">Filters</h2>
-          <button onClick={() => setIsSidebarOpen(false)}>
-            <Cancel />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="bg-primary px-3 py-1 text-sm rounded text-white-light hover:bg-secondary"
+            >
+              Apply
+            </button>
+            <button onClick={() => setIsSidebarOpen(false)}>
+              <Cancel />
+            </button>
+          </div>
         </div>
 
         <div className="text-white-light h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-[#1A1A1A] p-6">
@@ -119,7 +146,14 @@ const Projects = () => {
                   key={level}
                   className="flex items-center gap-4 text-base hover:text-white"
                 >
-                  <input type="checkbox" className="accent-primary h-5 w-5" />
+                  <input
+                    type="checkbox"
+                    className="accent-primary h-5 w-5"
+                    checked={selectedFilters.difficulty.includes(level)}
+                    onChange={(e) =>
+                      handleDifficultyChange(level, e.target.checked)
+                    }
+                  />
                   <span>{level}</span>
                 </label>
               ))}
@@ -142,6 +176,10 @@ const Projects = () => {
               'DevOps',
             ]}
             accent="accent-primary"
+            selected={selectedFilters.domain}
+            setSelected={(domain) =>
+              setSelectedFilters((prev) => ({ ...prev, domain }))
+            }
           />
 
           <SearchableTagInput
@@ -179,6 +217,10 @@ const Projects = () => {
               'GraphQL',
             ]}
             accent="accent-accent"
+            selected={selectedFilters.language}
+            setSelected={(language) =>
+              setSelectedFilters((prev) => ({ ...prev, language }))
+            }
           />
         </div>
       </div>
