@@ -29,19 +29,33 @@ export default {
         heading: ['Geist', 'system-ui', 'sans-serif'],
         body: ['Open Sans', 'system-ui', 'sans-serif'],
       },
+
       keyframes: {
-        loadingBar: {
-          '0%': { width: '0%', display: 'block' },
-          '100%': { width: '95%' },
-        },
-        loadingComplete: {
-          '0%': { width: '90%' },
-          '100%': { width: '100%', display: 'none' },
+        popupAnimation: {
+          '0%': {
+            transform: 'translateY(10rem)',
+            opacity: '0',
+          },
+          '10%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+          },
+          '70%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+          },
+          '80%': {
+            transform: 'translateX(120%)',
+            opacity: '0',
+          },
+          '100%': {
+            transform: 'translateX(200%)',
+            opacity: '0',
+          },
         },
       },
       animation: {
-        'loading-bar': 'loadingBar 1s ease-in forwards',
-        'loading-complete': 'loadingComplete 200ms ease-out forwards',
+        'popup-animation': 'popupAnimation 3500ms linear forwards',
       },
     },
   },

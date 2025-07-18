@@ -54,25 +54,25 @@ const HeaderContent = () => {
     setIsSearchBarOpen((prev) => !prev);
   };
   const { fetchData } = useFetchData();
+  async function fetchUserProfile() {
+    const token = localStorage.getItem('token');
+    const options = {
+      headers: {
+        authorization: `Bearer ${token}`,
+      },
+    };
 
+    const fetchResult = await fetchData('/user/profile', options);
+
+    if (fetchResult.success) {
+      setUserProfile(fetchResult.data.user);
+    }
+  }
   useEffect(() => {
     if (userProfile) return;
-    async function fetchUserProfile() {
-      const token = localStorage.getItem('token');
-      const options = {
-        headers: {
-          authorization: `Bearer ${token}`,
-        },
-      };
-
-      const fetchResult = await fetchData('/user/profile', options);
-
-      if (fetchResult.success) {
-        setUserProfile(fetchResult.data.user);
-      }
-    }
     fetchUserProfile();
   }, []);
+
   return (
     <>
       <div className="flex items-center gap-1.5 lg:gap-4">
@@ -154,11 +154,13 @@ const SearchBar = () => {
 const ProfileDropDown = ({ isVisible, setIsVisible, profileButtonRef }) => {
   const [theme, setTheme] = useRecoilState(colorThemeAtom);
   const dropDownRef = useRef(null);
+  const setUserProfile = useSetRecoilState(userProfileAtom);
   const toggleTheme = useCallback(() => {
     setTheme((curr) => (curr === 'light' ? 'dark' : 'light'));
   }, []);
   const navigate = useNavigate();
   const LogOutUser = useCallback(() => {
+    setUserProfile(null);
     localStorage.removeItem('token');
     navigate('/login');
   }, []);

@@ -4,9 +4,8 @@ import { useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../../store/atoms/userAtoms';
 import useFetchData from '../../hooks/useFetchData';
 import SkeletalLoader from '../ui/SkeletalLoader';
-import { PopupNotification } from '../ui/PopupNotification';
 import ConfirmDialog from '../ui/ConfirmationDialog';
-import Button from '../ui/Button';
+import usePopupNotication from '../../hooks/usePopup';
 
 const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();
@@ -14,14 +13,9 @@ const PersonalDetails = ({ userProfile, loading }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [popup, setPopup] = useState({ show: false, text: '', type: 'info' });
-
+  const showPopup = usePopupNotication();
   const setUserProfile = useSetRecoilState(userProfileAtom);
   const { fetchData } = useFetchData();
-
-  const showPopup = (text, type = 'info') => {
-    setPopup({ show: true, text, type });
-  };
 
   async function updateDisplayName() {
     const token = localStorage.getItem('token');
@@ -45,7 +39,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
     setUserProfile((prev) => ({ ...prev, displayName: editedName }));
     setEditMode(false);
     updateDisplayName();
-    showPopup('Name updated successfully!', 'success');
+    showPopup('success', 'Name updated successfully!');
   };
 
   const handleCancelEditName = () => {
@@ -62,7 +56,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
 
   const handleCancelDeleteDialog = () => {
     setShowDeleteDialog(false);
-    showPopup('Account deletion cancelled.', 'info');
+    showPopup('info', 'Account deletion cancelled.');
   };
 
   async function deleteUserAccount() {
@@ -72,22 +66,17 @@ const PersonalDetails = ({ userProfile, loading }) => {
       },
       method: 'DELETE',
     };
+
     const res = await fetchData('/user/', options);
     if (res.success) {
       localStorage.removeItem('token');
+      setUserProfile(null);
       navigate('/login');
     }
   }
 
   return (
     <>
-      {popup.show && (
-        <PopupNotification
-          text={popup.text}
-          type={popup.type}
-          onClose={() => setPopup({ ...popup, show: false })}
-        />
-      )}
       <div className="animate-fade-in text-primary-text mt-20 w-full max-w-2xl space-y-8 px-4 dark:text-white">
         {loading ? (
           <div className="space-y-8">

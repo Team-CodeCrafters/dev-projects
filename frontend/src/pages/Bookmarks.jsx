@@ -8,10 +8,11 @@ import { PopupNotification } from '../components/ui/PopupNotification';
 import { useNavigate } from 'react-router-dom';
 import { BookmarkIcon } from '../assets/icons/Bookmark';
 import { DeleteIcon } from '../assets/icons/Delete';
-
+import usePopupNotication from '../hooks/usePopup';
 const Bookmarks = () => {
   const { fetchData, loading, error } = useFetchData();
   const [bookmarks, setBookmarks] = useRecoilState(BookmarkedProjectsAtom);
+  const showPopup = usePopupNotication();
   const navigate = useNavigate();
   useEffect(() => {
     document.title = 'Dev Projects | Bookmarks';
@@ -30,6 +31,8 @@ const Bookmarks = () => {
       const response = await fetchData('/bookmark/', options);
       if (response.success) {
         setBookmarks(response.data.bookmarkedProjects);
+      } else {
+        showPopup('error', response.error);
       }
     }
     fetchBookmarks();
@@ -54,20 +57,21 @@ const Bookmarks = () => {
         body: JSON.stringify({ bookmarkId }),
       };
 
-      const { success } = await fetchData('/bookmark/', options);
+      const { success, error } = await fetchData('/bookmark/', options);
       if (success) {
         setBookmarkProject((prev) =>
           prev.filter((bookmark) => bookmark.id !== bookmarkId),
         );
+      } else {
+        showPopup('error', error);
       }
     }
 
     return (
       <>
-        {!!error && <PopupNotification type="info" text={error} />}
         <button
           onClick={removeBookmark}
-          className="dark:hover:bg-black-lighter hover:bg-white-dark absolute right-3 top-3 z-50 p-2 opacity-80"
+          className="dark:hover:bg-black-lighter hover:bg-white-dark absolute right-3 top-3 z-10 p-2 opacity-80"
         >
           <DeleteIcon />
         </button>
@@ -77,7 +81,6 @@ const Bookmarks = () => {
 
   return (
     <>
-      {!!error && <PopupNotification type="info" text={error} />}
       <div className="bg-white-medium dark:bg-black-medium relative ml-2 h-full rounded-lg p-3 md:p-5">
         {bookmarks.length > 0 ? (
           <>

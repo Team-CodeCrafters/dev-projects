@@ -15,8 +15,6 @@ const useFetchData = () => {
       );
       const response = await fetchResult.json();
       if (fetchResult.ok) {
-        // console.log({ response });
-
         setData(response);
         return { success: true, data: response };
       } else {

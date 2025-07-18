@@ -107,4 +107,34 @@ async function updateStartedProject(req, res) {
   }
 }
 
-export { startProject, getStartedProjects, updateStartedProject };
+async function deleteProject(req, res) {
+  try {
+    const { userProjectId } = req.body;
+    if (!userProjectId) {
+      return res.status(401).json({ message: 'Invalid project id' });
+    }
+
+    await prisma.userProject.delete({
+      where: {
+        id: userProjectId,
+      },
+    });
+    return res.status(200).json({ message: 'project removed' });
+  } catch (e) {
+    if (e.code === 'P2025') {
+      return res
+        .status(401)
+        .json({ message: 'invalid project id', error: e.message });
+    }
+    return res
+      .status(500)
+      .json({ message: 'internal server error', error: e.message });
+  }
+}
+
+export {
+  startProject,
+  getStartedProjects,
+  updateStartedProject,
+  deleteProject,
+};

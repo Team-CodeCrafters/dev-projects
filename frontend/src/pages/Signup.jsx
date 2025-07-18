@@ -11,9 +11,11 @@ import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 
 import logo from '../assets/images/dev-projects-dark.png';
+import usePopupNotication from '../hooks/usePopup';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const showPop = usePopupNotication();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -43,9 +45,11 @@ const Signup = () => {
     };
 
     const response = await fetchData('/user/signup', options);
-    if (response?.data.token) {
+    if (response.success) {
       localStorage.setItem('token', response.data.token);
       navigate('/dashboard');
+    } else {
+      showPop('error', response.error);
     }
   };
 
@@ -59,10 +63,6 @@ const Signup = () => {
         <h2 className="mb-4 mt-2 text-center text-3xl font-semibold">
           Create an account
         </h2>
-
-        <div className="h-6 text-center text-sm text-red-500">
-          {localError || serverError || ''}
-        </div>
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-6">
           <InputField

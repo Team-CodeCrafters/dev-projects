@@ -11,9 +11,9 @@ import {
 } from '../middleware/bookmarkValidation.js';
 
 const router = Router();
-
-router.get('/', authenticateUser, getBookmarks);
-router.post('/', authenticateUser, validateCreateBookmark, createBookmark);
-router.delete('/', authenticateUser, validateDeleteBookmark, deleteBookmark);
+router.use(authenticateUser);
+router.get('/', getBookmarks);
+router.post('/', validateCreateBookmark, createBookmark);
+router.delete('/', validateDeleteBookmark, deleteBookmark);
 
 export default router;

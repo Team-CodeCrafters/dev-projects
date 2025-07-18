@@ -12,7 +12,7 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
 import { useTheme } from './hooks/useTheme';
 import Bookmarks from './pages/Bookmarks';
-import Projects from './pages/Projects';
+import { PopupNotification } from './components/ui/PopupNotification';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -21,14 +21,15 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<LoadingPage />}>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+    <>
+      <BrowserRouter>
+        <Suspense fallback={<LoadingPage />}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />

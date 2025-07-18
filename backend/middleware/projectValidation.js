@@ -24,10 +24,16 @@ const updateProjectSchema = projectSchema.partial();
 const projectFilterSchema = projectSchema
   .pick({
     difficulty: true,
-    domain: true,
     tools: true,
   })
+  .extend({
+    domains: zod.array(
+      zod.nativeEnum(Domain, { message: 'domain is incorrect' }),
+      { message: 'invalid domain' },
+    ),
+  })
   .partial();
+
 const recommendationSchema = projectSchema
   .pick({
     difficulty: true,
@@ -70,9 +76,11 @@ async function validateProjectUpdate(req, res, next) {
 }
 
 async function validateProjectFilters(req, res, next) {
-  let { difficulty, domain, tools } = req.query;
+  let { difficulty, domains, tools } = req.query;
   tools = tools?.split(',');
-  req.filters = { difficulty, domain, tools };
+  domains = domains?.split(',');
+  req.filters = { difficulty, domains, tools };
+
   const zodResponse = projectFilterSchema.safeParse(req.filters);
   if (!zodResponse.success) {
     return res.status(401).json({
