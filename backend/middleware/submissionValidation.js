@@ -1,5 +1,4 @@
-import { log } from 'console';
-import zod, { ZodTransformer } from 'zod';
+import zod from 'zod';
 
 const submissionSchema = zod.object({
   title: zod
@@ -7,12 +6,13 @@ const submissionSchema = zod.object({
     .max(60, { message: 'the maximum length of title is 60 chars' }),
   description: zod
     .string({ message: 'description is required' })
-    .max(500, { message: 'the maximum length of description is 300 chars' })
+    .max(500, { message: 'the maximum length of description is 500 chars' })
     .optional(),
   githubRepo: zod
     .string({ message: 'invalid GitHub URL' })
     .startsWith('https://github.com/', { message: 'invalid GitHub URL' }),
   liveUrl: zod.string().optional(),
+  tools: zod.array(zod.string(), { message: 'invalid tools' }).optional(),
 });
 
 const submissionUpdateSchema = submissionSchema
@@ -21,6 +21,7 @@ const submissionUpdateSchema = submissionSchema
     description: true,
     githubRepo: true,
     liveUrl: true,
+    tools: true,
   })
   .partial()
   .extend({
@@ -29,6 +30,10 @@ const submissionUpdateSchema = submissionSchema
 
 export function validateCreateSubmission(req, res, next) {
   try {
+    if (req.body.tools) {
+      req.body.tools = req.body.tools.split(',');
+    }
+
     const zodResult = submissionSchema.safeParse(req.body);
 
     if (!zodResult.success) {
