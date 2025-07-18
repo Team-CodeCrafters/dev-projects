@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Filter from '../assets/icons/Filter';
 import Cancel from '../assets/icons/Cancel';
+import useFetchData from '../hooks/useFetchData';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { projectsAtom } from '../store/atoms/project';
+import ProjectCard from '../components/projects/ProjectCard';
 
 const SearchableTagInput = ({
   title,
@@ -76,6 +81,8 @@ const SearchableTagInput = ({
 };
 
 const Projects = () => {
+  const [projects, setProjects] = useRecoilState(projectsAtom);
+  const { fetchData, loading } = useFetchData();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
     difficulty: [],
@@ -90,6 +97,28 @@ const Projects = () => {
         ? [...prev.difficulty, level]
         : prev.difficulty.filter((item) => item !== level),
     }));
+  };
+
+  const applyFilers = async () => {
+    let toolsQuery = '';
+    let difficultyQuery = '';
+    let domainQuery = '';
+    if (selectedFilters.language.length > 0) {
+      toolsQuery = `&tools=${selectedFilters.language.join(',')}`;
+    }
+    if (selectedFilters.difficulty.length > 0) {
+      difficultyQuery = `&difficulty=${selectedFilters.difficulty.join(',')}`;
+    }
+    if (selectedFilters.domain.length > 0) {
+      domainQuery = `&domain=${selectedFilters.domain.join(',')}`;
+    }
+    const response = await fetchData(
+      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`,
+    );
+    console.log(selectedFilters);
+    if (response.success) {
+      setProjects(response.data.projects);
+    }
   };
 
   return (
@@ -108,6 +137,8 @@ const Projects = () => {
         <Filter /> Filter
       </button>
 
+      <ProjectLists />
+
       {isSidebarOpen && (
         <div
           className="bg-opacity-10 fixed inset-0 z-40 bg-black backdrop-blur-sm"
@@ -124,8 +155,11 @@ const Projects = () => {
           <h2 className="text-white-light text-lg font-bold">Filters</h2>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsSidebarOpen(false)}
-              className="bg-primary px-3 py-1 text-sm rounded text-white-light hover:bg-secondary"
+              onClick={() => {
+                setIsSidebarOpen(false);
+                applyFilers();
+              }}
+              className="bg-primary text-white-light hover:bg-secondary rounded px-3 py-1 text-sm"
             >
               Apply
             </button>
@@ -165,14 +199,14 @@ const Projects = () => {
             options={[
               'Frontend',
               'Backend',
-              'Web Development',
-              'App Development',
-              'AI/ML',
-              'UI/UX',
-              'Full Stack',
+              'Web_Development',
+              'App_Development',
+              'AIML',
+              'UIUX',
+              'Fullstack',
               'Blockchain',
-              'Data Science',
-              'Cloud Computing',
+              'Data_Science',
+              'Cloud_Computing',
               'DevOps',
             ]}
             accent="accent-primary"
@@ -192,19 +226,19 @@ const Projects = () => {
               'Node',
               'HTML',
               'CSS',
-              'JavaScript',
+              'Javascript',
               'MongoDB',
               'PostgreSQL',
               'API',
               'Git',
-              'React Native',
+              'React_Native',
               'Angular',
               'Vue',
               'Express',
               'Django',
               'Flask',
               'TensorFlow',
-              'Scikit Learn',
+              'Scikit_Learn',
               'Pandas',
               'NumPy',
               'Kotlin',
@@ -225,6 +259,31 @@ const Projects = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const ProjectLists = () => {
+  const navigate = useNavigate();
+  const projects = useRecoilValue(projectsAtom);
+  function redirectToDetails(projectId) {
+    navigate(`/project/${projectId}`);
+  }
+  if (projects?.length <= 0) {
+    return null;
+  }
+  return (
+    <>
+      <div className="flex w-full flex-wrap mx-4">
+        {projects?.map((project) => (
+          <ProjectCard
+            key={project.id}
+            styles={'sm:max-w-[20rem]  w-full mx-2  pt-6'}
+            project={project}
+            onClick={() => redirectToDetails(project.id)}
+          />
+        ))}
+      </div>
+    </>
   );
 };
 
