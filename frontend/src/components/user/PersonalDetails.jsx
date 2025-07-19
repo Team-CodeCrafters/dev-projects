@@ -123,13 +123,8 @@ const PersonalDetails = ({ userProfile, loading }) => {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="w-fit">
-                      <button
-                        onClick={handleSave}
-                        className="bg-primary hover:bg-secondary rounded-lg px-4 py-1.5 font-medium text-white transition"
-                      >
-                        Save
-                      </button>
+                    <div className="w-10">
+                      <Button styles={""} text={"Save"} onClick={handleSave}></Button>
                     </div>
                     <button
                       onClick={handleCancelEditName}
@@ -201,7 +196,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
         </div>
 
         {showPasswordDialog && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
+          <div className="bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black">
             <div className="text-primary-text dark:bg-black-medium w-[90%] max-w-md rounded-xl bg-white p-6 dark:text-white">
               <h3 className="mb-4 text-xl font-semibold">Are you sure?</h3>
               <p className="text-secondary-text mb-6">

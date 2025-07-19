@@ -13,6 +13,7 @@ import UserProfile from './pages/UserProfile';
 import { useTheme } from './hooks/useTheme';
 import Bookmarks from './pages/Bookmarks';
 import { PopupNotification } from './components/ui/PopupNotification';
+import Projects from './pages/Projects';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -34,10 +35,11 @@ function App() {
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route path="/projects" element={<div />} />
+              <Route path="/projects" element={<Projects />} />
               <Route path="/project/:id" element={<ProjectDetails />} />
               <Route path="/bookmarks" element={<Bookmarks />} />
             </Route>
+
             <Route path="*" element={<div>Page Not Found</div>} />
           </Routes>
         </Suspense>
