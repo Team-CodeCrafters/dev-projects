@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const InputField = ({
   type,
+  id = '',
   placeholder,
   value,
   onChange,
@@ -9,6 +10,7 @@ const InputField = ({
   isRequired = false,
   minLength,
   title,
+  styles,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
@@ -19,12 +21,13 @@ const InputField = ({
       <input
         type={inputType}
         placeholder={placeholder}
+        id={id}
         value={value}
         onChange={onChange}
         required={isRequired}
         minLength={minLength}
         title={title ? title : undefined}
-        className="w-full rounded-lg border border-gray-600 bg-[#1F1F1F] px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className={`w-full rounded-lg border border-gray-600 px-4 py-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1F1F1F] ${styles}`}
         pattern={pattern || undefined}
         min={isPassword ? 8 : undefined}
       />
