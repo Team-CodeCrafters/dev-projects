@@ -6,81 +6,12 @@ import useFetchData from '../hooks/useFetchData';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { projectsAtom } from '../store/atoms/project';
 import ProjectCard from '../components/projects/ProjectCard';
-
-const SearchableTagInput = ({
-  title,
-  options,
-  accent,
-  selected,
-  setSelected,
-}) => {
-  const [query, setQuery] = useState('');
-
-  const handleSelect = (option) => {
-    if (!selected.includes(option)) {
-      setSelected([...selected, option]);
-      setQuery('');
-    }
-  };
-
-  const handleRemove = (tag) => {
-    setSelected(selected.filter((item) => item !== tag));
-  };
-
-  const filteredOptions = options.filter(
-    (option) =>
-      option.toLowerCase().includes(query.toLowerCase()) &&
-      !selected.includes(option),
-  );
-
-  return (
-    <div>
-      <h3 className="text-white-light border-white-dark border-b pb-3 text-xl font-bold">
-        {title}
-      </h3>
-
-      <div className="mt-4">
-        <div className="mb-2 flex flex-wrap gap-2">
-          {selected.map((tag) => (
-            <span
-              key={tag}
-              className="bg-primary text-white-light flex items-center gap-1 rounded-full px-3 py-1 text-sm"
-            >
-              {tag}
-              <button onClick={() => handleRemove(tag)}>
-                <Cancel className="h-4 w-4" />
-              </button>
-            </span>
-          ))}
-        </div>
-
-        <input
-          type="text"
-          placeholder={`Search ${title}`}
-          className="w-full rounded-md bg-[#2A2A2A] px-3 py-2 text-white placeholder-gray-400 focus:outline-none"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-
-        {query && filteredOptions.length > 0 && (
-          <div className="border-white-dark mt-2 max-h-40 overflow-y-auto rounded-md border bg-[#1A1A1A] shadow-lg">
-            {filteredOptions.map((option) => (
-              <div
-                key={option}
-                className="text-white-light hover:bg-secondary cursor-pointer px-4 py-2"
-                onClick={() => handleSelect(option)}
-              >
-                {option}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+import usePopup from '../hooks/usePopup';
+import SearchTagInput from '../components/projects/SearchTagInput';
+import Loader from '../components/ui/Loader';
 
 const Projects = () => {
+  const showPopup = usePopup();
   const [projects, setProjects] = useRecoilState(projectsAtom);
   const { fetchData, loading } = useFetchData();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -118,6 +49,8 @@ const Projects = () => {
     console.log(selectedFilters);
     if (response.success) {
       setProjects(response.data.projects);
+    } else {
+      showPopup('error', response.error);
     }
   };
 
@@ -136,8 +69,15 @@ const Projects = () => {
       >
         <Filter /> Filter
       </button>
-
-      <ProjectLists />
+      {loading ? (
+        <>
+          <div className='w-full h-full flex justify-center items-center relative top-52'>
+            <Loader primaryColor="bg-primary"/>
+          </div>
+        </>
+      ) : (
+        <ProjectLists />
+      )}
 
       {isSidebarOpen && (
         <div
@@ -194,7 +134,7 @@ const Projects = () => {
             </div>
           </div>
 
-          <SearchableTagInput
+          <SearchTagInput
             title="Domain"
             options={[
               'Frontend',
@@ -216,7 +156,7 @@ const Projects = () => {
             }
           />
 
-          <SearchableTagInput
+          <SearchTagInput
             title="Languages"
             options={[
               'C',
@@ -273,7 +213,7 @@ const ProjectLists = () => {
   }
   return (
     <>
-      <div className="flex w-full flex-wrap mx-4">
+      <div className="mx-4 flex w-full flex-wrap">
         {projects?.map((project) => (
           <ProjectCard
             key={project.id}
