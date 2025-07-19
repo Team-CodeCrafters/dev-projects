@@ -20,6 +20,11 @@ export const similarProjectsAtom = atom({
   default: [],
 });
 
+export const projectsAtom = atom({
+  key: 'projectsAtom',
+  default: null,
+});
+
 export const projectStartedSelector = selector({
   key: 'isProjectStarted',
   get: ({ get }) => {
