@@ -10,6 +10,7 @@ import usePopup from '../hooks/usePopup';
 import SearchTagInput from '../components/projects/SearchTagInput';
 import Loader from '../components/ui/Loader';
 import InformationIcon from '../assets/icons/Information';
+import { DIFFICULTIES, DOMAINS, TOOLS } from '../utils/constants';
 
 const Projects = () => {
   const showPopup = usePopup();
@@ -19,7 +20,7 @@ const Projects = () => {
   const [selectedFilters, setSelectedFilters] = useState({
     difficulty: ['Beginner'],
     domain: ['Frontend'],
-    language: ['HTML', 'CSS', 'Javascript'],
+    tools: ['HTML', 'CSS', 'Javascript'],
   });
 
   const handleDifficultyChange = (level, checked) => {
@@ -35,8 +36,8 @@ const Projects = () => {
     let toolsQuery = '';
     let difficultyQuery = '';
     let domainQuery = '';
-    if (selectedFilters.language.length > 0) {
-      toolsQuery = `&tools=${selectedFilters.language.join(',')}`;
+    if (selectedFilters.tools.length > 0) {
+      toolsQuery = `&tools=${selectedFilters.tools.join(',')}`;
     }
     if (selectedFilters.difficulty.length > 0) {
       difficultyQuery = `&difficulty=${selectedFilters.difficulty.join(',')}`;
@@ -117,7 +118,7 @@ const Projects = () => {
               Difficulty
             </span>
             <div className="mt-4 space-y-4 md:space-y-5">
-              {['Beginner', 'Intermediate', 'Expert', 'Master'].map((level) => (
+              {DIFFICULTIES.map((level) => (
                 <label
                   key={level}
                   className="flex items-center gap-2 text-sm hover:text-white md:gap-4"
@@ -138,20 +139,7 @@ const Projects = () => {
 
           <SearchTagInput
             title="Domain"
-            options={[
-              'Frontend',
-              'Backend',
-              'Web_Development',
-              'App_Development',
-              'AIML',
-              'UIUX',
-              'Full_Stack',
-              'Blockchain',
-              'Data_Science',
-              'Cloud_Computing',
-              'DevOps',
-            ]}
-            accent="accent-primary"
+            options={DOMAINS}
             selected={selectedFilters.domain}
             setSelected={(domain) =>
               setSelectedFilters((prev) => ({ ...prev, domain }))
@@ -160,42 +148,10 @@ const Projects = () => {
 
           <SearchTagInput
             title="Languages"
-            options={[
-              'C',
-              'Python',
-              'Java',
-              'React',
-              'Node',
-              'HTML',
-              'CSS',
-              'Javascript',
-              'MongoDB',
-              'PostgreSQL',
-              'API',
-              'Git',
-              'React_Native',
-              'Angular',
-              'Vue',
-              'Express',
-              'Django',
-              'Flask',
-              'TensorFlow',
-              'Scikit_Learn',
-              'Pandas',
-              'NumPy',
-              'Kotlin',
-              'Swift',
-              'Firebase',
-              'MySQL',
-              'Docker',
-              'AWS',
-              'TypeScript',
-              'GraphQL',
-            ]}
-            accent="accent-accent"
-            selected={selectedFilters.language}
-            setSelected={(language) =>
-              setSelectedFilters((prev) => ({ ...prev, language }))
+            options={TOOLS}
+            selected={selectedFilters.tools}
+            setSelected={(tools) =>
+              setSelectedFilters((prev) => ({ ...prev, tools }))
             }
           />
         </div>

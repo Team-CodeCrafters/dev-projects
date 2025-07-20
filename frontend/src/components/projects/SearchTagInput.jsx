@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { formatString } from '../../utils/formatters';
 import Cancel from '../../assets/icons/Cancel';
 
-const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
+const SearchTagInput = ({
+  title,
+  options,
+  selected,
+  setSelected,
+  userDefined,
+}) => {
   const [query, setQuery] = useState('');
   const handleSelect = (option) => {
     if (!selected.includes(option)) {
@@ -22,6 +28,7 @@ const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
         !selected.includes(option),
     )
     .sort();
+  if (userDefined) filteredOptions.push(query);
 
   return (
     <div>
@@ -57,7 +64,7 @@ const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
             {filteredOptions.map((option) => (
               <div
                 key={option}
-                className="text-white-light hover:bg-secondary cursor-pointer px-4 py-2"
+                className="text-white-light hover:bg-primary cursor-pointer px-4 py-2"
                 onClick={() => handleSelect(option)}
               >
                 {formatString(option)}
