@@ -4,7 +4,6 @@ import Cancel from '../../assets/icons/Cancel';
 
 const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
   const [query, setQuery] = useState('');
-
   const handleSelect = (option) => {
     if (!selected.includes(option)) {
       setSelected([...selected, option]);
@@ -16,17 +15,19 @@ const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
     setSelected(selected.filter((item) => item !== tag));
   };
 
-  const filteredOptions = options.filter(
-    (option) =>
-      option.toLowerCase().includes(query.toLowerCase()) &&
-      !selected.includes(option),
-  );
+  const filteredOptions = options
+    .filter(
+      (option) =>
+        option.toLowerCase().includes(query.toLowerCase()) &&
+        !selected.includes(option),
+    )
+    .sort();
 
   return (
     <div>
-      <h3 className="text-white-light border-white-dark border-b pb-3 text-xl font-bold">
+      <span className="text-white-light border-white-dark text-md block border-b pb-3 font-bold">
         {title}
-      </h3>
+      </span>
 
       <div className="mt-4">
         <div className="mb-2 flex flex-wrap gap-2">
@@ -37,7 +38,7 @@ const SearchTagInput = ({ title, options, accent, selected, setSelected }) => {
             >
               {formatString(tag)}
               <button onClick={() => handleRemove(tag)}>
-                <Cancel className="h-4 w-4" />
+                <Cancel size="size-5 " />
               </button>
             </span>
           ))}
