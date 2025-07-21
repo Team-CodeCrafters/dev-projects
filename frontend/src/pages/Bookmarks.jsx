@@ -4,7 +4,6 @@ import useFetchData from '../hooks/useFetchData';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
-import { PopupNotification } from '../components/ui/PopupNotification';
 import { useNavigate } from 'react-router-dom';
 import { BookmarkIcon } from '../assets/icons/Bookmark';
 import { DeleteIcon } from '../assets/icons/Delete';
@@ -37,10 +36,6 @@ const Bookmarks = () => {
     }
     fetchBookmarks();
   }, []);
-
-  function redirectToDetails(projectId) {
-    navigate(`/project/${projectId}`);
-  }
 
   const DeleteBookmarkButton = ({ bookmarkId }) => {
     const setBookmarkProject = useSetRecoilState(BookmarkedProjectsAtom);
@@ -94,7 +89,7 @@ const Bookmarks = () => {
                     key={bookmark.id}
                     styles={'sm:max-w-[20rem]  w-full mx-2  pt-6'}
                     project={bookmark.project}
-                    onClick={() => redirectToDetails(bookmark.project.id)}
+                    href={`/project/${bookmark.project.id}`}
                   >
                     <DeleteBookmarkButton bookmarkId={bookmark.id} />
                   </ProjectCard>
@@ -104,7 +99,6 @@ const Bookmarks = () => {
           </>
         ) : loading || loading === undefined ? (
           <div className="relative top-40 flex h-full justify-center">
-            {console.log(loading)}
             <Loader primaryColor={true} />
           </div>
         ) : (

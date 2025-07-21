@@ -162,9 +162,7 @@ const Projects = () => {
 const ProjectLists = ({ getInitialProjects }) => {
   const navigate = useNavigate();
   const projects = useRecoilValue(projectsAtom);
-  function redirectToDetails(projectId) {
-    navigate(`/project/${projectId}`);
-  }
+
   useEffect(() => {
     if (projects === null) {
       getInitialProjects();
@@ -181,7 +179,7 @@ const ProjectLists = ({ getInitialProjects }) => {
             key={project.id}
             styles={'sm:max-w-[20rem]   mx-2  pt-6'}
             project={project}
-            onClick={() => redirectToDetails(project.id)}
+            href={`/project/${project.id}`}
           />
         ))}
       </div>

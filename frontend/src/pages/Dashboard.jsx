@@ -66,7 +66,7 @@ const Dashboard = () => {
               estimatedTime={userProject.estimatedTime}
               startedAt={userProject.startedAt}
               project={userProject.project}
-              onClick={() => redirectToProject(userProject.project.id)}
+              href={`/project/${userProject.project.id}`}
             />
           ))}
         </div>
@@ -79,9 +79,6 @@ const Dashboard = () => {
         <ProjectsLoadingIndicator />
       </div>
     );
-  }
-  function redirectToProject(id) {
-    navigate(`/project/${id}`);
   }
 
   if (!loading && !error && userProjects.length == 0) {

@@ -393,7 +393,7 @@ const ProjectContent = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
   const project = useRecoilValue(projectDetailsAtom);
   return (
-    <section className="mt-3 flex h-full w-full flex-col items-center rounded-md transition-all">
+    <section className="mt-3 flex h-full w-full flex-col rounded-md transition-all">
       {activeTab === 'get-started' && <ProjectInformation project={project} />}
       {activeTab === 'submissions' && <Submissions project={project} />}
       {activeTab === 'discussions' && <Discussions />}
@@ -453,10 +453,6 @@ const SimilarProjectsList = () => {
     getSimilarProjects();
   }, []);
 
-  function handleProjectClick(id) {
-    navigate(`/project/${id}`);
-  }
-
   if (!similarProjects) return null;
   return (
     <>
@@ -471,7 +467,7 @@ const SimilarProjectsList = () => {
               'sm:max-w-[20rem] !dark:bg-black-medium w-full mx-2 h-2xl pt-6'
             }
             project={project}
-            onClick={() => handleProjectClick(project.id)}
+            href={`/project/${project.id}`}
           >
             <span className="invisible absolute right-1 top-1 rotate-[135deg] p-1 opacity-80 transition-[visiblity] group-hover:visible">
               <ArrowLeft />
