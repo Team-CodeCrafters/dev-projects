@@ -60,6 +60,10 @@
     line-clamp: 2;
     overflow: hidden;
   }
+  .scrollbar-overlay {
+    overflow: overlay;
+  }
+
   .title-text {
     @apply font-heading text-xl font-medium;
   }

@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 const InputField = ({
   type,
-  id = '',
+  id = undefined,
   placeholder,
   value,
   onChange,

@@ -1,9 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Filter from '../assets/icons/Filter';
 import Cancel from '../assets/icons/Cancel';
 import useFetchData from '../hooks/useFetchData';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { projectsAtom } from '../store/atoms/project';
 import ProjectCard from '../components/projects/ProjectCard';
 import usePopup from '../hooks/usePopup';
@@ -49,7 +49,6 @@ const Projects = () => {
     const response = await fetchData(
       `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`,
     );
-    console.log(selectedFilters);
     if (response.success) {
       setProjects(response.data.projects);
     } else {
@@ -112,7 +111,7 @@ const Projects = () => {
           </div>
         </div>
 
-        <div className="text-white-light h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-[#1A1A1A] p-4 md:space-y-7 md:p-6">
+        <div className="text-white-light h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-[#1A1A1A] p-4 md:space-y-10 md:p-6">
           <div>
             <span className="text-white-light border-white-dark text-md block border-b pb-3 font-bold">
               Difficulty
@@ -168,8 +167,6 @@ const ProjectLists = ({ getInitialProjects }) => {
   }
   useEffect(() => {
     if (projects === null) {
-      console.log('getting inital projects');
-
       getInitialProjects();
     }
   }, []);

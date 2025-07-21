@@ -7,6 +7,8 @@ import { userProjectsAtom } from '../store/atoms/userProjects';
 import Button from '../components/ui/Button';
 import usePopupNotication from '../hooks/usePopup';
 import Loader from '../components/ui/Loader';
+import SearchTagInput from '../components/projects/SearchTagInput';
+import { TOOLS } from '../utils/constants';
 const SubmitProject = () => {
   const { id } = useParams();
   const showPop = usePopupNotication();
@@ -143,6 +145,23 @@ const SubmitProject = () => {
                     styles={'!py-2 text-xs focus:ring-1'}
                   />
                 </div>
+              </div>
+              <div className="flex flex-col gap-3">
+                <label
+                  htmlFor="tools"
+                  className="inline-block max-w-fit text-sm font-medium"
+                >
+                  Tools Used
+                </label>
+                <SearchTagInput
+                  id={'tools'}
+                  options={TOOLS}
+                  selected={submission.tools}
+                  userDefined={true}
+                  setSelected={(tools) =>
+                    setSubmission((prev) => ({ ...prev, tools }))
+                  }
+                />
               </div>
               <Button text={loading ? <Loader /> : 'submit'} />
             </form>
