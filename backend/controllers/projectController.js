@@ -6,7 +6,7 @@ async function getProjects(req, res) {
   try {
     const { difficulty, tools, domains } = req.filters;
     const query = {};
-    if (difficulty) query['difficulty'] = difficulty;
+    if (difficulty) query['difficulty'] = { in: difficulty };
     if (tools) query['tools'] = { hasSome: tools };
     if (domains)
       query['domain'] = {

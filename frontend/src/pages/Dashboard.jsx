@@ -51,16 +51,6 @@ const Dashboard = () => {
     console.log(error);
     return null;
   }
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center md:justify-start">
-        <ProjectsLoadingIndicator />
-      </div>
-    );
-  }
-  function redirectToProject(id) {
-    navigate(`/project/${id}`);
-  }
 
   if (userProjects.length > 0) {
     return (
@@ -83,6 +73,17 @@ const Dashboard = () => {
       </div>
     );
   }
+  if (loading || loading === undefined) {
+    return (
+      <div className="flex items-center justify-center md:justify-start">
+        <ProjectsLoadingIndicator />
+      </div>
+    );
+  }
+  function redirectToProject(id) {
+    navigate(`/project/${id}`);
+  }
+
   if (!loading && !error && userProjects.length == 0) {
     return <NoProjectsStarted />;
   }

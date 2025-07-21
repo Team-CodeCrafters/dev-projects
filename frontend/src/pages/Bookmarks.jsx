@@ -102,8 +102,9 @@ const Bookmarks = () => {
               })}
             </div>
           </>
-        ) : loading ? (
+        ) : loading || loading === undefined ? (
           <div className="relative top-40 flex h-full justify-center">
+            {console.log(loading)}
             <Loader primaryColor={true} />
           </div>
         ) : (
