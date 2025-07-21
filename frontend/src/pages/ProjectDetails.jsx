@@ -22,6 +22,7 @@ import Loader from '../components/ui/Loader';
 import { userProjectsAtom } from '../store/atoms/userProjects';
 import usePopupNotication from '../hooks/usePopup';
 import { createAccountDialogAtom } from '../store/atoms/dialog';
+import Submissions from '../components/projects/Submissions';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -346,7 +347,7 @@ const ProjectHeader = memo(({ projectId }) => {
 const TabsLayout = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
   return (
-    <div className="custom-scrollbar scrollbar-thin mt-7 w-full self-center overflow-x-auto md:max-w-max md:self-auto">
+    <div className="custom-scrollbar scrollbar-thin mt-7 min-h-12 w-full self-center overflow-x-auto md:max-w-max md:self-auto">
       <ul className="border-black-lighter flex min-w-max border-b border-opacity-40 dark:border-black">
         <TabElement text={'Get Started'} currentTab={'get-started'} />
         <TabElement text={'Discussions'} currentTab={'discussions'} />
@@ -392,9 +393,9 @@ const ProjectContent = () => {
   const activeTab = useRecoilValue(projectDetailsTab);
   const project = useRecoilValue(projectDetailsAtom);
   return (
-    <section className="mt-3 rounded-md transition-all">
+    <section className="mt-3 flex h-full w-full flex-col items-center rounded-md transition-all">
       {activeTab === 'get-started' && <ProjectInformation project={project} />}
-      {activeTab === 'submissions' && <Submissions />}
+      {activeTab === 'submissions' && <Submissions project={project} />}
       {activeTab === 'discussions' && <Discussions />}
     </section>
   );
@@ -489,7 +490,7 @@ const Discussions = () => {
   }
   return (
     <>
-      <div className="mb-4 mt-2 max-w-prose">
+      <div className="w-fl mb-4 w-full">
         <label className="focus-within:border-primary border-b-2 border-gray-400 pb-1 transition-all">
           <textarea
             type="text"
@@ -524,12 +525,6 @@ const Discussions = () => {
       <NoContentToDisplay />
     </>
   );
-};
-
-const Submissions = () => {
-  console.log('rendered submissions');
-
-  return <NoContentToDisplay />;
 };
 
 export default ProjectDetails;

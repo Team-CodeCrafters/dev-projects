@@ -96,6 +96,25 @@ export async function getAllSubmissionsOfProject(req, res) {
       where: {
         projectId: projectId,
       },
+      select: {
+        id: true,
+        title: true,
+        githubRepo: true,
+        tools: true,
+        liveUrl: true,
+        description: true,
+        createdAt: true,
+        user: {
+          select: {
+            username: true,
+            displayName: true,
+            profilePicture: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
     if (submissions.length <= 0) {
       return res.status(404).json({
