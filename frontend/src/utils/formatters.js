@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from 'date-fns';
+
 function formatString(str) {
   if (typeof str !== 'string') {
     return null;
@@ -5,4 +7,10 @@ function formatString(str) {
   return str.split('_').join(' ').trim();
 }
 
-export { formatString };
+function formatDate(date) {
+  const dateString = formatDistanceToNow(new Date(date), { addSuffix: true });
+
+  return dateString.replace(/^(about|over|almost) /, '');
+}
+
+export { formatString, formatDate };

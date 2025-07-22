@@ -6,6 +6,7 @@ import useFetchData from '../../hooks/useFetchData';
 import SkeletalLoader from '../ui/SkeletalLoader';
 import ConfirmDialog from '../ui/ConfirmationDialog';
 import usePopupNotication from '../../hooks/usePopup';
+import Button from '../ui/Button';
 
 const PersonalDetails = ({ userProfile, loading }) => {
   const navigate = useNavigate();
@@ -123,8 +124,12 @@ const PersonalDetails = ({ userProfile, loading }) => {
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="w-10">
-                      <Button styles={""} text={"Save"} onClick={handleSave}></Button>
+                    <div className="w-16">
+                      <Button
+                        styles={''}
+                        text={'Save'}
+                        onClick={handleSave}
+                      ></Button>
                     </div>
                     <button
                       onClick={handleCancelEditName}
@@ -196,7 +201,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
         </div>
 
         {showPasswordDialog && (
-          <div className="bg-opacity-70 fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
             <div className="text-primary-text dark:bg-black-medium w-[90%] max-w-md rounded-xl bg-white p-6 dark:text-white">
               <h3 className="mb-4 text-xl font-semibold">Are you sure?</h3>
               <p className="text-secondary-text mb-6">
