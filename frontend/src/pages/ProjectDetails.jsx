@@ -23,6 +23,7 @@ import { userProjectsAtom } from '../store/atoms/userProjects';
 import usePopupNotication from '../hooks/usePopup';
 import { createAccountDialogAtom } from '../store/atoms/dialog';
 import Submissions from '../components/projects/Submissions';
+import InformationIcon from '../assets/icons/Information';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -395,7 +396,7 @@ const ProjectContent = () => {
   return (
     <section className="mt-3 flex h-full w-full flex-col rounded-md transition-all">
       {activeTab === 'get-started' && <ProjectInformation project={project} />}
-      {activeTab === 'submissions' && <Submissions project={project} />}
+      {activeTab === 'submissions' && <Submissions />}
       {activeTab === 'discussions' && <Discussions />}
     </section>
   );
@@ -518,7 +519,11 @@ const Discussions = () => {
           </button>
         </div>
       </div>
-      <NoContentToDisplay />
+      <NoContentToDisplay
+        Icon={InformationIcon}
+        heading={'No discussions yet'}
+        body={'Be the first to start a conversation!'}
+      />
     </>
   );
 };

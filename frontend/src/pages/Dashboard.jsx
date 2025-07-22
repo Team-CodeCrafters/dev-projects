@@ -6,6 +6,7 @@ import { userProjectsAtom } from '../store/atoms/userProjects';
 import { ListIcon } from '../assets/icons/List';
 import SkeletalLoader from '../components/ui/SkeletalLoader';
 import ProjectCard from '../components/projects/ProjectCard';
+import NoContentToDisplay from '../components/ui/NoContent';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -82,38 +83,18 @@ const Dashboard = () => {
   }
 
   if (!loading && !error && userProjects.length == 0) {
-    return <NoProjectsStarted />;
+    return (
+      <NoContentToDisplay
+        Icon={ListIcon}
+        heading={'No Projects Started Yet'}
+        body={
+          'Start buiding cool stuff by exploring our curated collection of projects designed to help you learn and grow your skills.'
+        }
+        buttonText={'explore Projects'}
+        href={'/projects'}
+      />
+    );
   }
 };
 
-const NoProjectsStarted = () => {
-  const navigate = useNavigate();
-
-  function goToProjectsPage() {
-    navigate('/projects');
-  }
-
-  return (
-    <div className="bg-white-medium dark:bg-black-medium m-4 rounded-lg p-3">
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="dark:bg-black-light bg-white-dark mb-6 rounded-full p-6">
-          <ListIcon />
-        </div>
-        <h2 className="font-heading dark:text-white-light mb-3 text-xl font-medium tracking-wide">
-          No Projects Started Yet
-        </h2>
-        <p className="dark:text-white-medium mb-8 max-w-md text-balance opacity-80">
-          Start buiding cool stuff by exploring our curated collection of
-          projects designed to help you learn and grow your skills.
-        </p>
-        <button
-          onClick={goToProjectsPage}
-          className="bg-primary hover:bg-primary/90 duration-250 font-heading rounded-lg px-8 py-3 font-medium text-white transition-all hover:scale-105 hover:shadow-lg"
-        >
-          Explore Projects
-        </button>
-      </div>
-    </div>
-  );
-};
 export default Dashboard;

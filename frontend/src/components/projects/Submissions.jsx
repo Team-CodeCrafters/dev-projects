@@ -1,23 +1,27 @@
 import { useEffect } from 'react';
 import useFetchData from '../../hooks/useFetchData';
 import Loader from '../ui/Loader';
-import { useRecoilState } from 'recoil';
-import { projectSubmissionsAtom } from '../../store/atoms/project';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import {
+  projectDetailsAtom,
+  projectSubmissionsAtom,
+} from '../../store/atoms/project';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDate } from '../../utils/formatters';
 import NoContentToDisplay from '../ui/NoContent';
-const Submissions = ({ project }) => {
+const Submissions = () => {
+  const project = useRecoilValue(projectDetailsAtom);
   const { fetchData, loading } = useFetchData();
   const [projectSubmissions, setProjectSubmissions] = useRecoilState(
     projectSubmissionsAtom,
   );
   useEffect(() => {
     async function fetchSubmissions() {
+      console.log('fetching submissions', project.id);
+
       const response = await fetchData(`/submissions/all/${project.id}`);
-      console.log(response.data);
-      if (response.success) {
-        setProjectSubmissions(response.data.submissions);
-      }
+
+      setProjectSubmissions(response.data?.submissions);
     }
     fetchSubmissions();
   }, [project.id]);
@@ -31,7 +35,6 @@ const Submissions = ({ project }) => {
   }
 
   if (projectSubmissions && projectSubmissions.length > 0) {
-    console.log(projectSubmissions);
     return projectSubmissions.map((submission) => (
       <Submission
         key={submission.id}
@@ -47,7 +50,7 @@ const Submissions = ({ project }) => {
 const Submission = ({ project, user }) => {
   return (
     <div
-      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-1 rounded-md p-4 py-2 outline outline-2 transition-all duration-500 hover:shadow-md md:my-2 md:w-full`}
+      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-1 rounded-md p-4 outline outline-2 transition-all duration-500 hover:shadow-md md:my-2 md:w-full`}
     >
       <div className="flex gap-2">
         <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
@@ -72,9 +75,7 @@ const Submission = ({ project, user }) => {
           )}
         </div>
         <span className="ml-auto text-xs opacity-70">
-          {formatDistanceToNow(new Date(project.createdAt), {
-            addSuffix: true,
-          })}
+          {formatDate(project.createdAt)}
         </span>
       </div>
       <div className="font-heading mt-2 w-full font-medium">

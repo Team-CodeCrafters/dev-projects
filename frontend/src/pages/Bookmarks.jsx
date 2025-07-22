@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { BookmarkIcon } from '../assets/icons/Bookmark';
 import { DeleteIcon } from '../assets/icons/Delete';
 import usePopupNotication from '../hooks/usePopup';
+import NoContentToDisplay from '../components/ui/NoContent';
 const Bookmarks = () => {
   const { fetchData, loading, error } = useFetchData();
   const [bookmarks, setBookmarks] = useRecoilState(BookmarkedProjectsAtom);
@@ -39,9 +40,11 @@ const Bookmarks = () => {
 
   const DeleteBookmarkButton = ({ bookmarkId }) => {
     const setBookmarkProject = useSetRecoilState(BookmarkedProjectsAtom);
-    const { fetchData, error } = useFetchData();
+    const { fetchData } = useFetchData();
+
     async function removeBookmark(e) {
       e.stopPropagation();
+      e.preventDefault();
       const token = localStorage.getItem('token');
       const options = {
         method: 'DELETE',
@@ -102,40 +105,20 @@ const Bookmarks = () => {
             <Loader primaryColor={true} />
           </div>
         ) : (
-          !loading && bookmarks.length == 0 && <EmptyBookmarks />
+          !loading &&
+          bookmarks.length == 0 && (
+            <NoContentToDisplay
+              Icon={BookmarkIcon}
+              heading={'No bookmarks are saved'}
+              body={' You will see the saved projects here'}
+              buttonText={'explore projects'}
+              href={'/projects'}
+            />
+          )
         )}
       </div>
     </>
   );
 };
 
-const EmptyBookmarks = () => {
-  const navigate = useNavigate();
-
-  function goToProjectsPage() {
-    navigate('/projects');
-  }
-
-  return (
-    <div className="bg-white-medium dark:bg-black-medium m-4 rounded-lg p-3">
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="dark:bg-black-light bg-white-dark mb-6 rounded-full p-6">
-          <BookmarkIcon />
-        </div>
-        <h2 className="font-heading dark:text-white-light mb-3 text-xl font-medium tracking-wide">
-          No bookmarks are saved
-        </h2>
-        <p className="dark:text-white-medium mb-8 max-w-md text-balance opacity-80">
-          You will see the saved projects here
-        </p>
-        <button
-          onClick={goToProjectsPage}
-          className="bg-primary hover:bg-primary/90 duration-250 font-heading rounded-lg px-8 py-3 font-medium text-white transition-all hover:scale-105 hover:shadow-lg"
-        >
-          Explore Projects
-        </button>
-      </div>
-    </div>
-  );
-};
 export default Bookmarks;
