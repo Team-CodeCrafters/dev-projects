@@ -44,9 +44,8 @@ const Projects = () => {
       domainQuery = `&domain=${selectedFilters.domain.join(',')}`;
     }
     const response = await fetchData(
-      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`,
+      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`
     );
-    console.log(selectedFilters);
     if (response.success) {
       setProjects(response.data.projects);
     } else {
@@ -55,9 +54,9 @@ const Projects = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative bg-white-medium dark:bg-black-medium min-h-screen">
       <div className="mt-10 ml-10">
-        <h1 className="font-heading text-white-light mb-3 text-4xl font-bold">
+        <h1 className="font-heading text-primary-text dark:text-white-light mb-3 text-4xl font-bold">
           Projects
         </h1>
         <hr className="border-primary mt-3 w-97 border-t-2" />
@@ -69,12 +68,11 @@ const Projects = () => {
       >
         <Filter /> Filter
       </button>
+
       {loading ? (
-        <>
-          <div className='w-full h-full flex justify-center items-center relative top-52'>
-            <Loader primaryColor="bg-primary"/>
-          </div>
-        </>
+        <div className="w-full h-full flex justify-center items-center relative top-52">
+          <Loader primaryColor="bg-primary" />
+        </div>
       ) : (
         <ProjectLists />
       )}
@@ -87,12 +85,12 @@ const Projects = () => {
       )}
 
       <div
-        className={`bg-black-light fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-transform duration-300 ${
+        className={`bg-white-dark dark:bg-black-light fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-transform duration-300 ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="border-white-dark flex items-center justify-between border-b px-4 py-4">
-          <h2 className="text-white-light text-lg font-bold">Filters</h2>
+        <div className="border-white-dark dark:border-black-lighter flex items-center justify-between border-b px-4 py-4">
+          <h2 className="text-primary-text dark:text-white-light text-lg font-bold">Filters</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -109,16 +107,16 @@ const Projects = () => {
           </div>
         </div>
 
-        <div className="text-white-light h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-[#1A1A1A] p-6">
+        <div className="h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-white-dark dark:bg-[#1A1A1A] px-6 py-6">
           <div>
-            <h3 className="text-white-light border-white-dark border-b pb-3 text-xl font-bold">
+            <h3 className="text-xl font-bold text-primary-text dark:text-white-light border-b border-white-dark dark:border-black-lighter pb-3">
               Difficulty
             </h3>
             <div className="mt-4 space-y-5">
               {['Beginner', 'Intermediate', 'Expert', 'Master'].map((level) => (
                 <label
                   key={level}
-                  className="flex items-center gap-4 text-base hover:text-white"
+                  className="flex items-center gap-4 text-base text-primary-text dark:text-white-light hover:text-black dark:hover:text-white"
                 >
                   <input
                     type="checkbox"
@@ -205,25 +203,30 @@ const Projects = () => {
 const ProjectLists = () => {
   const navigate = useNavigate();
   const projects = useRecoilValue(projectsAtom);
+
   function redirectToDetails(projectId) {
     navigate(`/project/${projectId}`);
   }
+
   if (projects?.length <= 0) {
-    return null;
-  }
-  return (
-    <>
-      <div className="mx-4 flex w-full flex-wrap">
-        {projects?.map((project) => (
-          <ProjectCard
-            key={project.id}
-            styles={'sm:max-w-[20rem]  w-full mx-2  pt-6'}
-            project={project}
-            onClick={() => redirectToDetails(project.id)}
-          />
-        ))}
+    return (
+      <div className="text-primary-text dark:text-white-light mt-10 text-center text-lg">
+        No projects found.
       </div>
-    </>
+    );
+  }
+
+  return (
+    <div className="mx-4 flex w-full flex-wrap">
+      {projects?.map((project) => (
+        <ProjectCard
+          key={project.id}
+          styles="sm:max-w-[20rem] w-full mx-2 pt-6"
+          project={project}
+          onClick={() => redirectToDetails(project.id)}
+        />
+      ))}
+    </div>
   );
 };
 

@@ -14,6 +14,7 @@ import { useTheme } from './hooks/useTheme';
 import Bookmarks from './pages/Bookmarks';
 import { PopupNotification } from './components/ui/PopupNotification';
 import Projects from './pages/Projects';
+import PageNotFound from './pages/PageNotFound';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -40,7 +41,7 @@ function App() {
               <Route path="/bookmarks" element={<Bookmarks />} />
             </Route>
 
-            <Route path="*" element={<div>Page Not Found</div>} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
