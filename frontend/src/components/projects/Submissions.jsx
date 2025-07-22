@@ -4,46 +4,55 @@ import Loader from '../ui/Loader';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   projectDetailsAtom,
-  projectSubmissionsAtom,
+  projectSubmissionsAtomFamily,
 } from '../../store/atoms/project';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
 import { formatDate } from '../../utils/formatters';
 import NoContentToDisplay from '../ui/NoContent';
 const Submissions = () => {
-  const project = useRecoilValue(projectDetailsAtom);
   const { fetchData, loading } = useFetchData();
+  const project = useRecoilValue(projectDetailsAtom);
   const [projectSubmissions, setProjectSubmissions] = useRecoilState(
-    projectSubmissionsAtom,
+    projectSubmissionsAtomFamily(project.id),
   );
   useEffect(() => {
+    if (projectSubmissions) {
+      return;
+    }
+
     async function fetchSubmissions() {
-      console.log('fetching submissions', project.id);
-
       const response = await fetchData(`/submissions/all/${project.id}`);
-
       setProjectSubmissions(response.data?.submissions);
     }
     fetchSubmissions();
   }, [project.id]);
 
-  if (loading || loading === undefined) {
+  if ((loading || loading === undefined) && !projectSubmissions) {
     return (
       <div className="grid h-full place-items-center">
         <Loader primaryColor={true} />
       </div>
     );
   }
-
   if (projectSubmissions && projectSubmissions.length > 0) {
-    return projectSubmissions.map((submission) => (
-      <Submission
-        key={submission.id}
-        project={submission}
-        user={submission.user}
-      />
-    ));
+    return (
+      <div className="flex flex-col items-center">
+        {projectSubmissions.map((submission) => (
+          <Submission
+            key={submission.id}
+            project={submission}
+            user={submission.user}
+          />
+        ))}
+      </div>
+    );
   } else {
-    return <NoContentToDisplay text={'No submissions yet!'} />;
+    return (
+      <NoContentToDisplay
+        heading={'No submissions yet!'}
+        body={'projects submit by users are displayed here'}
+      />
+    );
   }
 };
 

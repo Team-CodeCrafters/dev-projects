@@ -76,7 +76,7 @@ const ProjectDetails = () => {
   if (loadingProject || loadingUserProject) {
     return (
       <div className="grid h-full place-items-center">
-        <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:max-w-xl md:p-4 lg:max-w-3xl">
+        <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
           <Loader height={'h-8'} width={'w-8'} primaryColor={true} />
         </div>
       </div>
