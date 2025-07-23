@@ -15,6 +15,7 @@ import { useTheme } from './hooks/useTheme';
 import { PopupNotification } from './components/ui/PopupNotification';
 const SubmitProject = lazy(() => import('./pages/SubmitProject'));
 const Projects = lazy(() => import('./pages/Projects'));
+import PageNotFound from './pages/PageNotFound';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -42,7 +43,7 @@ function App() {
               <Route path="/submit/:id" element={<SubmitProject />} />
             </Route>
 
-            <Route path="*" element={<div>Page Not Found</div>} />
+            <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
