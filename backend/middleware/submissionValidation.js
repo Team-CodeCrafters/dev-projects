@@ -9,10 +9,17 @@ const submissionSchema = zod.object({
     .max(500, { message: 'the maximum length of description is 500 chars' })
     .optional(),
   githubRepo: zod
-    .string({ message: 'invalid GitHub URL' })
-    .startsWith('https://github.com/', { message: 'invalid GitHub URL' }),
+    .string({ message: 'GitHub URL is required' })
+    .regex(/github\.com\//, {
+      message: 'invalid GitHub URL',
+    }),
+
   liveUrl: zod.string().optional(),
   tools: zod.array(zod.string(), { message: 'invalid tools' }).optional(),
+});
+
+const submissionCreateSchema = submissionSchema.extend({
+  projectId: zod.string({ message: 'submission project is invalid' }),
 });
 
 const submissionUpdateSchema = submissionSchema
@@ -30,11 +37,7 @@ const submissionUpdateSchema = submissionSchema
 
 export function validateCreateSubmission(req, res, next) {
   try {
-    if (req.body.tools) {
-      req.body.tools = req.body.tools.split(',');
-    }
-
-    const zodResult = submissionSchema.safeParse(req.body);
+    const zodResult = submissionCreateSchema.safeParse(req.body);
 
     if (!zodResult.success) {
       const zodError = zodResult.error.issues[0]?.message;

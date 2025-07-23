@@ -1,24 +1,26 @@
-import React, { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Filter from '../assets/icons/Filter';
 import Cancel from '../assets/icons/Cancel';
 import useFetchData from '../hooks/useFetchData';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { projectsAtom } from '../store/atoms/project';
 import ProjectCard from '../components/projects/ProjectCard';
 import usePopup from '../hooks/usePopup';
 import SearchTagInput from '../components/projects/SearchTagInput';
 import Loader from '../components/ui/Loader';
+import InformationIcon from '../assets/icons/Information';
+import { DIFFICULTIES, DOMAINS, TOOLS } from '../utils/constants';
 
 const Projects = () => {
   const showPopup = usePopup();
-  const [projects, setProjects] = useRecoilState(projectsAtom);
+  const setProjects = useSetRecoilState(projectsAtom);
   const { fetchData, loading } = useFetchData();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedFilters, setSelectedFilters] = useState({
-    difficulty: [],
-    domain: [],
-    language: [],
+    difficulty: ['Beginner'],
+    domain: ['Frontend'],
+    tools: ['HTML', 'CSS', 'Javascript'],
   });
 
   const handleDifficultyChange = (level, checked) => {
@@ -30,19 +32,20 @@ const Projects = () => {
     }));
   };
 
-  const applyFilers = async () => {
+  const applyFilers = useCallback(async () => {
     let toolsQuery = '';
     let difficultyQuery = '';
     let domainQuery = '';
-    if (selectedFilters.language.length > 0) {
-      toolsQuery = `&tools=${selectedFilters.language.join(',')}`;
+    if (selectedFilters.tools.length > 0) {
+      toolsQuery = `&tools=${selectedFilters.tools.join(',')}`;
     }
     if (selectedFilters.difficulty.length > 0) {
       difficultyQuery = `&difficulty=${selectedFilters.difficulty.join(',')}`;
     }
     if (selectedFilters.domain.length > 0) {
-      domainQuery = `&domain=${selectedFilters.domain.join(',')}`;
+      domainQuery = `&domains=${selectedFilters.domain.join(',')}`;
     }
+
     const response = await fetchData(
       `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`
     );
@@ -51,41 +54,43 @@ const Projects = () => {
     } else {
       showPopup('error', response.error);
     }
-  };
+  });
 
   return (
-    <div className="relative bg-white-medium dark:bg-black-medium min-h-screen">
-      <div className="mt-10 ml-10">
-        <h1 className="font-heading text-primary-text dark:text-white-light mb-3 text-4xl font-bold">
+    <div className="relative min-h-screen w-full">
+      <div className="ml-2 h-full rounded-lg p-3 md:p-5">
+        <h1 className="font-heading mb-2 text-xl font-medium tracking-wide md:text-2xl">
           Projects
         </h1>
-        <hr className="border-primary mt-3 w-97 border-t-2" />
+        <hr className="border-accent mt-3 border-t-2" />
       </div>
 
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="bg-primary text-white-light hover:bg-secondary mt-7 ml-10 flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition"
+        className="bg-primary text-white-light hover:bg-secondary ml-5 mt-5 flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition md:ml-7"
       >
         <Filter /> Filter
       </button>
 
       {loading ? (
-        <div className="w-full h-full flex justify-center items-center relative top-52">
-          <Loader primaryColor="bg-primary" />
-        </div>
+        <>
+          <div className="relative top-52 grid place-items-center">
+            <Loader primaryColor="bg-primary" />
+          </div>
+        </>
       ) : (
-        <ProjectLists />
+        <ProjectLists getInitialProjects={applyFilers} />
       )}
 
       {isSidebarOpen && (
         <div
-          className="bg-opacity-10 fixed inset-0 z-40 bg-black backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black bg-opacity-10 backdrop-blur-sm"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       <div
-        className={`bg-white-dark dark:bg-black-light fixed top-0 right-0 z-50 h-full w-80 transform shadow-xl transition-transform duration-300 ${
+        className={`bg-black-light fixed right-0 top-0 z-50 h-full w-[60%] transform shadow-xl transition-transform duration-300 md:w-80 ${
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -107,20 +112,20 @@ const Projects = () => {
           </div>
         </div>
 
-        <div className="h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-white-dark dark:bg-[#1A1A1A] px-6 py-6">
+        <div className="text-white-light h-[calc(100%-64px)] space-y-10 overflow-y-auto bg-[#1A1A1A] p-4 md:space-y-10 md:p-6">
           <div>
-            <h3 className="text-xl font-bold text-primary-text dark:text-white-light border-b border-white-dark dark:border-black-lighter pb-3">
+            <span className="text-white-light border-white-dark text-md block border-b pb-3 font-bold">
               Difficulty
-            </h3>
-            <div className="mt-4 space-y-5">
-              {['Beginner', 'Intermediate', 'Expert', 'Master'].map((level) => (
+            </span>
+            <div className="mt-4 space-y-4 md:space-y-5">
+              {DIFFICULTIES.map((level) => (
                 <label
                   key={level}
-                  className="flex items-center gap-4 text-base text-primary-text dark:text-white-light hover:text-black dark:hover:text-white"
+                  className="flex items-center gap-2 text-sm hover:text-white md:gap-4"
                 >
                   <input
                     type="checkbox"
-                    className="accent-primary h-5 w-5"
+                    className="accent-primary h-4 w-4"
                     checked={selectedFilters.difficulty.includes(level)}
                     onChange={(e) =>
                       handleDifficultyChange(level, e.target.checked)
@@ -134,20 +139,7 @@ const Projects = () => {
 
           <SearchTagInput
             title="Domain"
-            options={[
-              'Frontend',
-              'Backend',
-              'Web_Development',
-              'App_Development',
-              'AIML',
-              'UIUX',
-              'Fullstack',
-              'Blockchain',
-              'Data_Science',
-              'Cloud_Computing',
-              'DevOps',
-            ]}
-            accent="accent-primary"
+            options={DOMAINS}
             selected={selectedFilters.domain}
             setSelected={(domain) =>
               setSelectedFilters((prev) => ({ ...prev, domain }))
@@ -156,42 +148,10 @@ const Projects = () => {
 
           <SearchTagInput
             title="Languages"
-            options={[
-              'C',
-              'Python',
-              'Java',
-              'React',
-              'Node',
-              'HTML',
-              'CSS',
-              'Javascript',
-              'MongoDB',
-              'PostgreSQL',
-              'API',
-              'Git',
-              'React_Native',
-              'Angular',
-              'Vue',
-              'Express',
-              'Django',
-              'Flask',
-              'TensorFlow',
-              'Scikit_Learn',
-              'Pandas',
-              'NumPy',
-              'Kotlin',
-              'Swift',
-              'Firebase',
-              'MySQL',
-              'Docker',
-              'AWS',
-              'TypeScript',
-              'GraphQL',
-            ]}
-            accent="accent-accent"
-            selected={selectedFilters.language}
-            setSelected={(language) =>
-              setSelectedFilters((prev) => ({ ...prev, language }))
+            options={TOOLS}
+            selected={selectedFilters.tools}
+            setSelected={(tools) =>
+              setSelectedFilters((prev) => ({ ...prev, tools }))
             }
           />
         </div>
@@ -200,32 +160,49 @@ const Projects = () => {
   );
 };
 
-const ProjectLists = () => {
+const ProjectLists = ({ getInitialProjects }) => {
   const navigate = useNavigate();
   const projects = useRecoilValue(projectsAtom);
 
-  function redirectToDetails(projectId) {
-    navigate(`/project/${projectId}`);
-  }
-
+  useEffect(() => {
+    if (projects === null) {
+      getInitialProjects();
+    }
+  }, []);
   if (projects?.length <= 0) {
-    return (
-      <div className="text-primary-text dark:text-white-light mt-10 text-center text-lg">
-        No projects found.
-      </div>
-    );
+    return <NoProjectsFound />;
   }
 
   return (
-    <div className="mx-4 flex w-full flex-wrap">
-      {projects?.map((project) => (
-        <ProjectCard
-          key={project.id}
-          styles="sm:max-w-[20rem] w-full mx-2 pt-6"
-          project={project}
-          onClick={() => redirectToDetails(project.id)}
-        />
-      ))}
+    <>
+      <div className="ml-1 flex flex-wrap md:ml-3 md:w-full">
+        {projects?.map((project) => (
+          <ProjectCard
+            key={project.id}
+            styles={'sm:max-w-[20rem]   mx-2  pt-6'}
+            project={project}
+            href={`/project/${project.id}`}
+          />
+        ))}
+      </div>
+    </>
+  );
+};
+
+const NoProjectsFound = () => {
+  return (
+    <div className="bg-white-medium dark:bg-black-medium m-4 rounded-lg p-3">
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="dark:bg-black-light bg-white-dark mb-6 rounded-full p-6">
+          <InformationIcon />
+        </div>
+        <h2 className="font-heading dark:text-white-light mb-3 text-xl font-medium tracking-wide">
+          No Projects Found
+        </h2>
+        <p className="dark:text-white-medium mb-8 max-w-md text-balance opacity-80">
+          Consider changing filters to see more projects
+        </p>
+      </div>
     </div>
   );
 };

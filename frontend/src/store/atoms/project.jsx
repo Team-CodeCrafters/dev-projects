@@ -1,5 +1,6 @@
-import { atom, selector } from 'recoil';
+import { atom, atomFamily, selector } from 'recoil';
 import { userProjectsAtom } from './userProjects';
+import useFetchData from '../../hooks/useFetchData';
 
 export const projectDetailsAtom = atom({
   key: 'projectDetailsAtom',
@@ -37,4 +38,9 @@ export const projectStartedSelector = selector({
     );
     return isStarted;
   },
+});
+
+export const projectSubmissionsAtomFamily = atomFamily({
+  key: 'projectSubmissionsAtomFamily',
+  default: null,
 });
