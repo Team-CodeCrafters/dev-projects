@@ -6,11 +6,16 @@ import { Link } from 'react-router-dom';
 import LinkIcon from '../../assets/icons/Link';
 
 const UserSubmissions = memo(({ loadingSubmissions, userSubmissions }) => {
-  console.log({ loadingSubmissions, userSubmissions });
-
   if (loadingSubmissions || loadingSubmissions === undefined) {
-    <SkeletalLoader height="h-10" />;
+    return (
+      <div>
+        <SkeletalLoader height="h-10" width="w-full" />
+        <SkeletalLoader height="h-24" width="w-full" />
+        <SkeletalLoader height="h-7" width="w-full" />
+      </div>
+    );
   }
+
   if (userSubmissions?.length > 0) {
     return (
       <div className="flex flex-col items-center">
@@ -20,7 +25,8 @@ const UserSubmissions = memo(({ loadingSubmissions, userSubmissions }) => {
       </div>
     );
   }
-  if (userSubmissions.length === 0) {
+
+  if (userSubmissions?.length === 0) {
     return (
       <NoContentToDisplay
         heading={'No submission yet'}

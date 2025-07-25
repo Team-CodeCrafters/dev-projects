@@ -24,7 +24,7 @@ const userProfileAtom = atom({
 
 const userProfileTabsAtom = atom({
   key: 'userProfileTabs',
-  default: 'account',
+  default: 'submissions',
 });
 
 const userSubmissionsAtom = atom({

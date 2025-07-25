@@ -45,7 +45,6 @@ const UserProfile = () => {
 
     async function fetchUserSubmissions() {
       const res = await fetchSubmissionData('/submissions/user/all', options);
-      console.log({ res });
 
       if (res.success && res.data.submissions) {
         setUserSubmissions(res.data.submissions);
@@ -58,9 +57,9 @@ const UserProfile = () => {
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-center px-4 py-10 text-white">
+    <div className="flex w-full flex-col items-center p-4 text-white md:py-10">
       <ProfilePicture userProfile={userProfile} />
-      <div className="animate-fade-in text-primary-text mt- w-full max-w-2xl space-y-8 px-4 dark:text-white">
+      <div className="animate-fade-in text-primary-text w-full space-y-8 md:max-w-2xl dark:text-white">
         <UserProfileTabs />
         <ManageUserTabs
           loadingUser={loadingUserProfile}
@@ -80,7 +79,7 @@ const UserProfileTabs = () => {
   ];
 
   return (
-    <div className="my-3 w-max max-w-2xl px-4">
+    <div className="my-3 w-max max-w-2xl">
       <TabsLayout tabs={userProfileTabs} activeTabAtom={userProfileTabsAtom} />
     </div>
   );
