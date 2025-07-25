@@ -47,7 +47,7 @@ const Projects = () => {
     }
 
     const response = await fetchData(
-      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`,
+      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`
     );
     if (response.success) {
       setProjects(response.data.projects);
@@ -71,6 +71,7 @@ const Projects = () => {
       >
         <Filter /> Filter
       </button>
+
       {loading ? (
         <>
           <div className="relative top-52 grid place-items-center">
@@ -93,8 +94,8 @@ const Projects = () => {
           isSidebarOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="border-white-dark flex items-center justify-between border-b px-4 py-4">
-          <h2 className="text-white-light text-lg font-bold">Filters</h2>
+        <div className="border-white-dark dark:border-black-lighter flex items-center justify-between border-b px-4 py-4">
+          <h2 className="text-primary-text dark:text-white-light text-lg font-bold">Filters</h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -179,6 +180,7 @@ const ProjectLists = ({ getInitialProjects }) => {
       />
     );
   }
+
   return (
     <>
       <div className="mb-5 ml-1 flex flex-wrap items-stretch md:ml-3">
