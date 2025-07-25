@@ -22,4 +22,20 @@ const userProfileAtom = atom({
   default: null,
 });
 
-export { signInDataAtom, signUpDataAtom, userProfileAtom };
+const userProfileTabsAtom = atom({
+  key: 'userProfileTabs',
+  default: 'account',
+});
+
+const userSubmissionsAtom = atom({
+  key: 'userSubmissionsAtom',
+  default: null,
+});
+
+export {
+  signInDataAtom,
+  signUpDataAtom,
+  userProfileAtom,
+  userProfileTabsAtom,
+  userSubmissionsAtom,
+};

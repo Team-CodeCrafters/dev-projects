@@ -11,8 +11,8 @@ const TabsLayout = ({ tabs, activeTabAtom }) => {
   }, [activeTab]);
 
   return (
-    <div className="scrollbar-thin custom-scrollbar mt-7 min-h-14 max-w-full grow-0 overflow-x-auto">
-      <ul className="border-black-lighter flex w-max max-w-56 border-b border-opacity-40 dark:border-black">
+    <div className="scrollbar-thin custom-scrollbar mt-7 min-h-14 max-w-full overflow-x-auto">
+      <ul className="border-black-lighter flex w-max border-b border-opacity-40 dark:border-black">
         {tabs.map((tab) => (
           <TabElement
             key={tab.value}
@@ -38,7 +38,7 @@ const TabElement = ({ text, currentTab, activeTabAtom }) => {
 
   return (
     <li className="flex cursor-pointer select-none">
-      <label className="dark:bg-black-light dark:hover:bg-black-lighter hover:bg-white-dark has-[:checked]:text-primary w-32 cursor-pointer rounded-md p-2 px-4 text-center font-semibold outline outline-transparent transition-colors has-[:checked]:outline">
+      <label className="has-[:checked]:text-primary w-32 cursor-pointer rounded-md p-2 px-4 text-center font-semibold outline outline-transparent transition hover:bg-transparent/20 has-[:checked]:outline">
         <input
           type="radio"
           name={currentTab}
