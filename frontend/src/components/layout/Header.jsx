@@ -4,10 +4,11 @@ import { SearchIcon } from '../../assets/icons/Search';
 import { MenuIcon } from '../../assets/icons/MenuIcon';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
 import { ArrowLeft } from '../../assets/icons/ArrowLeft';
+import Button from '../ui/Button';
 import { ToggleSwitch } from '../../assets/icons/ToggleSwitch';
 import brandImageLight from '../../assets/images/dev-projects-dark.png';
 import brandImageDark from '../../assets/images/dev-projects-logo.png';
-import { memo, useCallback, useEffect, useRef } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   sidebarOpenAtom,
   dropDownOpenAtom,
@@ -43,13 +44,12 @@ const DashboardHeader = memo(() => {
 const HeaderContent = () => {
   const setIsSidebarOpen = useSetRecoilState(sidebarOpenAtom);
   const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
+  const theme = useRecoilValue(colorThemeAtom);
+  const setIsSearchBarOpen = useSetRecoilState(searchBoxAtom);
   const toggleSidebar = useCallback(() => {
     setIsSidebarOpen((prev) => !prev);
   }, [setIsSidebarOpen]);
-  const [isDropDownOpen, setDropDownOpen] = useRecoilState(dropDownOpenAtom);
-  const profileButtonRef = useRef(null);
-  const theme = useRecoilValue(colorThemeAtom);
-  const setIsSearchBarOpen = useSetRecoilState(searchBoxAtom);
+
   const toggleSearchBar = () => {
     setIsSearchBarOpen((prev) => !prev);
   };
@@ -106,30 +106,66 @@ const HeaderContent = () => {
             <SearchIcon />
           </button>
         </div>
-        <button className="hover:bg-white-medium dark:hover:bg-black-light focus:ring-primary cursor-pointer rounded-md p-1.5 transition-colors duration-200 focus:outline-none focus:ring-2">
-          <NotificationIcon />
-        </button>
-        <button
-          className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2"
-          ref={profileButtonRef}
-          onClick={() => setDropDownOpen((prev) => !prev)}
-        >
-          {userProfile?.profilePicture ? (
-            <img
-              src={userProfile.profilePicture}
-              alt="profile icon"
-              className="h-9 w-9 rounded-full object-cover"
-            />
-          ) : (
-            <ProfileIcon />
-          )}
-          <ProfileDropDown
-            isVisible={isDropDownOpen}
-            setIsVisible={setDropDownOpen}
-            profileButtonRef={profileButtonRef}
-          />
-        </button>
+        <UserHeaderMenu />
       </div>
+    </>
+  );
+};
+
+const UserHeaderMenu = () => {
+  const userProfile = useRecoilValue(userProfileAtom);
+  const [isDropDownOpen, setDropDownOpen] = useRecoilState(dropDownOpenAtom);
+  const profileButtonRef = useRef(null);
+  const [isLoggedIn, setIsLoggedIn] = useState();
+  const navigate = useNavigate();
+  function redirectToLogin() {
+    navigate('/login');
+  }
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setIsLoggedIn(false);
+    } else {
+      setIsLoggedIn(true);
+    }
+  }, []);
+
+  if (!isLoggedIn && isLoggedIn !== undefined) {
+    return (
+      <div className="">
+        <Button
+          text={'Login'}
+          onClick={redirectToLogin}
+          styles={'md:!min-w-28 !min-w-20 !h-11'}
+        />
+      </div>
+    );
+  }
+  return (
+    <>
+      <button className="hover:bg-white-medium dark:hover:bg-black-light focus:ring-primary cursor-pointer rounded-md p-1.5 transition-colors duration-200 focus:outline-none focus:ring-2">
+        <NotificationIcon />
+      </button>
+      <button
+        className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2"
+        ref={profileButtonRef}
+        onClick={() => setDropDownOpen((prev) => !prev)}
+      >
+        {userProfile?.profilePicture ? (
+          <img
+            src={userProfile.profilePicture}
+            alt="profile icon"
+            className="h-9 w-9 rounded-full object-cover"
+          />
+        ) : (
+          <ProfileIcon />
+        )}
+        <ProfileDropDown
+          isVisible={isDropDownOpen}
+          setIsVisible={setDropDownOpen}
+          profileButtonRef={profileButtonRef}
+        />
+      </button>
     </>
   );
 };

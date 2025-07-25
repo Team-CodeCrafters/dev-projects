@@ -101,7 +101,7 @@ const SubmitProject = () => {
                     }))
                   }
                   id="description"
-                  className="rounded-md border border-gray-600 p-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1F1F1F]"
+                  className="rounded-md border border-gray-600 p-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1F1F1F]"
                 ></textarea>
               </div>
               <div className="flex gap-3">

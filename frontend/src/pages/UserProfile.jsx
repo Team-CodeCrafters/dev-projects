@@ -1,44 +1,111 @@
-import { useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import ProfilePicture from '../components/user/ProfilePicture';
 import PersonalDetails from '../components/user/PersonalDetails';
 import { useNavigate } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
-import { userProfileAtom } from '../store/atoms/userAtoms';
-import { useRecoilState } from 'recoil';
+import {
+  userProfileAtom,
+  userProfileTabsAtom,
+  userSubmissionsAtom,
+} from '../store/atoms/userAtoms';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import usePopupNotication from '../hooks/usePopup';
+import TabsLayout from '../components/layout/TabsLayout';
+import UserSubmissions from '../components/user/userSubmissions';
+
 const UserProfile = () => {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useRecoilState(userProfileAtom);
-  const { fetchData, loading } = useFetchData();
+  const [userSubmissions, setUserSubmissions] =
+    useRecoilState(userSubmissionsAtom);
+  const { fetchData: fetchUserData, loading: loadingUserProfile } =
+    useFetchData();
+  const { fetchData: fetchSubmissionData, loading: loadingSubmissions } =
+    useFetchData();
   const showPopup = usePopupNotication();
   useEffect(() => {
     document.title = 'Dev Projects | Profile';
     const token = localStorage.getItem('token');
     if (!token) navigate('/login');
 
-    async function fetchUserProfile() {
-      const options = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
-      const res = await fetchData('/user/profile', options);
+    async function fetchUserProfile() {
+      const res = await fetchUserData('/user/profile', options);
       if (res.success && res.data.user) {
         setUserProfile(res.data.user);
       } else {
         showPopup('error', res.error);
       }
     }
+
+    async function fetchUserSubmissions() {
+      const res = await fetchSubmissionData('/submissions/user/all', options);
+
+      if (res.success && res.data.submissions) {
+        setUserSubmissions(res.data.submissions);
+      } else {
+        showPopup('error', res.error);
+      }
+    }
     if (!userProfile) fetchUserProfile();
+    if (!userSubmissions) fetchUserSubmissions();
   }, []);
 
   return (
-    <div className="flex w-full flex-col items-center px-4 py-10 text-white">
+    <div className="flex w-full flex-col items-center p-4 text-white md:py-10">
       <ProfilePicture userProfile={userProfile} />
-      <PersonalDetails userProfile={userProfile} loading={loading} />
+      <div className="animate-fade-in text-primary-text w-full space-y-8 md:max-w-2xl dark:text-white">
+        <UserProfileTabs />
+        <ManageUserTabs
+          loadingUser={loadingUserProfile}
+          loadingSubmissions={loadingSubmissions}
+          userProfile={userProfile}
+          userSubmissions={userSubmissions}
+        />
+      </div>
     </div>
   );
 };
+
+const UserProfileTabs = () => {
+  const userProfileTabs = [
+    { label: 'Account', value: 'account' },
+    { label: 'Submissions', value: 'submissions' },
+  ];
+
+  return (
+    <div className="my-3 w-max max-w-2xl">
+      <TabsLayout tabs={userProfileTabs} activeTabAtom={userProfileTabsAtom} />
+    </div>
+  );
+};
+
+const ManageUserTabs = memo(
+  ({ userProfile, loadingUser, userSubmissions, loadingSubmissions }) => {
+    const activeTab = useRecoilValue(userProfileTabsAtom);
+
+    if (activeTab === 'account') {
+      return (
+        <PersonalDetails userProfile={userProfile} loading={loadingUser} />
+      );
+    }
+
+    if (activeTab === 'submissions') {
+      return (
+        <UserSubmissions
+          userSubmissions={userSubmissions}
+          loadingSubmissions={loadingSubmissions}
+        />
+      );
+    }
+
+    return null;
+  },
+);
 
 export default UserProfile;

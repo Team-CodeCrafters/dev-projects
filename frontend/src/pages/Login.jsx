@@ -11,12 +11,11 @@ import { useEffect } from 'react';
 import usePopupNotication from '../hooks/usePopup';
 
 const Login = () => {
-  const navigate = useNavigate();
   const showPopup = usePopupNotication();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      navigate('/dashboard');
+      window.location.href = '/dashboard';
     }
   });
 

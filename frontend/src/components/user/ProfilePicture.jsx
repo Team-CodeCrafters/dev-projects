@@ -64,7 +64,7 @@ const ProfilePicture = ({ userProfile }) => {
 
   return (
     <>
-      <div className="group relative h-28 w-28 cursor-pointer overflow-hidden rounded-full border-2 border-white">
+      <div className="group relative h-20 w-20 cursor-pointer overflow-hidden rounded-full border-2 border-white">
         {userProfile?.profilePicture ? (
           <img
             src={userProfile.profilePicture}
@@ -106,7 +106,7 @@ const ProfilePicture = ({ userProfile }) => {
         />
       </div>
 
-      <p className="mt-5 text-2xl font-semibold text-black dark:text-white">
+      <p className="font-heading mt-5 text-xl font-bold text-black md:text-2xl dark:text-white">
         {userProfile?.username}
       </p>
     </>

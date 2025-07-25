@@ -4,7 +4,7 @@ import Cancel from '../../assets/icons/Cancel';
 
 const SearchTagInput = ({
   id = { undefined },
-  title,
+  title = '',
   options,
   selected,
   setSelected,
@@ -57,21 +57,21 @@ const SearchTagInput = ({
         type="text"
         id={id}
         placeholder={`Search ${title}`}
-        className="focus:outline-primary w-full rounded-md bg-[#2A2A2A] px-3 py-2 text-white placeholder-gray-400 outline-gray-400 focus:outline-none"
+        className="focus:outline-primary outline-black-lighter dark:bg-black-light w-full rounded-md px-3 py-2 placeholder-gray-500 outline outline-1 focus:outline-none"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />
 
       {query && filteredOptions.length > 0 && (
-        <div className="border-white-dark absolute z-50 mt-2 max-h-40 overflow-y-auto rounded-md border bg-[#1A1A1A] p-2 pr-0 shadow-lg">
+        <div className="border-white-dark dark:border-black-light dark:bg-black-dark absolute z-50 mt-2 max-h-40 overflow-y-auto rounded-md border bg-zinc-100 p-2 shadow-lg">
           {filteredOptions.map((option) => (
-            <div
+            <button
               key={option}
-              className="text-white-light hover:bg-primary cursor-pointer rounded-md px-4 py-2"
+              className="hover:bg-primary focus:bg-primary my-2 block w-full cursor-pointer rounded-md px-4 py-2 text-left outline-none hover:text-white focus:text-white"
               onClick={() => handleSelect(option)}
             >
               {formatString(option)}
-            </div>
+            </button>
           ))}
         </div>
       )}

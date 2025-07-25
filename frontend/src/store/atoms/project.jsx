@@ -1,12 +1,11 @@
 import { atom, atomFamily, selector } from 'recoil';
 import { userProjectsAtom } from './userProjects';
-import useFetchData from '../../hooks/useFetchData';
 
 export const projectDetailsAtom = atom({
   key: 'projectDetailsAtom',
   default: null,
 });
-export const projectDetailsTab = atom({
+export const projectDetailsActiveTab = atom({
   key: 'projectDetailsTab',
   default: 'get-started',
 });

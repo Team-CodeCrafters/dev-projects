@@ -9,8 +9,8 @@ import ProjectCard from '../components/projects/ProjectCard';
 import usePopup from '../hooks/usePopup';
 import SearchTagInput from '../components/projects/SearchTagInput';
 import Loader from '../components/ui/Loader';
-import InformationIcon from '../assets/icons/Information';
 import { DIFFICULTIES, DOMAINS, TOOLS } from '../utils/constants';
+import NoContentToDisplay from '../components/ui/NoContent';
 
 const Projects = () => {
   const showPopup = usePopup();
@@ -106,7 +106,10 @@ const Projects = () => {
             >
               Apply
             </button>
-            <button onClick={() => setIsSidebarOpen(false)}>
+            <button
+              className="text-white"
+              onClick={() => setIsSidebarOpen(false)}
+            >
               <Cancel />
             </button>
           </div>
@@ -170,40 +173,27 @@ const ProjectLists = ({ getInitialProjects }) => {
     }
   }, []);
   if (projects?.length <= 0) {
-    return <NoProjectsFound />;
+    return (
+      <NoContentToDisplay
+        heading={'No Content To Display'}
+        body={'Consider changing filters to see more projects'}
+      />
+    );
   }
 
   return (
     <>
-      <div className="ml-1 flex flex-wrap md:ml-3 md:w-full">
+      <div className="mb-5 ml-1 flex flex-wrap items-stretch md:ml-3">
         {projects?.map((project) => (
           <ProjectCard
             key={project.id}
-            styles={'sm:max-w-[20rem]   mx-2  pt-6'}
+            styles={'sm:max-w-[20rem] h-full  mx-2  pt-6'}
             project={project}
             href={`/project/${project.id}`}
           />
         ))}
       </div>
     </>
-  );
-};
-
-const NoProjectsFound = () => {
-  return (
-    <div className="bg-white-medium dark:bg-black-medium m-4 rounded-lg p-3">
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="dark:bg-black-light bg-white-dark mb-6 rounded-full p-6">
-          <InformationIcon />
-        </div>
-        <h2 className="font-heading dark:text-white-light mb-3 text-xl font-medium tracking-wide">
-          No Projects Found
-        </h2>
-        <p className="dark:text-white-medium mb-8 max-w-md text-balance opacity-80">
-          Consider changing filters to see more projects
-        </p>
-      </div>
-    </div>
   );
 };
 

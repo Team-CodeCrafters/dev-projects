@@ -3,8 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import useFetchData from '../hooks/useFetchData';
 import {
   BookmarkedProjectsAtom,
+  projectDetailsActiveTab,
   projectDetailsAtom,
-  projectDetailsTab,
   projectStartedSelector,
   similarProjectsAtom,
 } from '../store/atoms/project';
@@ -24,6 +24,7 @@ import usePopupNotication from '../hooks/usePopup';
 import { createAccountDialogAtom } from '../store/atoms/dialog';
 import Submissions from '../components/projects/Submissions';
 import InformationIcon from '../assets/icons/Information';
+import TabsLayout from '../components/layout/TabsLayout';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -91,7 +92,7 @@ const ProjectDetails = () => {
               projectId={project.id}
               isProjectStarted={isProjectStarted}
             />
-            <TabsLayout />
+            <ProjectTabLayout />
             <ProjectContent />
           </div>
         </div>
@@ -123,6 +124,7 @@ const ProjectSettings = () => {
     </div>
   );
 };
+
 const BookmarkButton = () => {
   const project = useRecoilValue(projectDetailsAtom);
   const { fetchData } = useFetchData();
@@ -345,53 +347,19 @@ const ProjectHeader = memo(({ projectId }) => {
   );
 });
 
-const TabsLayout = () => {
-  const activeTab = useRecoilValue(projectDetailsTab);
+const ProjectTabLayout = () => {
+  const projectTabs = [
+    { label: 'Get Started', value: 'get-started' },
+    { label: 'Discussions', value: 'discussions' },
+    { label: 'Submissions', value: 'submissions' },
+  ];
   return (
-    <div className="custom-scrollbar scrollbar-thin mt-7 min-h-12 w-full self-center overflow-x-auto md:max-w-max md:self-auto">
-      <ul className="border-black-lighter flex min-w-max border-b border-opacity-40 dark:border-black">
-        <TabElement text={'Get Started'} currentTab={'get-started'} />
-        <TabElement text={'Discussions'} currentTab={'discussions'} />
-        <TabElement text={'Submissions'} currentTab={'submissions'} />
-      </ul>
-
-      <div className="relative h-[2px] w-full">
-        <div
-          className={`bg-primary duration-450 absolute left-0 top-0 h-[2px] w-32 transition-all ${
-            activeTab === 'discussions'
-              ? 'left-32'
-              : activeTab === 'submissions'
-                ? 'left-64'
-                : ''
-          }`}
-        ></div>
-      </div>
-    </div>
-  );
-};
-
-const TabElement = ({ text, currentTab }) => {
-  const [currentActiveTab, setCurrentActiveTab] =
-    useRecoilState(projectDetailsTab);
-  return (
-    <li className="flex cursor-pointer select-none">
-      <label className="dark:bg-black-light dark:hover:bg-black-lighter hover:bg-white-dark has-[:checked]:text-primary w-32 cursor-pointer rounded-md p-2 px-4 text-center font-semibold outline outline-transparent transition-colors has-[:checked]:outline">
-        <input
-          type="radio"
-          name="project-tab"
-          value={text}
-          className="sr-only"
-          checked={currentTab === currentActiveTab}
-          onChange={() => setCurrentActiveTab(currentTab)}
-        />
-        {text}
-      </label>
-    </li>
+    <TabsLayout tabs={projectTabs} activeTabAtom={projectDetailsActiveTab} />
   );
 };
 
 const ProjectContent = () => {
-  const activeTab = useRecoilValue(projectDetailsTab);
+  const activeTab = useRecoilValue(projectDetailsActiveTab);
   const project = useRecoilValue(projectDetailsAtom);
   return (
     <section className="mt-3 flex h-full w-full flex-col rounded-md transition-all">
@@ -433,7 +401,6 @@ const ProjectInformation = ({ project }) => {
 };
 
 const SimilarProjectsList = () => {
-  const navigate = useNavigate();
   const { fetchData } = useFetchData();
   const project = useRecoilValue(projectDetailsAtom);
   const [similarProjects, setSimilarProjects] =
