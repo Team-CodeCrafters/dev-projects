@@ -11,7 +11,7 @@ import {
 import { useRecoilState, useRecoilValue } from 'recoil';
 import usePopupNotication from '../hooks/usePopup';
 import TabsLayout from '../components/layout/TabsLayout';
-import NoContentToDisplay from '../components/ui/NoContent';
+import UserSubmissions from '../components/user/userSubmissions';
 
 const UserProfile = () => {
   const navigate = useNavigate();
@@ -20,19 +20,21 @@ const UserProfile = () => {
     useRecoilState(userSubmissionsAtom);
   const { fetchData: fetchUserData, loading: loadingUserProfile } =
     useFetchData();
+  const { fetchData: fetchSubmissionData, loading: loadingSubmissions } =
+    useFetchData();
   const showPopup = usePopupNotication();
   useEffect(() => {
     document.title = 'Dev Projects | Profile';
     const token = localStorage.getItem('token');
     if (!token) navigate('/login');
 
-    async function fetchUserProfile() {
-      const options = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
 
+    async function fetchUserProfile() {
       const res = await fetchUserData('/user/profile', options);
       if (res.success && res.data.user) {
         setUserProfile(res.data.user);
@@ -40,7 +42,19 @@ const UserProfile = () => {
         showPopup('error', res.error);
       }
     }
+
+    async function fetchUserSubmissions() {
+      const res = await fetchSubmissionData('/submissions/user/all', options);
+      console.log({ res });
+
+      if (res.success && res.data.submissions) {
+        setUserSubmissions(res.data.submissions);
+      } else {
+        showPopup('error', res.error);
+      }
+    }
     if (!userProfile) fetchUserProfile();
+    if (!userSubmissions) fetchUserSubmissions();
   }, []);
 
   return (
@@ -50,7 +64,7 @@ const UserProfile = () => {
         <UserProfileTabs />
         <ManageUserTabs
           loadingUser={loadingUserProfile}
-          loadingSubmissions={loadingUserProfile}
+          loadingSubmissions={loadingSubmissions}
           userProfile={userProfile}
           userSubmissions={userSubmissions}
         />
@@ -84,9 +98,9 @@ const ManageUserTabs = memo(
 
     if (activeTab === 'submissions') {
       return (
-        <NoContentToDisplay
-          heading={'No Submissions done yet'}
-          body={'submit a project to view it here'}
+        <UserSubmissions
+          userSubmissions={userSubmissions}
+          loadingSubmissions={loadingSubmissions}
         />
       );
     }
