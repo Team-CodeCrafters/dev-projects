@@ -15,7 +15,7 @@ const ProjectCard = ({
   const CardContent = () => {
     return (
       <div
-        className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 transition-all duration-500 hover:shadow-md md:my-4 ${styles}`}
+        className={`bg-white-light dark:bg-black-light dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 flex w-full max-w-2xl cursor-pointer rounded-md p-4 outline outline-2 outline-neutral-400 transition-all duration-500 hover:shadow-md md:my-4 ${styles}`}
         onClick={onClick}
       >
         {children}
@@ -47,7 +47,7 @@ const ProjectCard = ({
 
   if (href) {
     return (
-      <Link to={href} className="block">
+      <Link to={href} className="m-2 block">
         <CardContent />
       </Link>
     );

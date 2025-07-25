@@ -13,7 +13,7 @@
 @layer utilities {
   .custom-scrollbar {
     scrollbar-width: 6px;
-    scrollbar-color: #d0d0d3 transparent;
+    scrollbar-color: #66666a transparent;
   }
   .scrollbar-gutter-stable {
     scrollbar-gutter: stable;
@@ -33,15 +33,11 @@
   }
 
   .dark .custom-scrollbar {
-    scrollbar-color: #27272a transparent;
+    scrollbar-color: #27272a;
   }
 
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: #303037;
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-corner {
-    background: transparent;
   }
 
   .scrollbar-thin {

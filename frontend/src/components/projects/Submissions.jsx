@@ -59,7 +59,7 @@ const Submissions = () => {
 const Submission = ({ project, user }) => {
   return (
     <div
-      className={`bg-white-light dark:bg-black-light outline-white-dark dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-1 rounded-md p-4 outline outline-2 transition-all duration-500 hover:shadow-md md:my-2 md:w-full`}
+      className={`bg-white-light dark:bg-black-light dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-1 rounded-md p-4 outline outline-2 outline-neutral-400 transition-all duration-500 hover:shadow-md md:my-2 md:w-full`}
     >
       <div className="flex gap-2">
         <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
