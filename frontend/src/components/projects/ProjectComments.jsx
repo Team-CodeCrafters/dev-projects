@@ -39,8 +39,8 @@ const ProjectComments = () => {
 
   if (projectComments && projectComments.length > 0) {
     return (
-      <div className="mt-3">
-        <h1 className="font-heading my-3 text-lg font-semibold">
+      <div>
+        <h1 className="font-heading mb-3 text-lg font-semibold">
           {commentsCount} comments
         </h1>
         {projectComments.map((comment) => (

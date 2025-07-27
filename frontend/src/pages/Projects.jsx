@@ -47,7 +47,7 @@ const Projects = () => {
     }
 
     const response = await fetchData(
-      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`
+      `/project/all?${difficultyQuery}${toolsQuery}${domainQuery}`,
     );
     if (response.success) {
       setProjects(response.data.projects);
@@ -95,7 +95,9 @@ const Projects = () => {
         }`}
       >
         <div className="border-white-dark dark:border-black-lighter flex items-center justify-between border-b px-4 py-4">
-          <h2 className="text-primary-text dark:text-white-light text-lg font-bold">Filters</h2>
+          <h2 className="text-primary-text dark:text-white-light text-lg font-bold">
+            Filters
+          </h2>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
@@ -183,11 +185,11 @@ const ProjectLists = ({ getInitialProjects }) => {
 
   return (
     <>
-      <div className="mb-5 ml-1 flex flex-wrap items-stretch md:ml-3">
+      <div className="mx-auto mb-5 flex w-[95vw] flex-wrap items-stretch gap-3 sm:ml-3 sm:w-full">
         {projects?.map((project) => (
           <ProjectCard
             key={project.id}
-            styles={'sm:max-w-[20rem] h-full  mx-2  pt-6'}
+            styles={'sm:max-w-[20rem] h-full  my-2 !p-4 !pt-6 !pb-0'}
             project={project}
             href={`/project/${project.id}`}
           />

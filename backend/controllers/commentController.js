@@ -3,6 +3,15 @@ import prisma from '../db/db.js';
 export async function createComment(req, res) {
   try {
     const { message, projectId, parentId } = req.body;
+    console.log(req.body);
+
+    if (!message) {
+      return res.status(401).json({
+        message: 'invalid message',
+        error: 'invalid data',
+      });
+    }
+
     const comment = await prisma.comment.create({
       data: {
         userId: req.userId,
@@ -10,11 +19,23 @@ export async function createComment(req, res) {
         message: message,
         ...(parentId && { parentId }),
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+            profilePicture: true,
+          },
+        },
+      },
     });
     return res
       .status(200)
       .json({ message: 'comment posted successfully', comment });
   } catch (e) {
+    console.log(e);
+
     if (e.code === 'P2003') {
       return res.status(401).json({
         message: 'invalid data',
@@ -22,7 +43,7 @@ export async function createComment(req, res) {
       });
     }
     return res
-      .status(200)
+      .status(500)
       .json({ message: 'internal server error', error: e.message });
   }
 }

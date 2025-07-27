@@ -26,7 +26,7 @@ const DashboardHeader = memo(() => {
   };
 
   return (
-    <header className="bg-white-light dark:border-b-black-light dark:bg-black-medium relative z-40 flex h-16 items-center justify-between gap-12 border-b-2 px-4 lg:px-6 dark:text-white">
+    <header className="bg-white-light dark:border-b-black-light dark:bg-black-medium relative z-40 flex h-16 w-screen items-center justify-between border-b-2 px-4 lg:px-6 dark:text-white">
       {isSearchBarOpen ? (
         <div className="flex w-full items-center justify-between gap-6">
           <button onClick={toggleSearchBar}>
@@ -97,7 +97,7 @@ const HeaderContent = () => {
       <div className="hidden h-9 w-full max-w-sm items-center justify-center sm:flex">
         <SearchBar />
       </div>
-      <div className="flex max-h-full items-center gap-3 lg:gap-3">
+      <div className="flex max-h-full">
         <div className="flex sm:hidden">
           <button
             className="hover:bg-white-medium dark:hover:bg-black-light focus:ring-primary cursor-pointer rounded-md p-1.5 transition-colors duration-200 focus:outline-none focus:ring-2"

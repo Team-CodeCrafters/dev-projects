@@ -23,7 +23,7 @@ export default function Comment({ comment, isReply }) {
 
   return (
     <div
-      className={`bg-black-neutral rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
+      className={`dark:bg-black-neutral rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
     >
       <div className={`flex gap-3`}>
         <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
@@ -80,7 +80,7 @@ export default function Comment({ comment, isReply }) {
               <ReplyIcon size="size-4 md:size-5" />
             </button>
 
-            <button className="ml-auto flex items-center gap-1 rounded px-2 py-1 text-sm text-gray-600 hover:bg-gray-100">
+            <button className="ml-auto flex items-center gap-1 rounded px-2 py-1 text-sm text-gray-600 hover:bg-transparent/5">
               <SettingsIcon className="h-4 w-4" />
             </button>
           </div>

@@ -22,7 +22,7 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="dark:bg-black-medium flex h-screen w-screen flex-col">
+    <div className="dark:bg-black-medium w flex h-screen flex-col">
       <DashboardHeader />
       <div className="relative flex w-[100vw] flex-1 justify-start overflow-hidden">
         <div
