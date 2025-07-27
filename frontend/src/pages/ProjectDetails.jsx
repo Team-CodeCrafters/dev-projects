@@ -16,15 +16,14 @@ import { BookmarkIcon } from '../assets/icons/Bookmark';
 import SettingIcon from '../assets/icons/Setting';
 import { ArrowLeft } from '../assets/icons/ArrowLeft';
 import Button from '../components/ui/Button';
-import NoContentToDisplay from '../components/ui/NoContent';
 import ProjectCard from '../components/projects/ProjectCard';
 import Loader from '../components/ui/Loader';
 import { userProjectsAtom } from '../store/atoms/userProjects';
 import usePopupNotication from '../hooks/usePopup';
 import { createAccountDialogAtom } from '../store/atoms/dialog';
 import Submissions from '../components/projects/Submissions';
-import InformationIcon from '../assets/icons/Information';
 import TabsLayout from '../components/layout/TabsLayout';
+import Discussions from '../components/projects/Discussions';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -443,54 +442,6 @@ const SimilarProjectsList = () => {
           </ProjectCard>
         ))}
       </div>
-    </>
-  );
-};
-
-const Discussions = () => {
-  const [comment, setComment] = useState('');
-  function postComment() {
-    console.log("post the user's comment");
-  }
-  return (
-    <>
-      <div className="w-fl mb-4 w-full">
-        <label className="focus-within:border-primary border-b-2 border-gray-400 pb-1 transition-all">
-          <textarea
-            type="text"
-            name="comment"
-            id="discussion-comment"
-            placeholder={'Add a comment'}
-            rows="1"
-            className="custom-scrollbar field-sizing-content w-full resize-none border-none bg-transparent pl-1 outline-none placeholder:text-black placeholder:opacity-80 dark:placeholder:text-white"
-            value={comment}
-            onChange={(e) => {
-              setComment(e.target.value);
-            }}
-          />
-        </label>
-        <div className="mt-3 flex items-center gap-2">
-          <button
-            onClick={() => {
-              setComment('');
-            }}
-            className="hover:bg-white-medium dark:hover:bg-black-medium rounded-full p-3 px-4 text-sm"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={postComment}
-            className="bg-black-lighter/90 hover:bg-black-lighter hover :scale-10 dark:bg-black-neutral rounded-full p-2 px-5 text-sm text-white transition-transform"
-          >
-            Post
-          </button>
-        </div>
-      </div>
-      <NoContentToDisplay
-        Icon={InformationIcon}
-        heading={'No discussions yet'}
-        body={'Be the first to start a conversation!'}
-      />
     </>
   );
 };

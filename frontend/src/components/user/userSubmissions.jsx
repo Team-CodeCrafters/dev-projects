@@ -72,7 +72,7 @@ const UserSubmissionCard = ({ submission }) => {
             className="flex items-center gap-2 rounded-2xl p-1 px-2 text-sm text-blue-600 outline outline-2 transition-colors hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
           >
             <LinkIcon size="size-5" />
-            Live Demo
+            View Site
           </Link>
         )}
 

@@ -46,7 +46,7 @@ export async function getComments(req, res) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
     });
 
     return res
