@@ -30,7 +30,6 @@ const Discussions = () => {
       }),
     };
     const response = await fetchData('/comments/new', options);
-    console.log(response);
     if (response.success) {
       setProjectComments((prev) => [response.data.comment, ...prev]);
     } else {

@@ -8,8 +8,8 @@
     min-height: 100dvh;
     min-width: 100dvw;
   }
-  * {
-    /* outline: 1px solid red; */
+  textarea {
+    field-sizing: content;
   }
 }
 

@@ -27,8 +27,6 @@ function structureComments(comments) {
     else parent.replies = [comment];
   });
 
-  console.log(resultComments);
-
   return resultComments;
 }
 
