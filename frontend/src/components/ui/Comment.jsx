@@ -9,13 +9,13 @@ import SettingIcon from '../../assets/icons/Setting';
 import EditIcon from '../../assets/icons/Edit';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../../store/atoms/userAtoms';
+import { createAccountDialogAtom } from '../../store/atoms/dialog';
 import useFetchData from '../../hooks/useFetchData';
 import {
   commentEditAtom,
   projectCommentsAtomFamily,
   projectDetailsAtom,
 } from '../../store/atoms/project';
-import InputField from '../../components/ui/InputField';
 import useNotification from '../../hooks/usePopup';
 const CommentOptions = ({ comment }) => {
   const user = useRecoilValue(userProfileAtom);
@@ -99,9 +99,11 @@ const CommentsDropDown = ({
     const response = await fetchData('/comments/', options);
 
     if (response.success) {
-      setProjectComments((prev) =>
-        prev.filter((prevComment) => prevComment.id !== comment.id),
-      );
+      setProjectComments((prev) => {
+        console.log({ prev }, comment.id);
+
+        return prev.filter((prevComment) => prevComment.id !== comment.id);
+      });
       showPop('info', 'comment was deleted');
     }
   }
@@ -186,6 +188,97 @@ const Comment = ({ comment, isReply }) => {
       showPop('info', 'comment was edited');
     }
   }
+  const ReplyComment = () => {
+    const userProfile = useRecoilValue(userProfileAtom);
+    const project = useRecoilValue(projectDetailsAtom);
+    const { fetchData } = useFetchData();
+    const setCreateAccountDialog = useSetRecoilState(createAccountDialogAtom);
+    const [replyMessage, setReplyMessage] = useState('');
+    const setProjectComments = useSetRecoilState(
+      projectCommentsAtomFamily(project.id),
+    );
+    if (userProfile === null) {
+      setCreateAccountDialog(true);
+      return null;
+    }
+    async function handleReplyComment() {
+      console.log('parent:', comment.id);
+
+      const options = {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: replyMessage,
+          projectId: project.id,
+          parentId: comment.id,
+        }),
+      };
+
+      const response = await fetchData('/comments/new', options);
+      console.log(response);
+      if (response.success) {
+        setProjectComments((comments) =>
+          comments.map((prevComment) => {
+            console.log(prevComment.id, comment.id);
+
+            if (prevComment.id === comment.id) {
+              console.log(prevComment, response);
+
+              prevComment.replies.push(response.data.comment);
+            }
+            return prevComment;
+          }),
+        );
+      }
+    }
+
+    return (
+      <>
+        <div className="mt-3 flex gap-3">
+          <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
+            {userProfile?.profilePicture ? (
+              <img
+                src={userProfile.profilePicture}
+                alt="profile icon"
+                className="h-9 w-9 rounded-full object-cover"
+              />
+            ) : (
+              <ProfileIcon />
+            )}
+          </span>
+          <div className="mr-2 flex-1 md:mr-3">
+            <textarea
+              type="text"
+              name="comment"
+              id="discussion-comment"
+              placeholder="Add a reply"
+              rows="1"
+              value={replyMessage}
+              onChange={(e) => setReplyMessage(e.target.value)}
+              className="custom-scrollbar field-sizing-content dark:bg-black-neutral bg-white-medium focus:outline-primary dark:focus:outline-primary peer w-[90%] resize-y rounded-md border-none p-1 px-2 outline-none outline-1 outline-gray-300 placeholder:text-black placeholder:opacity-80 dark:outline-gray-500 dark:placeholder:text-white"
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                className="rounded px-3 py-1 text-sm hover:bg-gray-100 hover:text-black"
+                onClick={() => setShowReplyInput(false)}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReplyComment}
+                className="bg-primary rounded px-3 py-1 text-sm text-white"
+              >
+                Reply
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div
@@ -282,42 +375,7 @@ const Comment = ({ comment, isReply }) => {
             </button>
           </div>
 
-          {showReplyInput && (
-            <div className="mt-3 flex gap-3">
-              <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
-                {comment.user?.profilePicture ? (
-                  <img
-                    src={comment.user.profilePicture}
-                    alt="profile icon"
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                ) : (
-                  <ProfileIcon />
-                )}
-              </span>
-              <div className="mr-2 flex-1 md:mr-3">
-                <input
-                  type="text"
-                  placeholder="Add a reply..."
-                  className="w-full border-b border-gray-300 bg-transparent pb-1 text-sm outline-none focus:border-gray-900"
-                />
-                <div className="mt-2 flex justify-end gap-2">
-                  <button
-                    className="rounded px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                    onClick={() => setShowReplyInput(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="cursor-not-allowed rounded bg-blue-600 px-3 py-1 text-sm text-white opacity-50"
-                    disabled
-                  >
-                    Reply
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+          {showReplyInput && <ReplyComment />}
         </div>
       </div>
 

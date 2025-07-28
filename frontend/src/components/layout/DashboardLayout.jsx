@@ -22,9 +22,9 @@ const DashboardLayout = () => {
   };
 
   return (
-    <div className="dark:bg-black-medium w flex h-screen flex-col">
+    <div className="dark:bg-black-medium flex h-screen w-full flex-col">
       <DashboardHeader />
-      <div className="relative flex w-[100vw] flex-1 justify-start overflow-hidden">
+      <div className="relative flex w-full flex-1 justify-start overflow-hidden">
         <div
           className={`bg-white-light dark:bg-black-medium dark:border-r-black-light z-10 h-full flex-shrink-0 border-r-2 transition-all duration-150 ease-in-out ${
             screenSize.width < 768
@@ -39,7 +39,7 @@ const DashboardLayout = () => {
           <DashboardSidebar />
         </div>
         <div
-          className={`dark:bg-black-medium custom-scrollbar scrollbar-gutter-stable h-full w-screen items-center justify-center overflow-auto bg-white pt-3 transition-all md:pt-6 dark:text-white ${
+          className={`custom-scrollbar scrollbar-gutter-stable dark:bg-black-medium h-full w-full items-center justify-center overflow-auto bg-white pt-3 transition-all md:pt-6 dark:text-white ${
             screenSize.width < 768 && isExpanded
               ? `pointer-events-none opacity-80 blur-sm`
               : ''
