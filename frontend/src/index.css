@@ -8,6 +8,9 @@
     min-height: 100dvh;
     min-width: 100dvw;
   }
+  textarea {
+    field-sizing: content;
+  }
 }
 
 @layer utilities {

@@ -43,3 +43,13 @@ export const projectSubmissionsAtomFamily = atomFamily({
   key: 'projectSubmissionsAtomFamily',
   default: null,
 });
+
+export const projectCommentsAtomFamily = atomFamily({
+  key: 'projectCommentsAtomFamily',
+  default: null,
+});
+
+export const commentEditAtom = atomFamily({
+  key: 'commentEditAtom',
+  default: false,
+});

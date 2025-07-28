@@ -13,4 +13,21 @@ function formatDate(date) {
   return dateString.replace(/^(about|over|almost) /, '');
 }
 
-export { formatString, formatDate };
+function structureComments(comments) {
+  const resultComments = [];
+  comments.forEach((comment) => {
+    if (comment.parentId === null) {
+      comment.replies = [];
+      resultComments.push(comment);
+      return;
+    }
+    const parent = comments.find(({ id }) => id === comment.parentId);
+
+    if (parent?.replies?.length > 0) parent.replies.push(comment);
+    else parent.replies = [comment];
+  });
+
+  return resultComments;
+}
+
+export { formatString, formatDate, structureComments };

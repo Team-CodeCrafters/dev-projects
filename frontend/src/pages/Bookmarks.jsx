@@ -79,7 +79,7 @@ const Bookmarks = () => {
 
   return (
     <>
-      <div className="bg-white-medium dark:bg-black-medium relative ml-2 h-full rounded-lg p-3 md:p-5">
+      <div className="bg-white-medium dark:bg-black-medium relative mx-auto h-full w-[95vw] rounded-lg p-3 sm:w-full md:ml-2 md:p-5">
         {bookmarks.length > 0 ? (
           <>
             <h1 className="font-heading mb-2 place-self-start text-xl font-medium tracking-wide md:text-2xl">
@@ -90,7 +90,7 @@ const Bookmarks = () => {
                 return (
                   <ProjectCard
                     key={bookmark.id}
-                    styles={'sm:max-w-[20rem]  w-full mx-2  pt-6'}
+                    styles={'sm:max-w-[20rem] w-full pt-6'}
                     project={bookmark.project}
                     href={`/project/${bookmark.project.id}`}
                   >
