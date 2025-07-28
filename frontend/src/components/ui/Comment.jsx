@@ -17,6 +17,7 @@ import {
   projectDetailsAtom,
 } from '../../store/atoms/project';
 import useNotification from '../../hooks/usePopup';
+
 const CommentOptions = ({ comment }) => {
   const user = useRecoilValue(userProfileAtom);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
@@ -100,8 +101,6 @@ const CommentsDropDown = ({
 
     if (response.success) {
       setProjectComments((prev) => {
-        console.log({ prev }, comment.id);
-
         return prev.filter((prevComment) => prevComment.id !== comment.id);
       });
       showPop('info', 'comment was deleted');
@@ -173,12 +172,12 @@ const Comment = ({ comment, isReply }) => {
     };
 
     const response = await fetchData('/comments/edit', options);
-    console.log(response);
+
     if (response.success) {
       setProjectComments((prev) =>
         prev.map((prevComment) => {
           if (prevComment.id === comment.id) {
-            return { ...prevComment, message: editedMessage };
+            return { ...prevComment, message: editedMessage, isEdited: true };
           } else {
             return prevComment;
           }
@@ -202,8 +201,6 @@ const Comment = ({ comment, isReply }) => {
       return null;
     }
     async function handleReplyComment() {
-      console.log('parent:', comment.id);
-
       const options = {
         method: 'POST',
         headers: {
@@ -218,32 +215,22 @@ const Comment = ({ comment, isReply }) => {
       };
 
       const response = await fetchData('/comments/new', options);
-      console.log(response);
+
       if (response.success) {
-        setProjectComments((comments) =>
-          comments.map((prevComment) => {
-            console.log(prevComment.id, comment.id);
-
-            if (prevComment.id === comment.id) {
-              console.log(prevComment, response);
-
-              prevComment.replies.push(response.data.comment);
-            }
-            return prevComment;
-          }),
-        );
+        setShowReplyInput(false);
+        setProjectComments((prev) => [...prev, response.data.comment]);
       }
     }
 
     return (
       <>
         <div className="mt-3 flex gap-3">
-          <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
+          <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
             {userProfile?.profilePicture ? (
               <img
                 src={userProfile.profilePicture}
                 alt="profile icon"
-                className="h-9 w-9 rounded-full object-cover"
+                className="h-6 w-6 rounded-full object-cover"
               />
             ) : (
               <ProfileIcon />
@@ -284,13 +271,13 @@ const Comment = ({ comment, isReply }) => {
     <div
       className={`dark:bg-black-neutral rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
     >
-      <div className={`flex gap-3`}>
-        <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
+      <div className="flex gap-1 sm:gap-2">
+        <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
           {comment.user?.profilePicture ? (
             <img
               src={comment.user.profilePicture}
               alt="profile icon"
-              className="h-9 w-9 rounded-full object-cover"
+              className="h-6 w-6 rounded-full object-cover"
             />
           ) : (
             <ProfileIcon />
@@ -346,7 +333,7 @@ const Comment = ({ comment, isReply }) => {
             )}
           </div>
 
-          <div className="flex w-full items-center justify-start gap-1">
+          <div className="flex w-full items-center justify-start gap-1 opacity-65">
             <button
               className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
                 liked ? 'text-blue-600' : ''
@@ -379,17 +366,29 @@ const Comment = ({ comment, isReply }) => {
         </div>
       </div>
 
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="dark:border-white-dark border-black-lighter border-l pl-4">
-          <div className="space-y-0">
-            {comment.replies.map((reply) => (
-              <Comment key={reply.id} comment={reply} isReply={true} />
-            ))}
-          </div>
-        </div>
-      )}
+      <ReplyComments parentComment={comment} />
     </div>
   );
 };
 
+const ReplyComments = ({ parentComment }) => {
+  const project = useRecoilValue(projectDetailsAtom);
+  const allComments = useRecoilValue(projectCommentsAtomFamily(project.id));
+
+  const replies = allComments.filter(
+    (comment) => comment.parentId === parentComment.id,
+  );
+
+  if (replies.length > 0) {
+    return (
+      <div className="dark:border-white-dark border-black-lighter border-l pl-1 sm:pl-3">
+        <div className="space-y-0">
+          {replies.map((reply) => (
+            <Comment key={reply.id} comment={reply} isReply={true} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+};
 export default Comment;

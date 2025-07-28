@@ -1,4 +1,4 @@
-import { atom, atomFamily, selector } from 'recoil';
+import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { userProjectsAtom } from './userProjects';
 
 export const projectDetailsAtom = atom({
@@ -47,6 +47,14 @@ export const projectSubmissionsAtomFamily = atomFamily({
 export const projectCommentsAtomFamily = atomFamily({
   key: 'projectCommentsAtomFamily',
   default: null,
+});
+export const commentsCountSelector = selectorFamily({
+  key: 'projectCommentsAtomFamily',
+  get:
+    (projectId) =>
+    ({ get }) => {
+      return get(projectCommentsAtomFamily(projectId))?.length;
+    },
 });
 
 export const commentEditAtom = atomFamily({
