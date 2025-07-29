@@ -23,7 +23,7 @@ const TabsLayout = ({ tabs, activeTabAtom }) => {
         ))}
       </ul>
 
-      <div className="relative h-[2px] w-full">
+      <div className="relative top-[-2px] h-[2px] w-full">
         <div
           className="bg-primary duration-450 absolute top-0 h-[2px] w-32 transition-all"
           style={{ left: `${getIndicatorPosition}px` }}
@@ -38,7 +38,7 @@ const TabElement = ({ text, currentTab, activeTabAtom }) => {
 
   return (
     <li className="flex cursor-pointer select-none">
-      <label className="has-[:checked]:text-primary w-32 cursor-pointer rounded-md p-2 px-4 text-center font-semibold outline outline-transparent transition hover:bg-transparent/20 has-[:checked]:outline">
+      <label className="has-[:checked]:text-primary w-32 cursor-pointer rounded-md p-2 px-4 text-center text-sm font-semibold outline outline-transparent transition hover:bg-transparent/20 has-[:checked]:outline sm:text-base">
         <input
           type="radio"
           name={currentTab}

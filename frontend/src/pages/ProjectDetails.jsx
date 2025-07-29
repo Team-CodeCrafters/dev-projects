@@ -84,18 +84,16 @@ const ProjectDetails = () => {
   }
   if (!loadingProject && !loadingUserProject && project) {
     return (
-      <>
-        <div className="grid h-full place-items-center">
-          <div className="dark:bg-black-light bg-white-dark bg-red relative mx-auto flex h-full w-full flex-col rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
-            <ProjectHeader
-              projectId={project.id}
-              isProjectStarted={isProjectStarted}
-            />
-            <ProjectTabLayout />
-            <ProjectContent />
-          </div>
+      <div className="flex w-full justify-center p-2">
+        <div className="dark:bg-black-light bg-white-dark relative flex w-full max-w-sm flex-col rounded-lg p-2 pt-4 sm:max-w-md md:max-w-2xl md:p-4 lg:max-w-3xl">
+          <ProjectHeader
+            projectId={project.id}
+            isProjectStarted={isProjectStarted}
+          />
+          <ProjectTabLayout />
+          <ProjectContent />
         </div>
-      </>
+      </div>
     );
   }
 };
@@ -331,14 +329,16 @@ const ProjectHeader = memo(({ projectId }) => {
             {project.name}
           </h1>
         </div>
-        <div className="flex w-full items-start justify-between">
-          <ToolsTag tools={project.tools} />
+        <div className="flex w-full flex-col justify-between gap-1 sm:flex-row">
           <div className="flex h-full items-center gap-3">
             <DifficultyTag difficulty={project.difficulty} />
             <DomainTag domain={project.domain} />
           </div>
+          <div>
+            <ToolsTag tools={project.tools} />
+          </div>
         </div>
-        <div className="mt-4 flex gap-4 md:flex-row">
+        <div className="mt-1 flex gap-4 sm:mt-2 md:flex-row">
           <StartProjectButton />
         </div>
       </div>

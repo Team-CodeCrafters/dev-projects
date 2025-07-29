@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatDate } from '../../utils/formatters';
-import LikeIcon from '../../assets/icons/Like';
-import DisLikeIcon from '../../assets/icons/DisLike';
 import ReplyIcon from '../../assets/icons/Reply';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
 import { DeleteIcon } from '../../assets/icons/Delete';
@@ -9,14 +7,18 @@ import SettingIcon from '../../assets/icons/Setting';
 import EditIcon from '../../assets/icons/Edit';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userProfileAtom } from '../../store/atoms/userAtoms';
+import { createAccountDialogAtom } from '../../store/atoms/dialog';
 import useFetchData from '../../hooks/useFetchData';
 import {
   commentEditAtom,
   projectCommentsAtomFamily,
   projectDetailsAtom,
+  userPreviousInteraction,
+  userVotedCommentsAtom,
 } from '../../store/atoms/project';
-import InputField from '../../components/ui/InputField';
 import useNotification from '../../hooks/usePopup';
+import { VoteIcon } from '../../assets/icons/Vote';
+
 const CommentOptions = ({ comment }) => {
   const user = useRecoilValue(userProfileAtom);
   const [isSettingOpen, setIsSettingOpen] = useState(false);
@@ -99,9 +101,9 @@ const CommentsDropDown = ({
     const response = await fetchData('/comments/', options);
 
     if (response.success) {
-      setProjectComments((prev) =>
-        prev.filter((prevComment) => prevComment.id !== comment.id),
-      );
+      setProjectComments((prev) => {
+        return prev.filter((prevComment) => prevComment.id !== comment.id);
+      });
       showPop('info', 'comment was deleted');
     }
   }
@@ -137,8 +139,6 @@ const CommentsDropDown = ({
 
 const Comment = ({ comment, isReply }) => {
   const { fetchData } = useFetchData();
-  const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [editMode, setEditMode] = useRecoilState(commentEditAtom(comment.id));
   const [editedMessage, setEditedMessage] = useState(comment.message);
@@ -148,15 +148,6 @@ const Comment = ({ comment, isReply }) => {
   );
   const showPop = useNotification();
 
-  const handleLike = () => {
-    if (disliked) setDisliked(false);
-    setLiked(!liked);
-  };
-
-  const handleDislike = () => {
-    if (liked) setLiked(false);
-    setDisliked(!disliked);
-  };
   async function submitEditedMessage() {
     const options = {
       method: 'PUT',
@@ -171,12 +162,12 @@ const Comment = ({ comment, isReply }) => {
     };
 
     const response = await fetchData('/comments/edit', options);
-    console.log(response);
+
     if (response.success) {
       setProjectComments((prev) =>
         prev.map((prevComment) => {
           if (prevComment.id === comment.id) {
-            return { ...prevComment, message: editedMessage };
+            return { ...prevComment, message: editedMessage, isEdited: true };
           } else {
             return prevComment;
           }
@@ -186,18 +177,97 @@ const Comment = ({ comment, isReply }) => {
       showPop('info', 'comment was edited');
     }
   }
+  const ReplyComment = () => {
+    const userProfile = useRecoilValue(userProfileAtom);
+    const project = useRecoilValue(projectDetailsAtom);
+    const { fetchData } = useFetchData();
+    const setCreateAccountDialog = useSetRecoilState(createAccountDialogAtom);
+    const [replyMessage, setReplyMessage] = useState('');
+    const setProjectComments = useSetRecoilState(
+      projectCommentsAtomFamily(project.id),
+    );
+    if (userProfile === null) {
+      setCreateAccountDialog(true);
+      return null;
+    }
+    async function handleReplyComment() {
+      const options = {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: replyMessage,
+          projectId: project.id,
+          parentId: comment.id,
+        }),
+      };
+
+      const response = await fetchData('/comments/new', options);
+
+      if (response.success) {
+        setShowReplyInput(false);
+        setProjectComments((prev) => [...prev, response.data.comment]);
+      }
+    }
+
+    return (
+      <>
+        <div className="mt-3 flex gap-3">
+          <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
+            {userProfile?.profilePicture ? (
+              <img
+                src={userProfile.profilePicture}
+                alt="profile icon"
+                className="h-6 w-6 rounded-full object-cover"
+              />
+            ) : (
+              <ProfileIcon />
+            )}
+          </span>
+          <div className="mr-2 flex-1 md:mr-3">
+            <textarea
+              type="text"
+              name="comment"
+              id="discussion-comment"
+              placeholder="Add a reply"
+              rows="1"
+              value={replyMessage}
+              onChange={(e) => setReplyMessage(e.target.value)}
+              className="custom-scrollbar field-sizing-content dark:bg-black-neutral bg-white-medium focus:outline-primary dark:focus:outline-primary peer w-[90%] resize-y rounded-md border-none p-1 px-2 outline-none outline-1 outline-gray-300 placeholder:text-black placeholder:opacity-80 dark:outline-gray-500 dark:placeholder:text-white"
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <button
+                className="rounded px-3 py-1 text-sm hover:bg-gray-100 hover:text-black"
+                onClick={() => setShowReplyInput(false)}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleReplyComment}
+                className="bg-primary rounded px-3 py-1 text-sm text-white"
+              >
+                Reply
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  };
 
   return (
     <div
       className={`dark:bg-black-neutral rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
     >
-      <div className={`flex gap-3`}>
-        <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
+      <div className="flex gap-1 sm:gap-2">
+        <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
           {comment.user?.profilePicture ? (
             <img
               src={comment.user.profilePicture}
               alt="profile icon"
-              className="h-9 w-9 rounded-full object-cover"
+              className="h-6 w-6 rounded-full object-cover"
             />
           ) : (
             <ProfileIcon />
@@ -252,86 +322,137 @@ const Comment = ({ comment, isReply }) => {
               <span>{comment.message}</span>
             )}
           </div>
-
-          <div className="flex w-full items-center justify-start gap-1">
-            <button
-              className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
-                liked ? 'text-blue-600' : ''
-              }`}
-              onClick={handleLike}
-            >
-              <LikeIcon size="size-4 md:size-5" />
-              {comment.likeCount + (liked ? 1 : 0) || ''}
-            </button>
-
-            <button
-              className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
-                disliked ? 'text-red-600' : ''
-              }`}
-              onClick={handleDislike}
-            >
-              <DisLikeIcon size="size-4 md:size-5" />
-              {comment.disLikeCount + (disliked ? 1 : 0) || ''}
-            </button>
-
-            <button
-              className="flex items-center gap-1 rounded px-2 py-1 text-sm"
-              onClick={() => setShowReplyInput(!showReplyInput)}
-            >
-              <ReplyIcon size="size-4 md:size-5" />
-            </button>
-          </div>
-
-          {showReplyInput && (
-            <div className="mt-3 flex gap-3">
-              <span className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
-                {comment.user?.profilePicture ? (
-                  <img
-                    src={comment.user.profilePicture}
-                    alt="profile icon"
-                    className="h-9 w-9 rounded-full object-cover"
-                  />
-                ) : (
-                  <ProfileIcon />
-                )}
-              </span>
-              <div className="mr-2 flex-1 md:mr-3">
-                <input
-                  type="text"
-                  placeholder="Add a reply..."
-                  className="w-full border-b border-gray-300 bg-transparent pb-1 text-sm outline-none focus:border-gray-900"
-                />
-                <div className="mt-2 flex justify-end gap-2">
-                  <button
-                    className="rounded px-3 py-1 text-sm text-gray-600 hover:bg-gray-100"
-                    onClick={() => setShowReplyInput(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="cursor-not-allowed rounded bg-blue-600 px-3 py-1 text-sm text-white opacity-50"
-                    disabled
-                  >
-                    Reply
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
-
-      {comment.replies && comment.replies.length > 0 && (
-        <div className="dark:border-white-dark border-black-lighter border-l pl-4">
-          <div className="space-y-0">
-            {comment.replies.map((reply) => (
-              <Comment key={reply.id} comment={reply} isReply={true} />
-            ))}
-          </div>
-        </div>
-      )}
+      <CommentReaction
+        comment={comment}
+        setShowReplyInput={setShowReplyInput}
+      />
+      {!!showReplyInput && <ReplyComment />}
+      <ReplyComments parentComment={comment} />
     </div>
   );
 };
 
+const CommentReaction = ({ comment, setShowReplyInput }) => {
+  const [commentVotes, setCommentVotes] = useState(
+    comment.upvoteCount - comment.downvoteCount,
+  );
+  const [userVotedComments, setUserVotedComments] = useRecoilState(
+    userVotedCommentsAtom,
+  );
+  const userInteraction = useRecoilValue(userPreviousInteraction(comment.id));
+  const { fetchData } = useFetchData();
+  const userProfile = useRecoilValue(userProfileAtom);
+  const setCreateAccountDialog = useSetRecoilState(createAccountDialogAtom);
+  async function handleCommentVote(toVote) {
+    if (userProfile === null) {
+      setCreateAccountDialog(true);
+      return;
+    }
+    const alreadyVotedComment = userVotedComments.find(
+      (votedComment) => votedComment.commentId === comment.id,
+    );
+
+    let voteChange = 0;
+
+    if (alreadyVotedComment) {
+      if (alreadyVotedComment.voteType === toVote) {
+        setUserVotedComments((userComments) =>
+          userComments.filter(
+            (userComment) => userComment.commentId !== comment.id,
+          ),
+        );
+        voteChange = toVote === 'UPVOTE' ? -1 : 1;
+      } else {
+        setUserVotedComments((userComments) =>
+          userComments.map((prevComment) => {
+            if (prevComment.commentId === comment.id) {
+              return { ...prevComment, voteType: toVote };
+            }
+            return prevComment;
+          }),
+        );
+        voteChange = toVote === 'UPVOTE' ? 2 : -2;
+      }
+    } else {
+      setUserVotedComments((prev) => [
+        ...prev,
+        {
+          commentId: comment.id,
+          voteType: toVote,
+        },
+      ]);
+      voteChange = toVote === 'UPVOTE' ? 1 : -1;
+    }
+    setCommentVotes(commentVotes + voteChange);
+
+    // sending request after updating UI
+    const token = localStorage.getItem('token');
+    const options = {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        commentId: comment.id,
+        voteType: toVote,
+      }),
+    };
+
+    await fetchData('/comments/vote', options);
+  }
+
+  return (
+    <>
+      <div className="flex w-full items-center justify-start">
+        <button
+          className={`flex items-center gap-1 rounded px-2 py-1 text-sm hover:bg-transparent/30 ${
+            userInteraction === 'UPVOTE' ? 'text-primary' : ''
+          }`}
+          onClick={() => handleCommentVote('UPVOTE')}
+        >
+          <VoteIcon size="size-4 md:size-5" />
+        </button>
+        <span>{commentVotes}</span>
+        <button
+          className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
+            userInteraction === 'DOWNVOTE' ? 'text-error' : ''
+          }`}
+          onClick={() => handleCommentVote('DOWNVOTE')}
+        >
+          <VoteIcon size="size-4 md:size-5" style={'rotate-180'} />
+        </button>
+        <button
+          className="flex items-center gap-1 rounded px-2 py-1 text-sm"
+          onClick={() => setShowReplyInput((prev) => !prev)}
+        >
+          <ReplyIcon size="size-4 md:size-5" />
+        </button>
+      </div>
+    </>
+  );
+};
+
+const ReplyComments = ({ parentComment }) => {
+  const project = useRecoilValue(projectDetailsAtom);
+  const allComments = useRecoilValue(projectCommentsAtomFamily(project.id));
+
+  const replies = allComments.filter(
+    (comment) => comment.parentId === parentComment.id,
+  );
+
+  if (replies.length > 0) {
+    return (
+      <div className="dark:border-white-dark border-black-lighter border-l pl-1 sm:pl-3">
+        <div className="space-y-0">
+          {replies.map((reply) => (
+            <Comment key={reply.id} comment={reply} isReply={true} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+};
 export default Comment;

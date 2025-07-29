@@ -1,4 +1,4 @@
-import { atom, atomFamily, selector } from 'recoil';
+import { atom, atomFamily, selector, selectorFamily } from 'recoil';
 import { userProjectsAtom } from './userProjects';
 
 export const projectDetailsAtom = atom({
@@ -48,8 +48,36 @@ export const projectCommentsAtomFamily = atomFamily({
   key: 'projectCommentsAtomFamily',
   default: null,
 });
+export const commentsCountSelector = selectorFamily({
+  key: 'projectCommentsAtomFamily',
+  get:
+    (projectId) =>
+    ({ get }) => {
+      return get(projectCommentsAtomFamily(projectId))?.length;
+    },
+});
 
 export const commentEditAtom = atomFamily({
   key: 'commentEditAtom',
   default: false,
+});
+
+export const userVotedCommentsAtom = atom({
+  key: 'userVotedCommentsAtom',
+  default: [],
+});
+
+export const userPreviousInteraction = selectorFamily({
+  key: 'userPreviousInteraction',
+  get:
+    (commentId) =>
+    ({ get }) => {
+      const userComments = get(userVotedCommentsAtom);
+
+      if (!userComments || userComments.length === 0) return null;
+      const userInteraction = userComments.find(
+        (userComment) => userComment.commentId === commentId,
+      );
+      return userInteraction?.voteType || null;
+    },
 });
