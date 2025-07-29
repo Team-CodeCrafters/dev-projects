@@ -116,9 +116,9 @@ model CommentVote {
   id        String          @id @default(uuid())
   voteType  CommentVoteType
   userId    String
-  user      User            @relation(fields: [userId], references: [id])
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   commentId String
-  comment   Comment         @relation(fields: [commentId], references: [id])
+  comment   Comment         @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
 }

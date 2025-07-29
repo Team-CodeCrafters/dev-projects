@@ -343,8 +343,13 @@ const CommentReaction = ({ comment, setShowReplyInput }) => {
   );
   const userInteraction = useRecoilValue(userPreviousInteraction(comment.id));
   const { fetchData } = useFetchData();
-
+  const userProfile = useRecoilValue(userProfileAtom);
+  const setCreateAccountDialog = useSetRecoilState(createAccountDialogAtom);
   async function handleCommentVote(toVote) {
+    if (userProfile === null) {
+      setCreateAccountDialog(true);
+      return;
+    }
     const alreadyVotedComment = userVotedComments.find(
       (votedComment) => votedComment.commentId === comment.id,
     );

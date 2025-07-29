@@ -19,11 +19,13 @@ const ProjectComments = () => {
     projectCommentsAtomFamily(project.id),
   );
   const commentsCount = useRecoilValue(commentsCountSelector(project.id));
-  const [userComments, setUserComments] = useRecoilState(userVotedCommentsAtom);
+  const [userVotedComments, setUserVotedComments] = useRecoilState(
+    userVotedCommentsAtom,
+  );
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!userComments && token) {
+    if (userVotedComments.length == 0 && token) {
       fetchUserComments(token);
     }
     if (projectComments) {
@@ -37,7 +39,7 @@ const ProjectComments = () => {
         },
       });
       if (response.success) {
-        setUserComments(response.data?.votedComments);
+        setUserVotedComments(response.data?.votedComments);
       }
     }
     async function fetchProjectComments() {
