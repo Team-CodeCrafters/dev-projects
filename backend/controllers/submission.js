@@ -130,6 +130,45 @@ export async function getAllSubmissionsOfProject(req, res) {
   }
 }
 
+export async function getAllSubmissions(req, res) {
+  try {
+    const submissions = await prisma.submissions.findMany({
+      where: {},
+      select: {
+        id: true,
+        title: true,
+        githubRepo: true,
+        tools: true,
+        liveUrl: true,
+        description: true,
+        createdAt: true,
+        user: {
+          select: {
+            username: true,
+            displayName: true,
+            profilePicture: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    if (submissions.length <= 0) {
+      return res.status(404).json({
+        message: 'no submission found for the project',
+      });
+    }
+
+    return res
+      .status(200)
+      .json({ message: 'submissions fetched successfully', submissions });
+  } catch (e) {
+    return res.status(500).json({ message: 'internal server error' });
+  }
+}
+
 export async function deleteUserSubmission(req, res) {
   try {
     const { submissionId } = req.body;
