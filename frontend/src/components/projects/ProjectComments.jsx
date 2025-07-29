@@ -4,6 +4,7 @@ import {
   commentsCountSelector,
   projectCommentsAtomFamily,
   projectDetailsAtom,
+  userVotedCommentsAtom,
 } from '../../store/atoms/project';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import NoContentToDisplay from '../ui/NoContent';
@@ -12,14 +13,32 @@ import Comment from '../ui/Comment';
 
 const ProjectComments = () => {
   const { fetchData, loading } = useFetchData();
+  const { fetchData: fetchUserCommentsData } = useFetchData();
   const project = useRecoilValue(projectDetailsAtom);
   const [projectComments, setProjectComments] = useRecoilState(
     projectCommentsAtomFamily(project.id),
   );
   const commentsCount = useRecoilValue(commentsCountSelector(project.id));
+  const [userComments, setUserComments] = useRecoilState(userVotedCommentsAtom);
+
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!userComments && token) {
+      fetchUserComments(token);
+    }
     if (projectComments) {
       return;
+    }
+
+    async function fetchUserComments(token) {
+      const response = await fetchUserCommentsData('/comments/user-votes', {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      if (response.success) {
+        setUserComments(response.data?.votedComments);
+      }
     }
     async function fetchProjectComments() {
       const response = await fetchData(`/comments/${project.id}`);

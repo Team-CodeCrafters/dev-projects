@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { formatDate } from '../../utils/formatters';
-import LikeIcon from '../../assets/icons/Like';
-import DisLikeIcon from '../../assets/icons/DisLike';
 import ReplyIcon from '../../assets/icons/Reply';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
 import { DeleteIcon } from '../../assets/icons/Delete';
@@ -15,8 +13,11 @@ import {
   commentEditAtom,
   projectCommentsAtomFamily,
   projectDetailsAtom,
+  userPreviousInteraction,
+  userVotedCommentsAtom,
 } from '../../store/atoms/project';
 import useNotification from '../../hooks/usePopup';
+import { VoteIcon } from '../../assets/icons/Vote';
 
 const CommentOptions = ({ comment }) => {
   const user = useRecoilValue(userProfileAtom);
@@ -138,8 +139,6 @@ const CommentsDropDown = ({
 
 const Comment = ({ comment, isReply }) => {
   const { fetchData } = useFetchData();
-  const [liked, setLiked] = useState(false);
-  const [disliked, setDisliked] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
   const [editMode, setEditMode] = useRecoilState(commentEditAtom(comment.id));
   const [editedMessage, setEditedMessage] = useState(comment.message);
@@ -149,15 +148,6 @@ const Comment = ({ comment, isReply }) => {
   );
   const showPop = useNotification();
 
-  const handleLike = () => {
-    if (disliked) setDisliked(false);
-    setLiked(!liked);
-  };
-
-  const handleDislike = () => {
-    if (liked) setLiked(false);
-    setDisliked(!disliked);
-  };
   async function submitEditedMessage() {
     const options = {
       method: 'PUT',
@@ -332,42 +322,111 @@ const Comment = ({ comment, isReply }) => {
               <span>{comment.message}</span>
             )}
           </div>
-
-          <div className="flex w-full items-center justify-start gap-1 opacity-65">
-            <button
-              className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
-                liked ? 'text-blue-600' : ''
-              }`}
-              onClick={handleLike}
-            >
-              <LikeIcon size="size-4 md:size-5" />
-              {comment.likeCount + (liked ? 1 : 0) || ''}
-            </button>
-
-            <button
-              className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
-                disliked ? 'text-red-600' : ''
-              }`}
-              onClick={handleDislike}
-            >
-              <DisLikeIcon size="size-4 md:size-5" />
-              {comment.disLikeCount + (disliked ? 1 : 0) || ''}
-            </button>
-
-            <button
-              className="flex items-center gap-1 rounded px-2 py-1 text-sm"
-              onClick={() => setShowReplyInput(!showReplyInput)}
-            >
-              <ReplyIcon size="size-4 md:size-5" />
-            </button>
-          </div>
-
-          {showReplyInput && <ReplyComment />}
         </div>
       </div>
-
+      <CommentReaction
+        comment={comment}
+        setShowReplyInput={setShowReplyInput}
+      />
+      {!!showReplyInput && <ReplyComment />}
       <ReplyComments parentComment={comment} />
     </div>
+  );
+};
+
+const CommentReaction = ({ comment, setShowReplyInput }) => {
+  const [commentVotes, setCommentVotes] = useState(
+    comment.upvoteCount - comment.downvoteCount,
+  );
+  const [userVotedComments, setUserVotedComments] = useRecoilState(
+    userVotedCommentsAtom,
+  );
+  const userInteraction = useRecoilValue(userPreviousInteraction(comment.id));
+  const { fetchData } = useFetchData();
+
+  async function handleCommentVote(toVote) {
+    const alreadyVotedComment = userVotedComments.find(
+      (votedComment) => votedComment.commentId === comment.id,
+    );
+
+    let voteChange = 0;
+
+    if (alreadyVotedComment) {
+      if (alreadyVotedComment.voteType === toVote) {
+        setUserVotedComments((userComments) =>
+          userComments.filter(
+            (userComment) => userComment.commentId !== comment.id,
+          ),
+        );
+        voteChange = toVote === 'UPVOTE' ? -1 : 1;
+      } else {
+        setUserVotedComments((userComments) =>
+          userComments.map((prevComment) => {
+            if (prevComment.commentId === comment.id) {
+              return { ...prevComment, voteType: toVote };
+            }
+            return prevComment;
+          }),
+        );
+        voteChange = toVote === 'UPVOTE' ? 2 : -2;
+      }
+    } else {
+      setUserVotedComments((prev) => [
+        ...prev,
+        {
+          commentId: comment.id,
+          voteType: toVote,
+        },
+      ]);
+      voteChange = toVote === 'UPVOTE' ? 1 : -1;
+    }
+    setCommentVotes(commentVotes + voteChange);
+
+    // sending request after updating UI
+    const token = localStorage.getItem('token');
+    const options = {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        commentId: comment.id,
+        voteType: toVote,
+      }),
+    };
+
+    await fetchData('/comments/vote', options);
+  }
+
+  return (
+    <>
+      <div className="flex w-full items-center justify-start">
+        <button
+          className={`flex items-center gap-1 rounded px-2 py-1 text-sm hover:bg-transparent/30 ${
+            userInteraction === 'UPVOTE' ? 'text-primary' : ''
+          }`}
+          onClick={() => handleCommentVote('UPVOTE')}
+        >
+          <VoteIcon size="size-4 md:size-5" />
+        </button>
+        <span>{commentVotes}</span>
+        <button
+          className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
+            userInteraction === 'DOWNVOTE' ? 'text-error' : ''
+          }`}
+          onClick={() => handleCommentVote('DOWNVOTE')}
+        >
+          <VoteIcon size="size-4 md:size-5" style={'rotate-180'} />
+        </button>
+        <button
+          className="flex items-center gap-1 rounded px-2 py-1 text-sm"
+          onClick={() => setShowReplyInput((prev) => !prev)}
+        >
+          <ReplyIcon size="size-4 md:size-5" />
+        </button>
+      </div>
+    </>
   );
 };
 

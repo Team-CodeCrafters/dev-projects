@@ -61,3 +61,23 @@ export const commentEditAtom = atomFamily({
   key: 'commentEditAtom',
   default: false,
 });
+
+export const userVotedCommentsAtom = atom({
+  key: 'userVotedCommentsAtom',
+  default: [],
+});
+
+export const userPreviousInteraction = selectorFamily({
+  key: 'userPreviousInteraction',
+  get:
+    (commentId) =>
+    ({ get }) => {
+      const userComments = get(userVotedCommentsAtom);
+
+      if (!userComments || userComments.length === 0) return null;
+      const userInteraction = userComments.find(
+        (userComment) => userComment.commentId === commentId,
+      );
+      return userInteraction?.voteType || null;
+    },
+});
