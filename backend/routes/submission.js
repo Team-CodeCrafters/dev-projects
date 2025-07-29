@@ -6,6 +6,7 @@ import {
 import {
   createSubmission,
   deleteUserSubmission,
+  getAllSubmissions,
   getAllSubmissionsOfProject,
   getAllSubmissionsOfUser,
   getUserSubmission,
@@ -16,7 +17,7 @@ import { authenticateUser } from '../middleware/userValidation.js';
 const router = Router();
 
 router.get('/all/:projectId', getAllSubmissionsOfProject);
-
+router.get('/all', getAllSubmissions);
 router.use(authenticateUser);
 router.get('/user/all', getAllSubmissionsOfUser);
 router.get('/user/:id', getUserSubmission);
