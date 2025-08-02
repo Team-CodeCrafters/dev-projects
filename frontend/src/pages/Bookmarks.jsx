@@ -79,7 +79,7 @@ const Bookmarks = () => {
 
   return (
     <>
-      <div className="bg-white-medium dark:bg-black-medium relative mx-auto h-full w-[95vw] rounded-lg p-3 sm:w-full md:ml-2 md:p-5">
+      <div className="bg-white-medium dark:bg-black-medium relative mx-auto h-full w-[95vw] rounded-lg p-3 sm:w-full md:p-5 md:pl-4">
         {bookmarks.length > 0 ? (
           <>
             <h1 className="font-heading mb-2 place-self-start text-xl font-medium tracking-wide md:text-2xl">

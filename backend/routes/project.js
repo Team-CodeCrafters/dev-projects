@@ -4,6 +4,7 @@ import {
   deleteProject,
   getProjectDetails,
   getProjects,
+  getProjectsBySearch,
   getRecommendation,
   updateProject,
 } from '../controllers/projectController.js';
@@ -23,6 +24,7 @@ router.post(
   createProject,
 );
 router.get('/all', validateProjectFilters, getProjects);
+router.get('/:search', getProjectsBySearch);
 router.get('/recommend', validateRecommendation, getRecommendation);
 router.get('/:id', getProjectDetails);
 router.patch(

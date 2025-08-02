@@ -177,7 +177,7 @@ const Comment = ({ comment, isReply }) => {
       showPop('info', 'comment was edited');
     }
   }
-  const ReplyComment = () => {
+  const AddReply = () => {
     const userProfile = useRecoilValue(userProfileAtom);
     const project = useRecoilValue(projectDetailsAtom);
     const { fetchData } = useFetchData();
@@ -186,10 +186,12 @@ const Comment = ({ comment, isReply }) => {
     const setProjectComments = useSetRecoilState(
       projectCommentsAtomFamily(project.id),
     );
-    if (userProfile === null) {
-      setCreateAccountDialog(true);
-      return null;
-    }
+    useEffect(() => {
+      if (userProfile === null) {
+        setShowReplyInput(false);
+        setCreateAccountDialog(true);
+      }
+    });
     async function handleReplyComment() {
       const options = {
         method: 'POST',
@@ -212,9 +214,11 @@ const Comment = ({ comment, isReply }) => {
       }
     }
 
+    if (!userProfile) return null;
+
     return (
       <>
-        <div className="mt-3 flex gap-3">
+        <div className="mt-3 flex gap-3 border-l border-black pl-1 pt-2 sm:pl-3">
           <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
             {userProfile?.profilePicture ? (
               <img
@@ -259,7 +263,7 @@ const Comment = ({ comment, isReply }) => {
 
   return (
     <div
-      className={`dark:bg-black-neutral rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
+      className={`dark:bg-black-neutral bg-white-light rounded-md pb-2 pl-2 pt-3 ${isReply ? 'mb-2' : 'mb-3'}`}
     >
       <div className="flex gap-1 sm:gap-2">
         <span className="focus:ring-primary group relative flex h-6 w-6 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2">
@@ -277,58 +281,57 @@ const Comment = ({ comment, isReply }) => {
           <div className="absolute right-1 top-1 z-50">
             <CommentOptions comment={comment} />
           </div>
-          <div className="mb-1 flex items-center gap-2">
+          <div className="mb-1 flex items-center gap-1 sm:gap-2">
             <span className="font-heading text-sm font-semibold">
               {comment.user.username}
             </span>
-            <span className="ml-1 text-xs text-gray-500 opacity-70 dark:text-white">
+            <span className="ml-1 text-xs tracking-tight text-gray-500 opacity-80 dark:text-white">
               {formatDate(comment.createdAt)}
             </span>
             {comment.isEdited && (
               <span className="text-xs text-gray-500">Edited</span>
             )}
           </div>
-
-          <div className="my-1 w-full break-words leading-relaxed">
-            {!!editMode ? (
-              <div className="flex w-full flex-col items-stretch gap-2">
-                <textarea
-                  type="text"
-                  name="comment"
-                  id="discussion-comment"
-                  rows="1"
-                  className="custom-scrollbar field-sizing-content dark:bg-black-neutral bg-white-medium focus:outline-primary dark:focus:outline-primary peer w-[90%] resize-y rounded-md border-none p-1 px-2 outline-none outline-1 outline-gray-300 placeholder:text-black placeholder:opacity-80 dark:outline-gray-500 dark:placeholder:text-white"
-                  value={editedMessage}
-                  onChange={(e) => {
-                    setEditedMessage(e.target.value);
-                  }}
-                />
-                <div className="flex gap-3">
-                  <button
-                    className="font-heading bg-primary self-start rounded px-3 py-1 text-sm"
-                    onClick={submitEditedMessage}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="font-heading self-start rounded bg-gray-100 px-3 py-1 text-sm text-gray-600"
-                    onClick={() => setEditMode(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <span>{comment.message}</span>
-            )}
-          </div>
         </div>
+      </div>
+      <div className="my-1 w-full break-words pl-1 text-sm leading-relaxed">
+        {!!editMode ? (
+          <div className="flex w-full flex-col items-stretch gap-2 sm:pl-3">
+            <textarea
+              type="text"
+              name="comment"
+              id="discussion-comment"
+              rows="1"
+              className="custom-scrollbar field-sizing-content dark:bg-black-neutral bg-white-medium focus:outline-primary dark:focus:outline-primary peer w-[90%] resize-y rounded-md border-none p-1 px-2 outline-none outline-1 outline-gray-300 placeholder:text-black placeholder:opacity-80 dark:outline-gray-500 dark:placeholder:text-white"
+              value={editedMessage}
+              onChange={(e) => {
+                setEditedMessage(e.target.value);
+              }}
+            />
+            <div className="mt-1 flex gap-3">
+              <button
+                className="font-heading bg-primary self-start rounded px-3 py-1 text-sm text-white"
+                onClick={submitEditedMessage}
+              >
+                Edit
+              </button>
+              <button
+                className="font-heading self-start rounded bg-gray-100 px-3 py-1 text-sm text-gray-600"
+                onClick={() => setEditMode(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <span>{comment.message}</span>
+        )}
       </div>
       <CommentReaction
         comment={comment}
         setShowReplyInput={setShowReplyInput}
       />
-      {!!showReplyInput && <ReplyComment />}
+      {!!showReplyInput && <AddReply />}
       <ReplyComments parentComment={comment} />
     </div>
   );
@@ -406,16 +409,16 @@ const CommentReaction = ({ comment, setShowReplyInput }) => {
 
   return (
     <>
-      <div className="flex w-full items-center justify-start">
+      <div className="flex w-full items-center justify-start text-black/50 dark:text-white/60">
         <button
-          className={`flex items-center gap-1 rounded px-2 py-1 text-sm hover:bg-transparent/30 ${
+          className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
             userInteraction === 'UPVOTE' ? 'text-primary' : ''
           }`}
           onClick={() => handleCommentVote('UPVOTE')}
         >
           <VoteIcon size="size-4 md:size-5" />
         </button>
-        <span>{commentVotes}</span>
+        <span className="dark:text-white-dark text-black">{commentVotes}</span>
         <button
           className={`flex items-center gap-1 rounded px-2 py-1 text-sm ${
             userInteraction === 'DOWNVOTE' ? 'text-error' : ''
@@ -426,7 +429,9 @@ const CommentReaction = ({ comment, setShowReplyInput }) => {
         </button>
         <button
           className="flex items-center gap-1 rounded px-2 py-1 text-sm"
-          onClick={() => setShowReplyInput((prev) => !prev)}
+          onClick={() => {
+            setShowReplyInput((prev) => !prev);
+          }}
         >
           <ReplyIcon size="size-4 md:size-5" />
         </button>
