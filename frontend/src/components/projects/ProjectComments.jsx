@@ -64,7 +64,7 @@ const ProjectComments = () => {
         {commentsCount > 0 && (
           <h1 className="font-heading mb-3 text-lg font-semibold">
             comments
-            <span className="bg-accent font-heading ml-2 aspect-square rounded-full p-1 px-2 text-center text-sm">
+            <span className="bg-accent font-heading ml-2 aspect-square rounded-full p-1 px-2 text-center text-sm text-white">
               {commentsCount}
             </span>
           </h1>

@@ -21,7 +21,7 @@ const ProjectCard = ({
         {children}
         <div className="w-full gap-1">
           <div className="mb-3 flex items-start justify-between sm:items-center md:mb-2 md:flex-row">
-            <span className="font-heading w-max text-lg font-medium tracking-tight md:text-xl">
+            <span className="font-heading text-lg font-medium tracking-tight md:text-xl">
               {project.name}
             </span>
             {!!status && (

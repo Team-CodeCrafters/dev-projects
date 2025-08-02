@@ -75,8 +75,8 @@ const ProjectDetails = () => {
 
   if (loadingProject || loadingUserProject) {
     return (
-      <div className="grid h-full place-items-center">
-        <div className="dark:bg-black-light bg-white-dark relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
+      <div className="dark:bg-black-light bg-white-dark grid h-full place-items-center">
+        <div className="relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
           <Loader height={'h-8'} width={'w-8'} primaryColor={true} />
         </div>
       </div>
@@ -85,7 +85,7 @@ const ProjectDetails = () => {
   if (!loadingProject && !loadingUserProject && project) {
     return (
       <div className="flex w-full justify-center p-2">
-        <div className="dark:bg-black-light bg-white-dark relative flex w-full max-w-sm flex-col rounded-lg p-2 pt-4 sm:max-w-md md:max-w-2xl md:p-4 lg:max-w-3xl">
+        <div className="dark:bg-black-light bg-white-dark relative flex h-full min-h-[40rem] w-full max-w-sm flex-col rounded-lg p-2 pt-4 sm:max-w-md md:max-w-2xl md:p-4 lg:max-w-3xl">
           <ProjectHeader
             projectId={project.id}
             isProjectStarted={isProjectStarted}
@@ -431,7 +431,7 @@ const SimilarProjectsList = () => {
           <ProjectCard
             key={project.id}
             styles={
-              'sm:max-w-[20rem] !dark:bg-black-medium w-full mx-2 h-2xl pt-6'
+              'sm:max-w-[20rem] !dark:bg-black-medium w-full max-w-full mx-2 h-2xl pt-6'
             }
             project={project}
             href={`/project/${project.id}`}
