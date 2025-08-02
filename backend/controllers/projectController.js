@@ -2,6 +2,7 @@ import prisma from '../db/db.js';
 import fs from 'fs';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 import { recommendOtherProjects } from '../utils/project.js';
+
 async function getProjects(req, res) {
   try {
     const { difficulty, tools, domains } = req.filters;
@@ -24,6 +25,37 @@ async function getProjects(req, res) {
     res
       .status(500)
       .json({ message: 'Internal server error.', error: error.message });
+  }
+}
+
+async function getProjectsBySearch(req, res) {
+  try {
+    const search = req.params.search;
+    if (!search) {
+      return res.status(401).json({
+        message: 'given search string is invalid',
+        error: 'invalid search input',
+      });
+    }
+    const projects = await prisma.project.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: 'projects fetched successfully', projects });
+  } catch (e) {
+    console.log({ e });
+    return res
+      .status(500)
+      .json({ message: 'internal server error', error: e.message });
   }
 }
 
@@ -186,4 +218,5 @@ export {
   updateProject,
   deleteProject,
   getRecommendation,
+  getProjectsBySearch,
 };

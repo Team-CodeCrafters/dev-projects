@@ -47,6 +47,10 @@ model Project {
   Bookmarks   Bookmarks[]
   Submissions Submissions[]
   Comment     Comment[]
+
+  @@index([difficulty, domain])
+  @@index([domain])
+  @@index([name])
 }
 
 model UserProject {
@@ -92,6 +96,7 @@ model Bookmarks {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, projectId])
+  @@index([userId])
 }
 
 model Comment {
@@ -110,6 +115,10 @@ model Comment {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   CommentVote   CommentVote[]
+
+  @@index([projectId, createdAt])
+  @@index([parentId])
+  @@index([userId])
 }
 
 model CommentVote {
@@ -121,6 +130,7 @@ model CommentVote {
   comment   Comment         @relation(fields: [commentId], references: [id], onDelete: Cascade)
 
   @@unique([userId, commentId])
+  @@index([commentId, voteType])
 }
 
 enum CommentVoteType {
