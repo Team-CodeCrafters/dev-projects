@@ -30,8 +30,8 @@ async function getProjects(req, res) {
 
 async function getProjectsBySearch(req, res) {
   try {
-    const search = req.params.search;
-    if (!search) {
+    const name = req.params.name;
+    if (!name) {
       return res.status(401).json({
         message: 'given search string is invalid',
         error: 'invalid search input',
@@ -40,7 +40,7 @@ async function getProjectsBySearch(req, res) {
     const projects = await prisma.project.findMany({
       where: {
         name: {
-          contains: search,
+          contains: name,
           mode: 'insensitive',
         },
       },
@@ -52,7 +52,6 @@ async function getProjectsBySearch(req, res) {
       .status(200)
       .json({ message: 'projects fetched successfully', projects });
   } catch (e) {
-    console.log({ e });
     return res
       .status(500)
       .json({ message: 'internal server error', error: e.message });

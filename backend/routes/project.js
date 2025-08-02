@@ -24,9 +24,9 @@ router.post(
   createProject,
 );
 router.get('/all', validateProjectFilters, getProjects);
-router.get('/:search', getProjectsBySearch);
 router.get('/recommend', validateRecommendation, getRecommendation);
 router.get('/:id', getProjectDetails);
+router.get('/search/:name', getProjectsBySearch);
 router.patch(
   '/:id',
   authenticateAdmin,

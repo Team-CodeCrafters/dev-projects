@@ -32,6 +32,7 @@ const Discussions = () => {
     const response = await fetchData('/comments/new', options);
     if (response.success) {
       setProjectComments((prev) => [response.data.comment, ...prev]);
+      setComment('');
     } else {
       showPop('error', response.error);
     }

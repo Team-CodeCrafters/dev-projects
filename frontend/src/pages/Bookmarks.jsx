@@ -85,7 +85,7 @@ const Bookmarks = () => {
             <h1 className="font-heading mb-2 place-self-start text-xl font-medium tracking-wide md:text-2xl">
               Bookmarks
             </h1>
-            <div className="mt-2 flex w-full flex-wrap gap-3">
+            <div className="flex w-full flex-wrap gap-3 py-2 pb-7">
               {bookmarks.map((bookmark) => {
                 return (
                   <ProjectCard

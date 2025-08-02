@@ -10,7 +10,7 @@ const SettingIcon = ({ size = 'size-6' }) => {
       strokeWidth="1.5"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="lucide lucide-more-vertical"
+      className={`lucide lucide-more-vertical ${size}`}
     >
       <circle cx="12" cy="7" r="1"></circle>
       <circle cx="12" cy="12" r="1"></circle>
