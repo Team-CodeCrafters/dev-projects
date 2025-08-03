@@ -30,7 +30,7 @@ const UserSubmissions = memo(({ loadingSubmissions, userSubmissions }) => {
     return (
       <NoContentToDisplay
         heading={'No submission yet'}
-        body={'you submitted projects will be displayed here'}
+        body={'your submitted projects will be displayed here'}
       />
     );
   }

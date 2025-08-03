@@ -76,7 +76,7 @@ const ProjectDetails = () => {
   if (loadingProject || loadingUserProject) {
     return (
       <div className="dark:bg-black-light bg-white-dark grid h-full place-items-center">
-        <div className="relative grid h-full w-full place-items-center rounded-lg p-2 pt-4 md:m-2 md:p-4 lg:max-w-3xl">
+        <div className="relative grid h-full w-full place-items-center rounded-lg p-2 sm:pt-4 md:m-2 md:p-4 lg:max-w-3xl">
           <Loader height={'h-8'} width={'w-8'} primaryColor={true} />
         </div>
       </div>
@@ -85,7 +85,7 @@ const ProjectDetails = () => {
   if (!loadingProject && !loadingUserProject && project) {
     return (
       <div className="flex w-full justify-center p-2">
-        <div className="dark:bg-black-light bg-white-dark relative flex h-full min-h-[40rem] w-full max-w-sm flex-col rounded-lg p-2 pt-4 sm:max-w-md md:max-w-2xl md:p-4 lg:max-w-3xl">
+        <div className="dark:bg-black-light bg-white-dark relative flex h-full min-h-[40rem] w-full max-w-sm flex-col rounded-lg p-2 pt-0 sm:max-w-md sm:pt-4 md:max-w-2xl md:p-4 lg:max-w-3xl">
           <ProjectHeader
             projectId={project.id}
             isProjectStarted={isProjectStarted}
@@ -103,15 +103,13 @@ const ProjectSettings = () => {
   const settingsBtnRef = useRef(null);
 
   return (
-    <div
-      className={`absolute right-4 top-3 opacity-80 ${!!isSettingOpen && '!opacity-100'}`}
-    >
+    <div className={`relative opacity-70 ${!!isSettingOpen && '!opacity-100'}`}>
       <button
         onClick={() => setIsSettingOpen((prev) => !prev)}
         ref={settingsBtnRef}
         className="focus:ring-primary absolutecursor-pointer group rounded-md p-1 outline-none focus:ring-2"
       >
-        <SettingIcon />
+        <SettingIcon size="sm:size-7 size-5" />
       </button>
       <SettingsDropDown
         settingsBtnRef={settingsBtnRef}
@@ -201,7 +199,7 @@ const CancelProject = () => {
       setUserProjects((prev) =>
         prev.filter((userProject) => userProject.project.id !== project.id),
       );
-      showPopup('success', response.data.message);
+      showPopup('info', response.data.message);
     } else {
       showPopup('error', response.error);
     }
@@ -244,7 +242,7 @@ const SettingsDropDown = ({
   return (
     <div
       ref={dropDownRef}
-      className={`dark:bg-black-medium duration-250 absolute right-0 top-[130%] z-50 grid h-max w-max items-center rounded-md bg-white shadow-md transition-all ${isSettingOpen ? `visible translate-y-2 opacity-100` : `invisible translate-y-[-10%] opacity-0`}`}
+      className={`dark:bg-black-medium duration-250 absolute right-0 top-[100%] z-50 grid h-max w-max items-center rounded-md bg-white shadow-md transition-all ${isSettingOpen ? `visible translate-y-2 opacity-100` : `invisible translate-y-[-10%] opacity-0`}`}
     >
       <ul className="font-body flex min-w-max flex-col gap-1 p-2 py-3 text-left text-sm">
         <li className="hover:bg-white-medium dark:hover:bg-black-light cursor-pointer rounded-md px-3 py-2">
@@ -323,11 +321,11 @@ const ProjectHeader = memo(({ projectId }) => {
   return (
     <>
       <div className="ml-2 flex flex-col gap-3">
-        <ProjectSettings />
-        <div className="mt-3 gap-3 sm:flex-row">
+        <div className="mt-3 flex items-start justify-between gap-3 sm:flex-row">
           <h1 className="font-heading inline flex-1 text-2xl font-medium tracking-wide">
             {project.name}
           </h1>
+          <ProjectSettings />
         </div>
         <div className="flex w-full flex-col justify-between gap-1 sm:flex-row">
           <div className="flex h-full items-center gap-3">
@@ -431,7 +429,7 @@ const SimilarProjectsList = () => {
           <ProjectCard
             key={project.id}
             styles={
-              'sm:max-w-[20rem] !dark:bg-black-medium w-full max-w-full mx-2 h-2xl pt-6'
+              'sm:max-w-[20rem] !dark:bg-black-medium w-full max-w-full sm:mx-2 h-2xl pt-6'
             }
             project={project}
             href={`/project/${project.id}`}

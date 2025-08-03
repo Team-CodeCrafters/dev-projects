@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
-import NotificationIcon from '../../assets/icons/notificationIcon';
 import { SearchIcon } from '../../assets/icons/Search';
 import { MenuIcon } from '../../assets/icons/MenuIcon';
 import { ProfileIcon } from '../../assets/icons/ProfileIcon';
 import { ArrowLeft } from '../../assets/icons/ArrowLeft';
 import Button from '../ui/Button';
+import SkeletalLoader from '../ui/SkeletalLoader';
+import NoContentToDisplay from '../ui/NoContent';
 import { ToggleSwitch } from '../../assets/icons/ToggleSwitch';
 import brandImageLight from '../../assets/images/dev-projects-dark.png';
 import brandImageDark from '../../assets/images/dev-projects-logo.png';
@@ -18,6 +19,8 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { colorThemeAtom } from '../../store/atoms/themeAtoms';
 import { userProfileAtom } from '../../store/atoms/userAtoms';
 import useFetchData from '../../hooks/useFetchData';
+import useDebounce from '../../hooks/useDebounce';
+import { searchedProjectsAtom } from '../../store/atoms/project';
 
 const DashboardHeader = memo(() => {
   const [isSearchBarOpen, setIsSearchBarOpen] = useRecoilState(searchBoxAtom);
@@ -97,7 +100,7 @@ const HeaderContent = () => {
       <div className="hidden h-9 w-full max-w-sm items-center justify-center sm:flex">
         <SearchBar />
       </div>
-      <div className="flex max-h-full">
+      <div className="flex max-h-full gap-1">
         <div className="flex sm:hidden">
           <button
             className="hover:bg-white-medium dark:hover:bg-black-light focus:ring-primary cursor-pointer rounded-md p-1.5 transition-colors duration-200 focus:outline-none focus:ring-2"
@@ -143,9 +146,6 @@ const UserHeaderMenu = () => {
   }
   return (
     <>
-      <button className="hover:bg-white-medium dark:hover:bg-black-light focus:ring-primary cursor-pointer rounded-md p-1.5 transition-colors duration-200 focus:outline-none focus:ring-2">
-        <NotificationIcon />
-      </button>
       <button
         className="focus:ring-primary group relative flex h-9 w-9 cursor-pointer items-center justify-center rounded-full outline-none focus:ring-2"
         ref={profileButtonRef}
@@ -171,19 +171,96 @@ const UserHeaderMenu = () => {
 };
 
 const SearchBar = () => {
+  const [searchInput, setSearchInput] = useState('');
+  const [showSearchResult, setShowSearchResult] = useState(false);
+  const debouncedSearch = useDebounce(searchInput);
+  const searchButtonRef = useRef();
+  const [searchedProjects, setSearchedProjects] =
+    useRecoilState(searchedProjectsAtom);
+  const { fetchData, loading } = useFetchData();
+  async function getProjects() {
+    const response = await fetchData(`/project/search/${debouncedSearch}`);
+    if (response.success) {
+      setSearchedProjects(response.data.projects);
+    }
+  }
+  useEffect(() => {
+    if (!searchInput) return;
+
+    getProjects();
+  }, [debouncedSearch]);
+
   return (
     <div className="dark:bg-black-light flex h-10 max-w-sm flex-1 rounded-3xl">
-      <div className="w-full flex-1">
+      <div className="relative w-full flex-1">
         <input
+          ref={searchButtonRef}
           type="text"
-          placeholder="Search"
+          placeholder="Search for projects"
+          value={searchInput}
+          onFocus={() => setShowSearchResult(true)}
+          onBlur={() => setShowSearchResult(false)}
+          onChange={(e) => setSearchInput(e.target.value)}
           className="dark:bg-black-medium focus:border-primary border-black-light outline-black-light h-full w-full rounded-bl-3xl rounded-tl-3xl border-2 pl-8 outline-none outline-offset-[-2px] focus:outline-none"
         />
       </div>
-      <div className="dark:bg-black-light border-black-light dark:border-black-light flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-[1px] border-l-transparent">
+      <button
+        onClick={() => {
+          searchButtonRef?.current.focus();
+          getProjects();
+        }}
+        className="dark:bg-black-light border-black-light dark:border-black-light flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-[1px] border-l-transparent"
+      >
         <SearchIcon />
-      </div>
+      </button>
+      <SearchResults
+        showSearchResult={showSearchResult}
+        setShowSearchResult={setShowSearchResult}
+        isLoading={loading}
+        searchedProjects={searchedProjects}
+      />
     </div>
+  );
+};
+
+const SearchResults = memo(
+  ({ isLoading, searchedProjects, showSearchResult, setShowSearchResult }) => {
+    if (isLoading || searchedProjects) {
+      return (
+        <div
+          className={`bg-white-dark outline-black-lighter absolute left-1/2 top-full z-[9999] mt-1 grid min-h-20 w-[90vw] max-w-[36rem] -translate-x-1/2 place-items-center rounded-md p-2 outline transition-all duration-300 sm:left-1/2 sm:w-[70vw] dark:bg-black ${!!showSearchResult ? 'visible translate-y-0 opacity-100' : 'invisible -translate-y-4 opacity-0'}`}
+          onClick={() => setShowSearchResult(false)}
+        >
+          {!!isLoading || !searchedProjects ? (
+            <>
+              <SkeletalLoader height="h-10" />
+              <SkeletalLoader height="h-10" />
+              <SkeletalLoader height="h-10" />
+            </>
+          ) : searchedProjects?.length > 0 ? (
+            <ListSearchResult />
+          ) : (
+            <strong className="font-heading">No results found</strong>
+          )}
+        </div>
+      );
+    }
+  },
+);
+
+const ListSearchResult = () => {
+  const searchedProjects = useRecoilValue(searchedProjectsAtom);
+  return (
+    <ul className="font-heading custom-scrollbar flex max-h-[50vh] w-full list-none flex-col gap-1 overflow-auto px-1 transition-all">
+      {searchedProjects.map((project) => (
+        <Link key={project.id} to={`project/${project.id}`}>
+          <li className="dark:hover:bg-black-neutral hover:bg-white-medium flex gap-3 rounded-md py-2 pl-2 transition-all">
+            <SearchIcon />
+            {project.name}
+          </li>
+        </Link>
+      ))}
+    </ul>
   );
 };
 

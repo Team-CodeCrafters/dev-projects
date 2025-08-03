@@ -81,3 +81,8 @@ export const userPreviousInteraction = selectorFamily({
       return userInteraction?.voteType || null;
     },
 });
+
+export const searchedProjectsAtom = atom({
+  key: 'searchedProjectsAtom',
+  default: null,
+});
