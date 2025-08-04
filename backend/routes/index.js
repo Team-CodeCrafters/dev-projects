@@ -13,4 +13,8 @@ router.use('/user-projects', userProjectsRouter);
 router.use('/bookmark', bookmarkRouter);
 router.use('/submissions', SubmissionsRouter);
 router.use('/comments', commentRouter);
+
+router.get('/ping', (_, res) => {
+  res.status(200).send('OK');
+});
 export default router;
