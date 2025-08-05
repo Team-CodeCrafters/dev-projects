@@ -15,6 +15,11 @@ router.use('/submissions', SubmissionsRouter);
 router.use('/comments', commentRouter);
 
 router.get('/ping', (_, res) => {
-  res.status(200).send('OK');
+  res
+    .status(200)
+    .set('Content-Type', 'text/plain')
+    .set('Content-Length', '2')
+    .end('OK');
 });
+
 export default router;
