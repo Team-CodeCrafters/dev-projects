@@ -1,0 +1,17 @@
+name: ping render web server
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render web server
+        env:
+          PING_URL: ${{ secrets.PING_URL }}
+        run: |
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "$PING_URL")
+          if [ "$RESPONSE" != "200" ]; then
+            echo "Error: Ping failed with status code $RESPONSE"
+            exit 1
+          fi
