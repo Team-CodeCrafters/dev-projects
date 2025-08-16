@@ -27,7 +27,7 @@ const InputField = ({
         required={isRequired}
         minLength={minLength}
         title={title ? title : undefined}
-        className={`w-full rounded-lg border border-gray-600 px-4 py-4 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#1F1F1F] ${styles}`}
+        className={`w-full rounded-lg border border-gray-600 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:py-4 dark:bg-[#1F1F1F] ${styles}`}
         pattern={pattern || undefined}
         min={isPassword ? 8 : undefined}
       />

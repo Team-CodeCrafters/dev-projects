@@ -16,11 +16,9 @@ const Dashboard = () => {
   const ProjectsLoadingIndicator = () => {
     return (
       <div className="bg-white-medium dark:bg-black-medium w-[90%] max-w-2xl p-2">
-        <SkeletalLoader height="h-7">
-          <SkeletalLoader height="h-8" width="w-[70%]" />
-          <SkeletalLoader height="h-10" styles="mt-5" />
-          <SkeletalLoader height="h-10" />
-        </SkeletalLoader>
+        <SkeletalLoader height="h-12" width="w-[70%]" />
+        <SkeletalLoader height="h-56" styles="mt-5" />
+        <SkeletalLoader height="h-56" />
       </div>
     );
   };
@@ -76,7 +74,7 @@ const Dashboard = () => {
   }
   if (loading || loading === undefined) {
     return (
-      <div className="flex items-center justify-center md:justify-start">
+      <div className="flex max-w-2xl items-center justify-center md:justify-start">
         <ProjectsLoadingIndicator />
       </div>
     );

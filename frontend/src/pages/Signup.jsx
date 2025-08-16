@@ -96,6 +96,7 @@ const Signup = () => {
             placeholder="Password"
             value={signUpData.password}
             isRequired={true}
+            minLength={8}
             onChange={(e) =>
               setSignUpData((prev) => ({
                 ...prev,
