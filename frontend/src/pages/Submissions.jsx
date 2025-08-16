@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import useFetchData from '../hooks/useFetchData';
 import Loader from '../components/ui/Loader';
 import SubmissionCard from '../components/projects/SubmissionCard';
-
+import NoContentToDisplay from '../components/ui/NoContent';
 const Submissions = () => {
   const { fetchData, loading } = useFetchData();
   const [submissions, setSubmissions] = useState([]);
   useEffect(() => {
     document.title = 'Dev Projects | Submissions';
     async function fetchSubmissions() {
-      const response = await fetchData('/submissions/all');
-      setSubmissions(response.data.submissions);
+      const { success, data } = await fetchData('/submissions/all');
+      if (success) {
+        setSubmissions(data?.submissions);
+      }
     }
     fetchSubmissions();
   }, []);
@@ -30,12 +32,17 @@ const Submissions = () => {
             />
           ))}
         </div>
+      ) : loading ? (
+        <div className="relative top-24 flex justify-center">
+          <Loader primaryColor={true} />
+        </div>
       ) : (
-        loading && (
-          <div className="relative top-24 flex justify-center">
-            <Loader primaryColor={true} />
-          </div>
-        )
+        <NoContentToDisplay
+          heading={'No submissions yet'}
+          body={' You will see the submissions here'}
+          buttonText={'explore projects'}
+          href={'/projects'}
+        />
       )}
     </div>
   );

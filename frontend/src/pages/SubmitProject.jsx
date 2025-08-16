@@ -123,6 +123,8 @@ const SubmitProject = () => {
                     type="text"
                     isRequired={true}
                     placeholder={'github.com/username/repo'}
+                    title={'URL should start with http:// or https://'}
+                    pattern="https?://.+"
                     styles={'!py-2 text-xs focus:ring-1'}
                   />
                 </div>
@@ -142,6 +144,8 @@ const SubmitProject = () => {
                     }
                     id="live-url"
                     type="text"
+                    title={'URL should start with http:// or https://'}
+                    pattern="https?://.+"
                     styles={'!py-2 text-xs focus:ring-1'}
                   />
                 </div>
