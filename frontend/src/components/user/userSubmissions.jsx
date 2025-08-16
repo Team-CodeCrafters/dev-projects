@@ -4,6 +4,7 @@ import NoContentToDisplay from '../ui/NoContent';
 import { formatDate } from '../../utils/formatters';
 import { Link } from 'react-router-dom';
 import LinkIcon from '../../assets/icons/Link';
+import ToolsTag from '../projects/tags/ToolsTag';
 
 const UserSubmissions = memo(({ loadingSubmissions, userSubmissions }) => {
   if (loadingSubmissions || loadingSubmissions === undefined) {
@@ -38,7 +39,7 @@ const UserSubmissions = memo(({ loadingSubmissions, userSubmissions }) => {
 
 const UserSubmissionCard = ({ submission }) => {
   return (
-    <div className="bg-white-medium dark:bg-black-neutral dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-3 rounded-md p-4 outline outline-2 outline-neutral-400 transition-all duration-500 hover:shadow-md md:my-2 md:w-full">
+    <div className="bg-white-medium dark:bg-black-light dark:outline-black-dark hover:outline-primary dark:hover:outline-primary duration-250 group relative my-2 mb-2 flex w-[95%] max-w-2xl cursor-pointer flex-col gap-3 rounded-md p-4 outline outline-2 outline-neutral-400 transition-all duration-500 hover:shadow-md md:my-2 md:w-full">
       <div className="flex items-start justify-between gap-3">
         <h3 className="font-heading flex-grow text-lg font-semibold text-gray-900 dark:text-white">
           {submission.title}
@@ -53,14 +54,9 @@ const UserSubmissionCard = ({ submission }) => {
       </div>
       {submission.tools && submission.tools.length > 0 && (
         <div className="flex flex-wrap gap-2">
-          {submission.tools.map((tool, index) => (
-            <span
-              key={index}
-              className="rounded-md bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-300"
-            >
-              {tool}
-            </span>
-          ))}
+          {submission.tools && submission.tools.length > 0 && (
+            <ToolsTag tools={submission.tools} />
+          )}
         </div>
       )}
 

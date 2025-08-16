@@ -56,6 +56,10 @@ const Projects = () => {
     }
   });
 
+  useEffect(() => {
+    document.title = 'Dev Projects | Projects';
+  }, []);
+
   return (
     <div className="relative min-h-screen w-full">
       <div className="ml-2 h-full rounded-lg p-3 md:p-5">
@@ -158,6 +162,7 @@ const Projects = () => {
             setSelected={(tools) =>
               setSelectedFilters((prev) => ({ ...prev, tools }))
             }
+            dropDownPosition="ABOVE"
           />
         </div>
       </div>

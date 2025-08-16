@@ -154,7 +154,6 @@ const SubmitProject = () => {
                   Tools Used
                 </label>
                 <SearchTagInput
-                  id={'tools'}
                   options={TOOLS}
                   selected={submission.tools}
                   userDefined={true}

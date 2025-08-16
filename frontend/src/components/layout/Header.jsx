@@ -209,7 +209,7 @@ const SearchBar = () => {
           searchButtonRef?.current.focus();
           getProjects();
         }}
-        className="dark:bg-black-light border-black-light dark:border-black-light flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-[1px] border-l-transparent"
+        className="dark:bg-black-light border-black-light dark:border-black-light hover:!border-white-medium focus:!border-white-medium flex w-12 cursor-pointer items-center justify-center rounded-br-3xl rounded-tr-3xl border-2 border-l-transparent outline-none"
       >
         <SearchIcon />
       </button>
