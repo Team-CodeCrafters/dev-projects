@@ -9,13 +9,14 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const ProjectDetails = lazy(() => import('./pages/ProjectDetails'));
 const Bookmarks = lazy(() => import('./pages/Bookmarks'));
+const SubmitProject = lazy(() => import('./pages/SubmitProject'));
+const Projects = lazy(() => import('./pages/Projects'));
+const PageNotFound = lazy(() => import('./pages/PageNotFound'));
+const Submissions = lazy(() => import('./pages/Submissions'));
 import DashboardLayout from './components/layout/DashboardLayout';
 import UserProfile from './pages/UserProfile';
 import { useTheme } from './hooks/useTheme';
 import { PopupNotification } from './components/ui/PopupNotification';
-const SubmitProject = lazy(() => import('./pages/SubmitProject'));
-const Projects = lazy(() => import('./pages/Projects'));
-import PageNotFound from './pages/PageNotFound';
 
 function App() {
   const { setCurrentTheme } = useTheme();
@@ -41,6 +42,7 @@ function App() {
               <Route path="/project/:id" element={<ProjectDetails />} />
               <Route path="/bookmarks" element={<Bookmarks />} />
               <Route path="/submit/:id" element={<SubmitProject />} />
+              <Route path="/submissions" element={<Submissions />} />
             </Route>
 
             <Route path="*" element={<PageNotFound />} />

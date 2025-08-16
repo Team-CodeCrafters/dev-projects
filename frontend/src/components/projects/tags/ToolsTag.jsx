@@ -9,9 +9,9 @@ const ToolsTag = ({ tools }) => {
         {tools.map((tool, index) => (
           <span
             key={index}
-            className="dark:bg-black-light dark:hover:bg-primary/20 dark:hover:text-primary hover:text-primary border-black-light group relative inline-flex items-center gap-1.5 rounded-full border bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md dark:border-gray-700 dark:text-gray-200 dark:hover:border-blue-600"
+            className="dark:bg-black-light dark:hover:bg-primary/20 dark:hover:text-primary hover:text-primary border-black-light duration-250 group relative inline-flex items-center gap-1.5 rounded-full border bg-white px-3 py-1.5 text-xs font-medium shadow-sm transition-all hover:-translate-y-1 hover:border-blue-300 hover:bg-blue-50 hover:shadow-md dark:border-gray-700 dark:text-gray-200 dark:hover:border-blue-600"
           >
-            <div className="h-1.5 w-1.5 rounded-full bg-current opacity-60 transition-opacity group-hover:opacity-100" />
+            <div className="h-1.5 w-1.5 rounded-full bg-current opacity-60 transition-opacity" />
             {formatString(tool)}
           </span>
         ))}

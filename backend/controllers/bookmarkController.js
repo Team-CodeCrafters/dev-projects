@@ -9,6 +9,11 @@ async function createBookmark(req, res) {
         userId: req.userId,
         projectId: projectId,
       },
+      select: {
+        id: true,
+        createdAt: true,
+        project: true,
+      },
     });
 
     return res
