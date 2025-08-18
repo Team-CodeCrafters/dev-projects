@@ -1,7 +1,7 @@
 import prisma from '../db/db.js';
 import { createJWT } from '../utils/jwt.js';
 import { hashPassword } from '../utils/bcrypt.js';
-import { sendEmail } from '../utils/email.js';
+import { sendResetEmail } from '../utils/email.js';
 import { generateProfilePicture } from '../utils/profilePicture.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
 async function signup(req, res) {
@@ -39,7 +39,7 @@ async function forgotPassword(req, res) {
     const token = createJWT({ email: email }, '15min');
     const username = req.body.username;
     const url = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-    const emailResponse = await sendEmail(email, username, url);
+    const emailResponse = await sendResetEmail(email, username, url);
     if (emailResponse.success) {
       return res.status(200).json({ message: 'email sent successfully' });
     }
