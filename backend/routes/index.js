@@ -5,7 +5,7 @@ import userProjectsRouter from './userProjects.js';
 import bookmarkRouter from './bookmark.js';
 import SubmissionsRouter from './submission.js';
 import commentRouter from './comment.js';
-
+import pingServer from '../utils/pingServer.js';
 const router = Router();
 router.use('/user', userRouter);
 router.use('/project', projectRouter);
@@ -21,5 +21,9 @@ router.get('/ping', (_, res) => {
     .set('Content-Length', '2')
     .end('OK');
 });
+
+if (process.env.SELF_PING === 'true') {
+  pingServer();
+}
 
 export default router;
