@@ -6,7 +6,7 @@ const RedirectToRoot = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) navigate('/dashboard', { replace: true });
-    else navigate('/login', { replace: true });
+    else navigate('/signup', { replace: true });
   }, []);
   return <></>;
 };

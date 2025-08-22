@@ -17,6 +17,11 @@ const signUpDataAtom = atom({
   },
 });
 
+const signupFormStepAtom = atom({
+  key: 'signupFormStep',
+  default: 'signup-option',
+});
+
 const userProfileAtom = atom({
   key: 'userProfileAtom',
   default: null,
@@ -33,6 +38,7 @@ const userSubmissionsAtom = atom({
 });
 
 export {
+  signupFormStepAtom,
   signInDataAtom,
   signUpDataAtom,
   userProfileAtom,
