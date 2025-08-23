@@ -5,6 +5,7 @@ import Cancel from '../../assets/icons/Cancel';
 const SearchTagInput = ({
   id = { undefined },
   title = '',
+  placeholder,
   options,
   selected = [],
   setSelected,
@@ -60,7 +61,7 @@ const SearchTagInput = ({
           type="text"
           ref={queryInputRef}
           id={id}
-          placeholder={`Search ${title}`}
+          placeholder={`${placeholder ? placeholder : `Search ${title}`}`}
           className="focus:outline-primary outline-black-lighter dark:bg-black-light w-full rounded-md px-3 py-2 placeholder-gray-500 outline outline-1 focus:outline-none"
           value={query}
           onBlur={(e) => {
