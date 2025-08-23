@@ -7,6 +7,8 @@ import {
   updateProfile,
   profile,
   deleteAccount,
+  sendEmailVerification,
+  userVerification,
 } from '../controllers/userController.js';
 import {
   validateSignIn,
@@ -15,9 +17,13 @@ import {
   validateResetPassword,
   validateProfileUpdate,
   authenticateUser,
+  validateUserEmail,
 } from '../middleware/userValidation.js';
 import { upload } from '../middleware/multer.js';
 const router = Router();
+
+router.post('/email-verification', validateUserEmail, sendEmailVerification);
+router.post('/verify-otp', userVerification);
 
 router.post('/signup', validateSignUp, signup);
 router.post('/signin', validateSignIn, signin);

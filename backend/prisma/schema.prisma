@@ -29,6 +29,17 @@ model Admin {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model UserVerification {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  otp        String
+  createdAt  DateTime @default(now())
+  isVerified Boolean  @default(false)
+  expiresAt  DateTime
+
+  @@unique([email, otp])
+}
+
 model Project {
   id          String        @id @default(uuid())
   name        String        @unique

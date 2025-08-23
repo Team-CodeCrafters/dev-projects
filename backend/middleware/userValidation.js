@@ -71,6 +71,15 @@ async function authenticateUser(req, res, next) {
   }
 }
 
+async function validateUserEmail(req, res, next) {
+  const { email } = req.body;
+  const { success } = zod.string().email().safeParse(email);
+  if (!success) {
+    return res.status(401).json({ message: 'Invalid Email' });
+  }
+  next();
+}
+
 async function validateSignUp(req, res, next) {
   const zodResult = signUpSchema.safeParse(req.body);
   if (!zodResult.success) {
@@ -174,6 +183,7 @@ export {
   authenticateAdmin,
   authenticateUser,
   validateSignUp,
+  validateUserEmail,
   validateSignIn,
   validateForgotPassword,
   validateResetPassword,
