@@ -165,7 +165,6 @@ async function updateProfile(req, res) {
     if (profilePicture === 'DELETE') {
       updateData.profilePicture = null;
     }
-    console.log({ updateData });
 
     const updatedUser = await prisma.user.update({
       where: {
