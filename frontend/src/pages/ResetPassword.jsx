@@ -80,7 +80,7 @@ const ResetPassword = () => {
               }))
             }
           />
-          <Button text={loading ? <Loader size="20" /> : 'Reset Password'} />
+          <Button Content={loading ? <Loader size="20" /> : 'Reset Password'} />
         </form>
         <p className="mt-5 text-center text-gray-400">
           Back to{' '}

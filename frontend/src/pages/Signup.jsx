@@ -78,21 +78,32 @@ const SignupSelection = ({ setIsFormChanging }) => {
   const [signupData, setSignupData] = useRecoilState(signUpDataAtom);
   const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
   const navigate = useNavigate();
+  const { fetchData, loading } = useFetchData();
+  const showPopup = usePopupNotication();
 
   function handleGuest() {
     localStorage.setItem('guest-account', true);
     navigate('/dashboard');
   }
 
-  function handleEmailSubmit(e) {
+  async function handleEmailSubmit(e) {
     e.preventDefault();
-    console.log('sending email');
-
-    setIsFormChanging(true);
-    setTimeout(() => {
+    const response = await fetchData('/user/email-verification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: signupData.email }),
+    });
+    if (response.success) {
       setCurrentFormStep('email-verification');
       setIsFormChanging(false);
-    }, 250);
+    } else {
+      showPopup({
+        type: 'error',
+        message: response.message || 'Failed to send verification email',
+      });
+    }
   }
 
   return (
@@ -111,7 +122,7 @@ const SignupSelection = ({ setIsFormChanging }) => {
             setSignupData({ ...signupData, email: e.target.value })
           }
         />
-        <Button type="submit" text={'Continue'} />
+        <Button type="submit" Content={'Continue'} />
         <div className="mb-2 mt-7 flex w-full items-center gap-3 text-xs opacity-70">
           <span className="h-1 flex-1 border-t border-[#404040]"></span>
           <p>or</p>
@@ -121,7 +132,7 @@ const SignupSelection = ({ setIsFormChanging }) => {
           type="button"
           className="w-full"
           onClick={handleGuest}
-          text={'Continue as Guest'}
+          Content={'Continue as Guest'}
           styles={
             '!bg-black-light  outline outline-black-black !text-white !text-sm !font-medium'
           }
@@ -141,21 +152,30 @@ const EmailVerification = ({ setIsFormChanging }) => {
   const signupData = useRecoilValue(signUpDataAtom);
   const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
   const [otp, setOtp] = useState('');
+  const { fetchData, loading } = useFetchData();
+  const showPopup = usePopupNotication();
 
-  function handleVerifySubmit(e) {
+  async function handleVerifySubmit(e) {
     e.preventDefault();
-    console.log('verifying otp', otp);
+    const response = await fetchData('/user/verify-otp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: signupData.email, otp }),
+    });
+    console.log({ response });
 
-    if (otp.length !== 6) {
-      console.log('Please enter a valid 6-digit code');
-      return;
-    }
-
-    setIsFormChanging(true);
-    setTimeout(() => {
+    if (response.success) {
+      showPopup(
+        'success',
+        response?.data?.message || 'OTP verified successfully',
+      );
       setCurrentFormStep('basic-info');
       setIsFormChanging(false);
-    }, 250);
+    } else {
+      showPopup('error', response?.error || 'Failed to verify OTP');
+    }
   }
 
   function handleBackToEmail() {
@@ -185,7 +205,7 @@ const EmailVerification = ({ setIsFormChanging }) => {
           styles={'!bg-[#262626] text-center tracking-widest text-lg'}
           onChange={(e) => setOtp(e.target.value)}
         />
-        <Button type="submit" text={'Continue'} className="w-full" />
+        <Button type="submit" Content={'Continue'} className="w-full" />
         <div className="mt-4 text-center text-sm">
           Use another email?{' '}
           <button
@@ -261,7 +281,7 @@ const BasicInfo = ({ setIsFormChanging }) => {
             }));
           }}
         />
-        <Button type="submit" className="w-full" text={'Continue'} />
+        <Button type="submit" className="w-full" Content={'Continue'} />
       </form>
     </>
   );
@@ -413,7 +433,7 @@ const UserPreferences = ({ setIsFormChanging }) => {
         </div>
 
         <div className="mt-6">
-          <Button type="submit" className="w-full" text={'Complete Setup'} />
+          <Button type="submit" className="w-full" Content={'Complete Setup'} />
         </div>
       </form>
     </>

@@ -137,7 +137,7 @@ const UserHeaderMenu = () => {
     return (
       <div className="">
         <Button
-          text={'Login'}
+          Content={'Login'}
           onClick={redirectToLogin}
           styles={'md:!min-w-28 !min-w-20 !h-11'}
         />

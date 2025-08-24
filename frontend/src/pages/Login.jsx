@@ -92,7 +92,7 @@ const Login = () => {
             </Link>
           </div>
 
-          <Button text={loading ? <Loader /> : 'Log In'} />
+          <Button Content={loading ? <Loader /> : 'Log In'} />
         </form>
 
         <div className="mt-5 text-center text-sm text-gray-400">

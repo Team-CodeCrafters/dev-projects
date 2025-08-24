@@ -52,6 +52,7 @@ const Projects = () => {
     if (response.success) {
       setProjects(response.data.projects);
     } else {
+      setProjects([]);
       showPopup('error', response.error);
     }
   });
@@ -179,6 +180,7 @@ const ProjectLists = ({ getInitialProjects }) => {
       getInitialProjects();
     }
   }, []);
+
   if (projects?.length <= 0) {
     return (
       <NoContentToDisplay
