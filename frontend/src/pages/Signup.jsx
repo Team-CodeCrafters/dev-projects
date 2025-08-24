@@ -1,19 +1,79 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signUpDataAtom, signupFormStepAtom } from '../store/atoms/userAtoms';
+import {
+  signInDataAtom,
+  signUpDataAtom,
+  signupFormStepAtom,
+} from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
 import InputField from '../components/ui/InputField';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import logo from '../assets/images/dev-projects-dark.png';
+import Loader from '../components/ui/Loader';
 import usePopupNotication from '../hooks/usePopup';
 import SearchTagInput from '../components/projects/SearchTagInput';
 import { DOMAINS } from '../utils/constants';
 
 const Signup = () => {
-  const currentFormStep = useRecoilValue(signupFormStepAtom);
+  const navigate = useNavigate();
   const [isFormChanging, setIsFormChanging] = useState(false);
+  const [currentFormStep, setCurrentFormStep] =
+    useRecoilState(signupFormStepAtom);
+  const signupData = useRecoilValue(signUpDataAtom);
+  const { fetchData, loading } = useFetchData();
+  const showPopup = usePopupNotication();
+  const setSigninData = useSetRecoilState(signInDataAtom);
+
+  async function handleEmailSubmit(e) {
+    e.preventDefault();
+    const response = await fetchData('/user/email-verification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: signupData.email }),
+    });
+    if (response.success) {
+      if (response.data.isUserVerified) {
+        showPopup('success', response.data.message);
+        setCurrentFormStep('create-account');
+      } else {
+        setCurrentFormStep('email-verification');
+      }
+    } else {
+      if (response.status === 409) {
+        setSigninData({ identifier: signupData.email });
+        localStorage.removeItem('current-form-step');
+        navigate('/login');
+        return;
+      }
+      showPopup('error', response.error);
+    }
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      localStorage.removeItem('current-form-step');
+      navigate('/dashboard');
+    } else {
+      const previousFormStep = localStorage.getItem('current-form-step');
+      if (previousFormStep) {
+        setCurrentFormStep(previousFormStep);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    setIsFormChanging(true);
+    setTimeout(() => {
+      setIsFormChanging(false);
+    }, 250);
+    localStorage.setItem('current-form-step', currentFormStep);
+  }, [currentFormStep]);
 
   const getProgress = () => {
     if (currentFormStep === 'signup-option') {
@@ -22,12 +82,16 @@ const Signup = () => {
     if (currentFormStep === 'email-verification') {
       return 25;
     }
-    if (currentFormStep === 'basic-info') {
+    if (currentFormStep === 'create-account') {
       return 50;
     }
-    if (currentFormStep === 'user-preferences') {
+    if (currentFormStep === 'additional-info') {
       return 75;
     }
+    if (currentFormStep === 'completed') {
+      return 100;
+    }
+
     return 0;
   };
 
@@ -48,7 +112,6 @@ const Signup = () => {
           <img src={logo} alt="Logo" className="h-12" />
         </div>
 
-        {/* Form Container with Animation */}
         <div
           className={`transition-all duration-500 ease-out ${
             isFormChanging
@@ -57,53 +120,32 @@ const Signup = () => {
           }`}
         >
           {currentFormStep === 'signup-option' && (
-            <SignupSelection setIsFormChanging={setIsFormChanging} />
+            <SignupSelectionForm
+              handleEmailSubmit={handleEmailSubmit}
+              isLoading={loading}
+            />
           )}
           {currentFormStep === 'email-verification' && (
-            <EmailVerification setIsFormChanging={setIsFormChanging} />
+            <EmailVerificationForm
+              handleEmailSubmit={handleEmailSubmit}
+              isLoading={loading}
+            />
           )}
-          {currentFormStep === 'basic-info' && (
-            <BasicInfo setIsFormChanging={setIsFormChanging} />
-          )}
-          {currentFormStep === 'user-preferences' && (
-            <UserPreferences setIsFormChanging={setIsFormChanging} />
-          )}
+          {currentFormStep === 'create-account' && <CreateAccountForm />}
+          {currentFormStep === 'additional-info' && <UserAdditionalInfoForm />}
         </div>
       </Card>
     </div>
   );
 };
 
-const SignupSelection = ({ setIsFormChanging }) => {
+const SignupSelectionForm = ({ handleEmailSubmit, isLoading }) => {
   const [signupData, setSignupData] = useRecoilState(signUpDataAtom);
-  const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
   const navigate = useNavigate();
-  const { fetchData, loading } = useFetchData();
-  const showPopup = usePopupNotication();
 
   function handleGuest() {
     localStorage.setItem('guest-account', true);
     navigate('/dashboard');
-  }
-
-  async function handleEmailSubmit(e) {
-    e.preventDefault();
-    const response = await fetchData('/user/email-verification', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email: signupData.email }),
-    });
-    if (response.success) {
-      setCurrentFormStep('email-verification');
-      setIsFormChanging(false);
-    } else {
-      showPopup({
-        type: 'error',
-        message: response.message || 'Failed to send verification email',
-      });
-    }
   }
 
   return (
@@ -122,7 +164,7 @@ const SignupSelection = ({ setIsFormChanging }) => {
             setSignupData({ ...signupData, email: e.target.value })
           }
         />
-        <Button type="submit" Content={'Continue'} />
+        <Button type="submit" Content={isLoading ? <Loader /> : 'Continue'} />
         <div className="mb-2 mt-7 flex w-full items-center gap-3 text-xs opacity-70">
           <span className="h-1 flex-1 border-t border-[#404040]"></span>
           <p>or</p>
@@ -148,15 +190,22 @@ const SignupSelection = ({ setIsFormChanging }) => {
   );
 };
 
-const EmailVerification = ({ setIsFormChanging }) => {
+const EmailVerificationForm = ({ handleEmailSubmit, isLoading }) => {
   const signupData = useRecoilValue(signUpDataAtom);
   const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
   const [otp, setOtp] = useState('');
   const { fetchData, loading } = useFetchData();
   const showPopup = usePopupNotication();
 
+  useEffect(() => {
+    if (!signupData.email) {
+      setCurrentFormStep('signup-option');
+    }
+  }, []);
+
   async function handleVerifySubmit(e) {
     e.preventDefault();
+    console.log({ otp, signupData });
     const response = await fetchData('/user/verify-otp', {
       method: 'POST',
       headers: {
@@ -164,26 +213,16 @@ const EmailVerification = ({ setIsFormChanging }) => {
       },
       body: JSON.stringify({ email: signupData.email, otp }),
     });
-    console.log({ response });
 
     if (response.success) {
       showPopup(
         'success',
         response?.data?.message || 'OTP verified successfully',
       );
-      setCurrentFormStep('basic-info');
-      setIsFormChanging(false);
+      setCurrentFormStep('create-account');
     } else {
-      showPopup('error', response?.error || 'Failed to verify OTP');
+      showPopup('error', response.error);
     }
-  }
-
-  function handleBackToEmail() {
-    setIsFormChanging(true);
-    setTimeout(() => {
-      setCurrentFormStep('signup-option');
-      setIsFormChanging(false);
-    }, 250);
   }
 
   return (
@@ -195,22 +234,38 @@ const EmailVerification = ({ setIsFormChanging }) => {
         <div className="text-center text-gray-300">
           Enter the verification code sent to <br />
           <span className="font-medium text-white">{signupData.email}</span>
+          <div className="text-center">
+            Did not receive the email?{' '}
+            <button
+              type="button"
+              onClick={handleEmailSubmit}
+              className="text-blue-400 hover:underline"
+            >
+              Resend
+            </button>
+          </div>
         </div>
+
         <InputField
           type="text"
           placeholder="Verification Code"
           value={otp}
           isRequired={true}
           maxLength={6}
+          minLength={6}
           styles={'!bg-[#262626] text-center tracking-widest text-lg'}
           onChange={(e) => setOtp(e.target.value)}
         />
-        <Button type="submit" Content={'Continue'} className="w-full" />
+        <Button
+          type="submit"
+          Content={isLoading ? <Loader /> : 'Continue'}
+          className="w-full"
+        />
         <div className="mt-4 text-center text-sm">
           Use another email?{' '}
           <button
             type="button"
-            onClick={handleBackToEmail}
+            onClick={() => setCurrentFormStep('signup-option')}
             className="text-blue-400 hover:underline"
           >
             Go back
@@ -221,19 +276,46 @@ const EmailVerification = ({ setIsFormChanging }) => {
   );
 };
 
-const BasicInfo = ({ setIsFormChanging }) => {
+const CreateAccountForm = () => {
   const [signupData, setSignupData] = useRecoilState(signUpDataAtom);
   const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
+  const { fetchData, loading } = useFetchData();
+  const showPopup = usePopupNotication();
 
-  function handleBasicInfoSubmit(e) {
+  useEffect(() => {
+    console.log({ signupData });
+    if (!signupData.email) {
+      showPopup('info', 'verification is required for your account');
+      setCurrentFormStep('signup-option');
+    }
+  }, []);
+
+  async function handleCreateAccount(e) {
     e.preventDefault();
-    console.log('submitting basic info', signupData);
+    if (signupData.password !== signupData.confirmPassword) {
+      showPopup('error', "Passwords don't match");
+      return;
+    }
 
-    setIsFormChanging(true);
-    setTimeout(() => {
-      setCurrentFormStep('user-preferences');
-      setIsFormChanging(false);
-    }, 250);
+    const response = await fetchData('/user/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: signupData.email,
+        username: signupData.username,
+        password: signupData.password,
+      }),
+    });
+
+    if (response.success) {
+      const token = response.data.token;
+      localStorage.setItem('token', token);
+      setCurrentFormStep('additional-info');
+    } else {
+      showPopup('error', response.error);
+    }
   }
 
   return (
@@ -241,7 +323,7 @@ const BasicInfo = ({ setIsFormChanging }) => {
       <h2 className="mb-6 text-center text-2xl font-semibold">
         Set up your account
       </h2>
-      <form onSubmit={handleBasicInfoSubmit} className="space-y-6">
+      <form onSubmit={handleCreateAccount} className="space-y-6">
         <InputField
           type="text"
           placeholder="Username"
@@ -281,32 +363,73 @@ const BasicInfo = ({ setIsFormChanging }) => {
             }));
           }}
         />
-        <Button type="submit" className="w-full" Content={'Continue'} />
+        <Button
+          type="submit"
+          className="w-full"
+          Content={loading ? <Loader /> : 'Continue'}
+        />
+        <div className="mt-4 text-center text-sm opacity-70">
+          Use another email?{' '}
+          <button
+            type="button"
+            onClick={() => setCurrentFormStep('signup-option')}
+            className="text-blue-400 hover:underline"
+          >
+            Go back
+          </button>
+          <div className="text-center text-sm">
+            Already have an account?{' '}
+            <Link to="/login" className="text-blue-400 hover:underline">
+              Log in
+            </Link>
+          </div>
+        </div>
       </form>
     </>
   );
 };
 
-const UserPreferences = ({ setIsFormChanging }) => {
-  const [signupData, setSignupData] = useRecoilState(signUpDataAtom);
+const UserAdditionalInfoForm = () => {
+  const { fetchData, loading } = useFetchData();
   const setCurrentFormStep = useSetRecoilState(signupFormStepAtom);
-  const [selectedFilters, setSelectedFilters] = useState({
+  const [userDetails, setUserDetails] = useState({
     domains: [],
     experience: '',
   });
   const [isSkillDropdownOpen, setIsSkillDropdownOpen] = useState(false);
   const navigate = useNavigate();
 
-  function handleSignupSubmit(e) {
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.removeItem('current-form-step');
+      setCurrentFormStep('signup-option');
+    }
+  }, []);
+  async function handleSignupSubmit(e) {
     e.preventDefault();
-    console.log('submitting signup data', {
-      signupData,
-      userInfo: selectedFilters,
+    const formData = new FormData();
+    formData.append('domain', userDetails.domains);
+    formData.append('experience', userDetails.experience);
+
+    const response = await fetchData('/user/update-profile', {
+      method: 'PUT',
+      headers: {
+        authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: formData,
     });
+
+    if (response.success) {
+      localStorage.removeItem('current-form-step');
+      navigate('/dashboard');
+    } else {
+      showPopup('error', response.error);
+    }
   }
 
   const handleExperienceChange = (level) => {
-    setSelectedFilters((prev) => ({ ...prev, experience: level }));
+    setUserDetails((prev) => ({ ...prev, experience: level }));
     setIsSkillDropdownOpen(false);
   };
 
@@ -330,11 +453,11 @@ const UserPreferences = ({ setIsFormChanging }) => {
           <SearchTagInput
             options={DOMAINS}
             placeholder={'Search domain'}
-            selected={selectedFilters.domains}
+            selected={userDetails.domains}
             userDefined={true}
             dropDownPosition={`${window.innerWidth < 768 ? 'ABOVE' : 'BELOW'}`}
             setSelected={(domains) =>
-              setSelectedFilters((prev) => ({ ...prev, domains }))
+              setUserDetails((prev) => ({ ...prev, domains }))
             }
           />
         </div>
@@ -363,8 +486,8 @@ const UserPreferences = ({ setIsFormChanging }) => {
                   </svg>
                 </div>
                 <span className="text-sm text-gray-200">
-                  {selectedFilters.experience
-                    ? selectedFilters.experience
+                  {userDetails.experience
+                    ? userDetails.experience
                     : 'Select your skill level'}
                 </span>
               </div>
@@ -392,9 +515,9 @@ const UserPreferences = ({ setIsFormChanging }) => {
             {isSkillDropdownOpen && (
               <div className="flex flex-col gap-2 border-t border-gray-600 px-3 pb-3">
                 {[
-                  { value: 'Beginner', desc: '(0 to 1 year)' },
-                  { value: 'Intermediate', desc: '(1 to 3 years)' },
-                  { value: 'Advanced', desc: '(3+ years)' },
+                  { value: 'Beginner', description: '(0 to 1 year)' },
+                  { value: 'Intermediate', description: '(1 to 3 years)' },
+                  { value: 'Advanced', description: '(3+ years)' },
                 ].map((level) => (
                   <label
                     key={level.value}
@@ -413,7 +536,7 @@ const UserPreferences = ({ setIsFormChanging }) => {
                     <span className="text-gray-200">
                       {level.value}{' '}
                       <span className="ml-1 text-xs opacity-50">
-                        {level.desc}
+                        {level.description}
                       </span>
                     </span>
                     <input
@@ -422,7 +545,7 @@ const UserPreferences = ({ setIsFormChanging }) => {
                       value={level.value}
                       className="absolute right-2 h-3 w-3 accent-blue-400"
                       id={level.value.toLowerCase()}
-                      checked={selectedFilters.experience === level.value}
+                      checked={userDetails.experience === level.value}
                       onChange={(e) => handleExperienceChange(e.target.value)}
                     />
                   </label>
@@ -435,6 +558,7 @@ const UserPreferences = ({ setIsFormChanging }) => {
         <div className="mt-6">
           <Button type="submit" className="w-full" Content={'Complete Setup'} />
         </div>
+        <div className="mt-4 text-center text-sm"></div>
       </form>
     </>
   );

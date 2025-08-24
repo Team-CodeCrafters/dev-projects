@@ -38,6 +38,8 @@ async function sendEmailVerification(req, res) {
       .status(500)
       .json({ message: 'Failed to send verification email' });
   } catch (e) {
+    console.log(e);
+
     return res
       .status(500)
       .json({ message: 'Internal server error', error: e.message });
@@ -70,15 +72,20 @@ async function userVerification(req, res) {
       return res.status(401).json({ message: 'Invalid or expired OTP' });
     }
 
-    await prisma.userVerification.delete({
+    await prisma.userVerification.update({
       where: {
         id: userVerification.id,
+      },
+      data: {
+        isVerified: true,
       },
     });
 
     return res.status(200).json({ message: 'User verified successfully' });
   } catch (error) {
-    return res.status(500).json({ message: 'Internal server error', error });
+    return res
+      .status(500)
+      .json({ message: 'Internal server error', error: error.message });
   }
 }
 
@@ -146,10 +153,11 @@ async function resetPassword(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    const { email, displayName, profilePicture } = req.body;
+    const { displayName, domain, experience, profilePicture } = req.body;
     const updateData = {};
-    if (email) updateData.email = email;
     if (displayName) updateData.displayName = displayName;
+    if (domain) updateData.domain = domain.split(',');
+    if (experience) updateData.experience = experience;
     if (req.file) {
       const [avatarURL] = await uploadOnCloudinary(req.file);
       updateData.profilePicture = avatarURL;
@@ -157,6 +165,7 @@ async function updateProfile(req, res) {
     if (profilePicture === 'DELETE') {
       updateData.profilePicture = null;
     }
+    console.log({ updateData });
 
     const updatedUser = await prisma.user.update({
       where: {
@@ -168,6 +177,8 @@ async function updateProfile(req, res) {
         email: true,
         displayName: true,
         profilePicture: true,
+        domain: true,
+        experience: true,
       },
     });
 
@@ -176,13 +187,15 @@ async function updateProfile(req, res) {
       user: updatedUser,
     });
   } catch (e) {
+    console.log(e);
+
     return res
       .status(500)
       .json({ message: 'failed to update user profile', error: e.message });
   }
 }
 
-const profile = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
     const user = await prisma.user.findFirstOrThrow({
       where: {
@@ -227,7 +240,7 @@ export {
   signin,
   forgotPassword,
   resetPassword,
-  profile,
+  getUserProfile,
   updateProfile,
   deleteAccount,
 };

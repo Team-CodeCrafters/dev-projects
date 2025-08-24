@@ -14,6 +14,8 @@ model User {
   displayName     String?
   profilePicture  String?
   email           String        @unique
+  domain          String[]
+  experience      String?
   admin           Admin?
   createdProjects Project[]
   startedProjects UserProject[]

@@ -15,12 +15,12 @@ const useFetchData = () => {
       );
       const response = await fetchResult.json();
       if (fetchResult.ok) {
-        setData(response);
-        return { success: true, data: response };
+        setData({ ...response, status: fetchResult.status });
+        return { success: true, data: response, status: fetchResult.status };
       } else {
         const err = response.message || 'Request failed';
         setError(err);
-        return { success: false, error: err };
+        return { success: false, error: err, status: fetchResult.status };
       }
     } catch (error) {
       const message = 'Network error';

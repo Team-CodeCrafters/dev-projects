@@ -75,7 +75,7 @@ const SearchTagInput = ({
 
         {query && filteredOptions.length > 0 && (
           <div
-            className={`border-white-dark dark:border-black-light custom-scrollbar scrollbar-thin absolute z-50 max-h-40 min-w-28 overflow-y-auto rounded-md border bg-zinc-100 p-2 shadow-lg dark:bg-[#242424] ${
+            className={`border-black-light custom-scrollbar scrollbar-thin absolute z-50 max-h-40 min-w-28 overflow-y-auto rounded-md border bg-[#242424] p-2 shadow-lg ${
               dropDownPosition === 'ABOVE' ? 'bottom-[120%]' : 'top-[120%]'
             }`}
             ref={optionsRef}

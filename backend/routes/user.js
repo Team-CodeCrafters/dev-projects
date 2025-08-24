@@ -5,7 +5,7 @@ import {
   forgotPassword,
   resetPassword,
   updateProfile,
-  profile,
+  getUserProfile,
   deleteAccount,
   sendEmailVerification,
   userVerification,
@@ -24,12 +24,12 @@ const router = Router();
 
 router.post('/email-verification', validateUserEmail, sendEmailVerification);
 router.post('/verify-otp', userVerification);
-
+router.post('');
 router.post('/signup', validateSignUp, signup);
 router.post('/signin', validateSignIn, signin);
 router.post('/forgot-password', validateForgotPassword, forgotPassword);
 router.post('/reset-password', validateResetPassword, resetPassword);
-router.get('/profile', authenticateUser, profile);
+router.get('/profile', authenticateUser, getUserProfile);
 router.put(
   '/update-profile',
   [authenticateUser, upload.single('avatar'), validateProfileUpdate],
