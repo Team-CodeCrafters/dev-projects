@@ -24,8 +24,9 @@ const forgotPasswordSchema = zod.object({ email: zod.string().email() });
 const resetPasswordSchema = signUpSchema.pick({ password: true });
 const updateProfileSchema = signUpSchema
   .pick({
-    email: true,
     displayName: true,
+    domain: zod.array(zod.string()).optional(),
+    experience: zod.string().optional(),
   })
   .partial();
 async function authenticateAdmin(req, res, next) {
@@ -71,6 +72,35 @@ async function authenticateUser(req, res, next) {
   }
 }
 
+async function validateUserEmail(req, res, next) {
+  const { email } = req.body;
+  const { success } = zod.string().email().safeParse(email);
+  if (!success) {
+    return res.status(401).json({ message: 'Invalid Email' });
+  }
+  const user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (user) {
+    return res.status(409).json({ message: 'user with email already exists' });
+  }
+  const lastVerification = await prisma.userVerification.findFirst({
+    where: { email },
+  });
+  const ResendTimeLimit = 2 * 60 * 1000;
+  const isResendTimePassed =
+    lastVerification &&
+    lastVerification.createdAt.getTime() < Date.now() - ResendTimeLimit;
+
+  if (!isResendTimePassed) {
+    return res.status(429).json({
+      message: 'Please wait 2 minutes before requesting new OTP',
+    });
+  }
+  next();
+}
+
 async function validateSignUp(req, res, next) {
   const zodResult = signUpSchema.safeParse(req.body);
   if (!zodResult.success) {
@@ -80,19 +110,27 @@ async function validateSignUp(req, res, next) {
     });
   }
   try {
+    const { username, email } = req.body;
     const userExists = await prisma.user.findFirst({
       where: {
-        OR: [{ username: req.body.username }, { email: req.body.email }],
+        OR: [{ username }, { email }],
       },
     });
-    if (userExists) {
-      return res
-        .status(401)
-        .json({ message: 'user already exists. Please Login' });
+    if (!userExists) {
+      return next();
     }
-    next();
+
+    if (userExists.email === email) {
+      return res.status(409).json({
+        message: 'user with email already exists',
+      });
+    }
+    if (userExists.username === username) {
+      return res.status(409).json({
+        message: 'Username is already taken',
+      });
+    }
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({ message: 'Internal server error' });
   }
 }
@@ -137,7 +175,6 @@ async function validateForgotPassword(req, res, next) {
     req.body.username = user.username;
     next();
   } catch (e) {
-    console.log(e);
     return res.status(500).json({ message: 'internal server error', error: e });
   }
 }
@@ -148,7 +185,6 @@ async function validateResetPassword(req, res, next) {
     const { password } = req.body;
     resetPasswordSchema.parse({ password });
     const JWTResponse = verifyJWT(token);
-    console.log({ JWTResponse });
     if (JWTResponse.error) {
       return res.status(401).json({ message: 'link is invalid or expired' });
     }
@@ -162,8 +198,12 @@ async function validateResetPassword(req, res, next) {
 }
 
 async function validateProfileUpdate(req, res, next) {
-  const { email, displayName } = req.body;
-  const ZodResponse = updateProfileSchema.safeParse({ email, displayName });
+  const { displayName, domain, experience } = req.body;
+  const ZodResponse = updateProfileSchema.safeParse({
+    displayName,
+    domain,
+    experience,
+  });
   if (!ZodResponse.success) {
     return res.status(401).json({ message: 'invalid data' });
   }
@@ -174,6 +214,7 @@ export {
   authenticateAdmin,
   authenticateUser,
   validateSignUp,
+  validateUserEmail,
   validateSignIn,
   validateForgotPassword,
   validateResetPassword,

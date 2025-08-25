@@ -5,14 +5,16 @@ import Cancel from '../../assets/icons/Cancel';
 const SearchTagInput = ({
   id = { undefined },
   title = '',
+  placeholder,
   options,
-  selected,
+  selected = [],
   setSelected,
   userDefined,
   dropDownPosition = 'BELOW',
 }) => {
   const [query, setQuery] = useState('');
   const queryInputRef = useRef(null);
+  const optionsRef = useRef(null);
   const handleSelect = (option) => {
     if (!selected.includes(option)) {
       setSelected([...selected, option]);
@@ -59,17 +61,24 @@ const SearchTagInput = ({
           type="text"
           ref={queryInputRef}
           id={id}
-          placeholder={`Search ${title}`}
+          placeholder={`${placeholder ? placeholder : `Search ${title}`}`}
           className="focus:outline-primary outline-black-lighter dark:bg-black-light w-full rounded-md px-3 py-2 placeholder-gray-500 outline outline-1 focus:outline-none"
           value={query}
+          onBlur={(e) => {
+            e.preventDefault();
+            if (e.target.contains(optionsRef.current)) {
+              e.target.value = '';
+            }
+          }}
           onChange={(e) => setQuery(e.target.value)}
         />
 
         {query && filteredOptions.length > 0 && (
           <div
-            className={`border-white-dark dark:border-black-light dark:bg-black-dark absolute z-50 max-h-40 min-w-28 overflow-y-auto rounded-md border bg-zinc-100 p-2 shadow-lg ${
+            className={`border-black-light custom-scrollbar scrollbar-thin absolute z-50 max-h-40 min-w-28 overflow-y-auto rounded-md border bg-[#242424] p-2 shadow-lg ${
               dropDownPosition === 'ABOVE' ? 'bottom-[120%]' : 'top-[120%]'
             }`}
+            ref={optionsRef}
           >
             {filteredOptions.map((option) => (
               <button

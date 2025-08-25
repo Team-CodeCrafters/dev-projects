@@ -44,4 +44,28 @@ async function sendEmail(email, message) {
   }
 }
 
-export { sendResetEmail, sendEmail };
+async function sendOTPEmail(email, OTP) {
+  try {
+    const templatePath = path.join(
+      process.cwd(),
+      'templates',
+      'emailVerification.html',
+    );
+    let html = fs.readFileSync(templatePath, 'utf8');
+
+    html = html.replace(/{{otpCode}}/g, OTP);
+
+    const { error } = await resend.emails.send({
+      from: 'Developers Projects <no-reply@developersprojects.tech>',
+      to: email,
+      subject: 'Email Verification',
+      html: html,
+    });
+    if (error) throw new Error(error.message);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export { sendResetEmail, sendEmail, sendOTPEmail };

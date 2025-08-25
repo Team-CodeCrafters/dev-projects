@@ -126,7 +126,7 @@ const PersonalDetails = ({ userProfile, loading }) => {
                   <div className="w-16">
                     <Button
                       styles={'!min-w-12 !h-10 !text-sm'}
-                      text={'Save'}
+                      Content={'Save'}
                       onClick={handleSave}
                     ></Button>
                   </div>

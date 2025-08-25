@@ -166,7 +166,7 @@ const SubmitProject = () => {
                   }
                 />
               </div>
-              <Button text={loading ? <Loader /> : 'submit'} />
+              <Button Content={loading ? <Loader /> : 'submit'} />
             </form>
           </div>
         </div>

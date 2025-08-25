@@ -26,7 +26,8 @@ const Dashboard = () => {
   useEffect(() => {
     document.title = 'Dev Projects | Dashboard';
     const token = localStorage.getItem('token');
-    if (!token) {
+    const guestAccount = localStorage.getItem('guest-account');
+    if (!token && !guestAccount) {
       navigate('/signup');
       return;
     }

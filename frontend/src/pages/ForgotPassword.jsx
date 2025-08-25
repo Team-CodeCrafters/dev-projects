@@ -55,7 +55,7 @@ const ForgotPassword = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <Button text={loading ? <Loader /> : 'Send Reset Link'} />
+          <Button Content={loading ? <Loader /> : 'Send Reset Link'} />
         </form>
 
         <p className="mt-5 text-center text-gray-400">

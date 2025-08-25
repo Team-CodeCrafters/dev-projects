@@ -1,9 +1,92 @@
 import prisma from '../db/db.js';
 import { createJWT } from '../utils/jwt.js';
-import { hashPassword } from '../utils/bcrypt.js';
-import { sendResetEmail } from '../utils/email.js';
+import { comparePassword, hashPassword } from '../utils/bcrypt.js';
+import { sendOTPEmail, sendResetEmail } from '../utils/email.js';
 import { generateProfilePicture } from '../utils/profilePicture.js';
 import { uploadOnCloudinary } from '../utils/cloudinary.js';
+import { generateOTP } from '../utils/generateOTP.js';
+
+async function sendEmailVerification(req, res) {
+  try {
+    const { email } = req.body;
+    const OTP = generateOTP();
+    const hashedOTP = await hashPassword(OTP);
+
+    // deleting previous OTP
+    await prisma.userVerification.deleteMany({
+      where: {
+        email,
+      },
+    });
+
+    await prisma.userVerification.create({
+      data: {
+        email,
+        otp: hashedOTP,
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+      },
+    });
+
+    const emailResponse = await sendOTPEmail(email, OTP);
+
+    if (emailResponse.success) {
+      return res
+        .status(200)
+        .json({ message: 'Verification email sent successfully' });
+    }
+    return res
+      .status(500)
+      .json({ message: 'Failed to send verification email' });
+  } catch (e) {
+    return res
+      .status(500)
+      .json({ message: 'Internal server error', error: e.message });
+  }
+}
+
+async function userVerification(req, res) {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(401).json({ message: 'Invalid email or OTP' });
+    }
+    const userVerification = await prisma.userVerification.findUnique({
+      where: {
+        email,
+        expiresAt: {
+          gt: new Date(),
+        },
+      },
+    });
+
+    if (!userVerification) {
+      return res.status(401).json({ message: 'Invalid or expired OTP' });
+    }
+
+    const IsOTPVerified = await comparePassword(otp, userVerification.otp);
+
+    if (!IsOTPVerified) {
+      return res.status(401).json({ message: 'Invalid or expired OTP' });
+    }
+
+    await prisma.userVerification.update({
+      where: {
+        id: userVerification.id,
+      },
+      data: {
+        isVerified: true,
+      },
+    });
+
+    return res.status(200).json({ message: 'User verified successfully' });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: 'Internal server error', error: error.message });
+  }
+}
+
 async function signup(req, res) {
   try {
     const { username, email, password, displayName } = req.body;
@@ -68,10 +151,11 @@ async function resetPassword(req, res) {
 
 async function updateProfile(req, res) {
   try {
-    const { email, displayName, profilePicture } = req.body;
+    const { displayName, domain, experience, profilePicture } = req.body;
     const updateData = {};
-    if (email) updateData.email = email;
     if (displayName) updateData.displayName = displayName;
+    if (domain) updateData.domain = domain.split(',');
+    if (experience) updateData.experience = experience;
     if (req.file) {
       const [avatarURL] = await uploadOnCloudinary(req.file);
       updateData.profilePicture = avatarURL;
@@ -90,6 +174,8 @@ async function updateProfile(req, res) {
         email: true,
         displayName: true,
         profilePicture: true,
+        domain: true,
+        experience: true,
       },
     });
 
@@ -104,7 +190,7 @@ async function updateProfile(req, res) {
   }
 }
 
-const profile = async (req, res) => {
+const getUserProfile = async (req, res) => {
   try {
     const user = await prisma.user.findFirstOrThrow({
       where: {
@@ -143,11 +229,13 @@ const deleteAccount = async (req, res) => {
 };
 
 export {
+  sendEmailVerification,
+  userVerification,
   signup,
   signin,
   forgotPassword,
   resetPassword,
-  profile,
+  getUserProfile,
   updateProfile,
   deleteAccount,
 };

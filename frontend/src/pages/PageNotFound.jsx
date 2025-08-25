@@ -22,7 +22,7 @@ const PageNotFound = () => {
         <div className="grid place-items-center">
           <Button
             onClick={() => navigate('/dashboard')}
-            text={'Go to Home'}
+            Content={'Go to Home'}
             styles={'!max-w-fit'}
             className="bg-primary hover:bg-secondary rounded-lg px-6 py-2 text-white transition"
           ></Button>

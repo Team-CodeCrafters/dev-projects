@@ -1,5 +1,6 @@
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { signInDataAtom } from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
 import InputField from '../components/ui/InputField';
@@ -7,7 +8,6 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Loader from '../components/ui/Loader';
 import logo from '../assets/images/dev-projects-dark.png';
-import { useEffect } from 'react';
 import usePopupNotication from '../hooks/usePopup';
 
 const Login = () => {
@@ -51,7 +51,7 @@ const Login = () => {
           Sign in to your account
         </h2>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <InputField
             type="text"
             placeholder="Username or Email"
@@ -86,21 +86,21 @@ const Login = () => {
           <div className="text-right">
             <Link
               to="/forgot-password"
-              className="text-blue-400 hover:underline"
+              className="text-sm text-blue-400 hover:underline"
             >
               Forgot your password?
             </Link>
           </div>
 
-          <Button text={loading ? <Loader /> : 'Sign In'} />
+          <Button Content={loading ? <Loader /> : 'Log In'} />
         </form>
 
-        <p className="mt-5 text-center text-gray-400">
+        <div className="mt-5 text-center text-sm text-gray-400">
           New to our platform?{' '}
           <Link to="/signup" className="text-blue-400 hover:underline">
-            Create account
+            Create an account
           </Link>
-        </p>
+        </div>
       </Card>
     </div>
   );

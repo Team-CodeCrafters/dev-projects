@@ -1,118 +1,139 @@
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-
-import { signUpDataAtom } from '../store/atoms/userAtoms';
+import { useNavigate } from 'react-router-dom';
+import {
+  signInDataAtom,
+  signUpDataAtom,
+  signupFormStepAtom,
+} from '../store/atoms/userAtoms';
 import useFetchData from '../hooks/useFetchData';
-
-import InputField from '../components/ui/InputField';
 import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
-import Loader from '../components/ui/Loader';
-
 import logo from '../assets/images/dev-projects-dark.png';
 import usePopupNotication from '../hooks/usePopup';
+import SignupSelectionForm from '../components/user/auth/SignupSelectionForm';
+import EmailVerificationForm from '../components/user/auth/EmailVerificationForm';
+import CreateAccountForm from '../components/user/auth/CreateAccountForm';
+import UserAdditionalInfoForm from '../components/user/auth/UserAdditionalInfoForm';
 
 const Signup = () => {
   const navigate = useNavigate();
-  const showPop = usePopupNotication();
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      navigate('/dashboard');
-    }
-  });
+  const [isFormChanging, setIsFormChanging] = useState(false);
+  const [currentFormStep, setCurrentFormStep] =
+    useRecoilState(signupFormStepAtom);
+  const signupData = useRecoilValue(signUpDataAtom);
+  const { fetchData, loading } = useFetchData();
+  const showPopup = usePopupNotication();
+  const setSigninData = useSetRecoilState(signInDataAtom);
 
-  const [signUpData, setSignUpData] = useRecoilState(signUpDataAtom);
-  const { fetchData, error: serverError, loading } = useFetchData();
-  const [localError, setLocalError] = useState(null);
-
-  const handleSubmit = async (e) => {
+  async function handleEmailSubmit(e) {
     e.preventDefault();
-    setLocalError(null);
-
-    if (signUpData.password.length < 8) {
-      setLocalError('Password must be at least 8 characters long');
-      return;
-    }
-
-    const options = {
+    const response = await fetchData('/user/email-verification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(signUpData),
-    };
-
-    const response = await fetchData('/user/signup', options);
+      body: JSON.stringify({ email: signupData.email }),
+    });
     if (response.success) {
-      localStorage.setItem('token', response.data.token);
+      if (response.data?.isUserVerified) {
+        showPopup('success', response.data.message);
+        setCurrentFormStep('create-account');
+      } else {
+        localStorage.setItem('last-email-request', Date.now().toString());
+        setCurrentFormStep('email-verification');
+      }
+    } else {
+      if (response.status === 409) {
+        setSigninData({ identifier: signupData.email });
+        localStorage.removeItem('current-form-step');
+        navigate('/login');
+        return;
+      }
+      showPopup('error', response.error);
+    }
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      localStorage.removeItem('current-form-step');
       navigate('/dashboard');
     } else {
-      showPop('error', response.error);
+      const previousFormStep = localStorage.getItem('current-form-step');
+      if (previousFormStep) {
+        setCurrentFormStep(previousFormStep);
+      }
     }
+  }, []);
+
+  useEffect(() => {
+    setIsFormChanging(true);
+    setTimeout(() => {
+      setIsFormChanging(false);
+    }, 250);
+    localStorage.setItem('current-form-step', currentFormStep);
+  }, [currentFormStep]);
+
+  const getProgress = () => {
+    if (currentFormStep === 'signup-option') {
+      return 0;
+    }
+    if (currentFormStep === 'email-verification') {
+      return 25;
+    }
+    if (currentFormStep === 'create-account') {
+      return 50;
+    }
+    if (currentFormStep === 'additional-info') {
+      return 75;
+    }
+    if (currentFormStep === 'completed') {
+      return 100;
+    }
+
+    return 0;
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-black px-4">
-      <Card>
+    <div className="flex min-h-[100dvh] items-center justify-center bg-[#141414]">
+      <Card
+        className="relative w-full max-w-md overflow-hidden p-8"
+        styles={'bg-[#1f1f1f]'}
+      >
+        <div className="mb-6 h-0.5 bg-[#404040]">
+          <div
+            className="bg-secondary h-full transition-all duration-700 ease-out"
+            style={{ width: `${getProgress()}%` }}
+          />
+        </div>
+
         <div className="mb-6 flex justify-center">
           <img src={logo} alt="Logo" className="h-12" />
         </div>
 
-        <h2 className="mb-4 mt-2 text-center text-3xl font-semibold">
-          Create an account
-        </h2>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-6">
-          <InputField
-            type="text"
-            placeholder="Username"
-            value={signUpData.username}
-            isRequired={true}
-            pattern="^[a-zA-Z0-9_]+$"
-            title={'username can only contain letters, numbers and underscore'}
-            onChange={(e) =>
-              setSignUpData((prev) => ({
-                ...prev,
-                username: e.target.value,
-              }))
-            }
-          />
-          <InputField
-            type="email"
-            placeholder="Email"
-            value={signUpData.email}
-            isRequired={true}
-            onChange={(e) =>
-              setSignUpData((prev) => ({
-                ...prev,
-                email: e.target.value,
-              }))
-            }
-          />
-          <InputField
-            type="password"
-            placeholder="Password"
-            value={signUpData.password}
-            isRequired={true}
-            minLength={8}
-            onChange={(e) =>
-              setSignUpData((prev) => ({
-                ...prev,
-                password: e.target.value,
-              }))
-            }
-          />
-          <Button text={loading ? <Loader /> : 'Sign Up'} />
-        </form>
-
-        <p className="mt-5 text-center text-gray-400">
-          Already have an account?{' '}
-          <Link to="/login" className="text-blue-400 hover:underline">
-            Sign in
-          </Link>
-        </p>
+        <div
+          className={`transition-all duration-500 ease-out ${
+            isFormChanging
+              ? 'translate-x-4 transform opacity-0'
+              : 'translate-x-0 transform opacity-100'
+          }`}
+        >
+          {currentFormStep === 'signup-option' && (
+            <SignupSelectionForm
+              handleEmailSubmit={handleEmailSubmit}
+              isLoading={loading}
+            />
+          )}
+          {currentFormStep === 'email-verification' && (
+            <EmailVerificationForm
+              handleEmailSubmit={handleEmailSubmit}
+              isLoading={loading}
+            />
+          )}
+          {currentFormStep === 'create-account' && <CreateAccountForm />}
+          {currentFormStep === 'additional-info' && <UserAdditionalInfoForm />}
+        </div>
       </Card>
     </div>
   );

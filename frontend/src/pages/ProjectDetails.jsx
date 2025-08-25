@@ -304,14 +304,14 @@ const ProjectHeader = memo(({ projectId }) => {
             <div className="flex gap-2">
               <Button
                 onClick={handleProjectSubmission}
-                text={loading ? <Loader /> : 'Submit'}
+                Content={loading ? <Loader /> : 'Submit'}
               />
               <CancelProject />
             </div>
           ) : (
             <Button
               onClick={handleStartProject}
-              text={loading ? <Loader /> : 'start project'}
+              Content={loading ? <Loader /> : 'start project'}
             />
           )}
         </div>
