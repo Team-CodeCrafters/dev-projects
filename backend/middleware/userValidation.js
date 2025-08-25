@@ -78,27 +78,37 @@ async function validateUserEmail(req, res, next) {
   if (!success) {
     return res.status(401).json({ message: 'Invalid Email' });
   }
-  const user = await prisma.user.findUnique({
-    where: { email },
-  });
-
-  if (user) {
-    return res.status(409).json({ message: 'user with email already exists' });
-  }
-  const lastVerification = await prisma.userVerification.findFirst({
-    where: { email },
-  });
-  const ResendTimeLimit = 2 * 60 * 1000;
-  const isResendTimePassed =
-    lastVerification &&
-    lastVerification.createdAt.getTime() < Date.now() - ResendTimeLimit;
-
-  if (!isResendTimePassed) {
-    return res.status(429).json({
-      message: 'Please wait 2 minutes before requesting new OTP',
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
     });
+
+    if (user) {
+      return res
+        .status(409)
+        .json({ message: 'user with email already exists' });
+    }
+    const lastVerification = await prisma.userVerification.findUnique({
+      where: { email },
+    });
+    if (!lastVerification) {
+      next();
+      return;
+    }
+    const ResendTimeLimit = 2 * 60 * 1000;
+    const isResendTimePassed =
+      lastVerification &&
+      lastVerification.createdAt.getTime() < Date.now() - ResendTimeLimit;
+
+    if (!isResendTimePassed) {
+      return res.status(429).json({
+        message: 'Please wait 2 minutes before requesting new OTP',
+      });
+    }
+    next();
+  } catch (e) {
+    return res.status(500).json({ message: 'internal server error' });
   }
-  next();
 }
 
 async function validateSignUp(req, res, next) {

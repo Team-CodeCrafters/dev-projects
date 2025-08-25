@@ -76,6 +76,7 @@ const EmailVerificationForm = ({ handleEmailSubmit, isLoading }) => {
       );
       setCurrentFormStep('create-account');
     } else {
+      console.log(response.status);
       showPopup('error', response.error);
     }
   }
