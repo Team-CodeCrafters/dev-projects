@@ -85,7 +85,19 @@ async function validateUserEmail(req, res, next) {
   if (user) {
     return res.status(409).json({ message: 'user with email already exists' });
   }
+  const lastVerification = await prisma.userVerification.findFirst({
+    where: { email },
+  });
+  const ResendTimeLimit = 2 * 60 * 1000;
+  const isResendTimePassed =
+    lastVerification &&
+    lastVerification.createdAt.getTime() < Date.now() - ResendTimeLimit;
 
+  if (!isResendTimePassed) {
+    return res.status(429).json({
+      message: 'Please wait 2 minutes before requesting new OTP',
+    });
+  }
   next();
 }
 
@@ -119,7 +131,6 @@ async function validateSignUp(req, res, next) {
       });
     }
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({ message: 'Internal server error' });
   }
 }
@@ -164,7 +175,6 @@ async function validateForgotPassword(req, res, next) {
     req.body.username = user.username;
     next();
   } catch (e) {
-    console.log(e);
     return res.status(500).json({ message: 'internal server error', error: e });
   }
 }
@@ -175,7 +185,6 @@ async function validateResetPassword(req, res, next) {
     const { password } = req.body;
     resetPasswordSchema.parse({ password });
     const JWTResponse = verifyJWT(token);
-    console.log({ JWTResponse });
     if (JWTResponse.error) {
       return res.status(401).json({ message: 'link is invalid or expired' });
     }

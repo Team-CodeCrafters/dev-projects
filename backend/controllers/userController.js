@@ -38,8 +38,6 @@ async function sendEmailVerification(req, res) {
       .status(500)
       .json({ message: 'Failed to send verification email' });
   } catch (e) {
-    console.log(e);
-
     return res
       .status(500)
       .json({ message: 'Internal server error', error: e.message });
@@ -186,8 +184,6 @@ async function updateProfile(req, res) {
       user: updatedUser,
     });
   } catch (e) {
-    console.log(e);
-
     return res
       .status(500)
       .json({ message: 'failed to update user profile', error: e.message });

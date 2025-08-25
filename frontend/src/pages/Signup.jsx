@@ -35,10 +35,11 @@ const Signup = () => {
       body: JSON.stringify({ email: signupData.email }),
     });
     if (response.success) {
-      if (response.data.isUserVerified) {
+      if (response.data?.isUserVerified) {
         showPopup('success', response.data.message);
         setCurrentFormStep('create-account');
       } else {
+        localStorage.setItem('last-email-request', Date.now().toString());
         setCurrentFormStep('email-verification');
       }
     } else {
