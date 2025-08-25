@@ -43,13 +43,17 @@ const Signup = () => {
         setCurrentFormStep('email-verification');
       }
     } else {
+      console.log(response.status);
       if (response.status === 409) {
         setSigninData({ identifier: signupData.email });
         localStorage.removeItem('current-form-step');
         navigate('/login');
-        return;
+      } else if (response.status === 429) {
+        setSigninData({ identifier: signupData.email });
+        setCurrentFormStep('email-verification');
+      } else {
+        showPopup('error', response.error);
       }
-      showPopup('error', response.error);
     }
   }
 
