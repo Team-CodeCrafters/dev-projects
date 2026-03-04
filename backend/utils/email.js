@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 import { Resend } from 'resend';
-
+import "dotenv/config"
+console.log("what is process", process.env.RESEND_API_KEY)
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 async function sendResetEmail(recipient, username, resetUrl) {
